@@ -86,10 +86,18 @@ impl Neg for Tuple {
     }
 }
 
+impl Mul<f32> for Tuple {
+    type Output = Tuple;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs, self.w * rhs)
+    }
+}
+
 #[cfg(test)]
 mod tuple_math_tests {
     use super::*;
-    use std::ops::{Add, Sub};
+    use std::ops::{Add, Mul, Sub};
 
     #[test]
     fn add_point_to_a_vector_yields_a_point() {
@@ -129,5 +137,13 @@ mod tuple_math_tests {
         let tuple2 = Tuple::vector(4.0, 1.0, 6.0);
 
         assert_eq!(tuple1 - tuple2, -tuple2);
+    }
+
+    #[test]
+    fn tuple_vector_scalar_multiply() {
+        let tuple1 = Tuple::vector(8.0, 2.0, -12.0);
+        let tuple2 = Tuple::vector(4.0, 1.0, -6.0);
+
+        assert_eq!(tuple1, tuple2 * 2.0);
     }
 }
