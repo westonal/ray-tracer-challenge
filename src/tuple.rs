@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 struct Tuple {
@@ -94,10 +94,18 @@ impl Mul<f32> for Tuple {
     }
 }
 
+impl Div<f32> for Tuple {
+    type Output = Tuple;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        Tuple::new(self.x / rhs, self.y / rhs, self.z / rhs, self.w / rhs)
+    }
+}
+
 #[cfg(test)]
 mod tuple_math_tests {
     use super::*;
-    use std::ops::{Add, Mul, Sub};
+    use std::ops::{Add, Div, Mul, Sub};
 
     #[test]
     fn add_point_to_a_vector_yields_a_point() {
@@ -145,5 +153,13 @@ mod tuple_math_tests {
         let tuple2 = Tuple::vector(4.0, 1.0, -6.0);
 
         assert_eq!(tuple1, tuple2 * 2.0);
+    }
+
+    #[test]
+    fn tuple_vector_divide() {
+        let tuple1 = Tuple::vector(12.0, 3.0, -18.0);
+        let tuple2 = Tuple::vector(4.0, 1.0, -6.0);
+
+        assert_eq!(tuple2, tuple1 / 3.0);
     }
 }
