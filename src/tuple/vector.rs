@@ -22,6 +22,16 @@ impl Vector {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
+    pub fn cross(&self, other: Vector) -> Self {
+        let a = self;
+        let b = other;
+        Self::vector(
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x,
+        )
+    }
+
     pub fn magnitude(&self) -> f32 {
         self.dot(*self).sqrt()
     }
@@ -119,86 +129,94 @@ mod vector_math_tests {
 
     #[test]
     fn sub_vector_from_vector_yields_a_vector() {
-        let tuple1 = Vector::vector(1.0, 5.0, 4.0);
-        let tuple2 = Vector::vector(4.0, 1.0, 6.0);
+        let a = Vector::vector(1.0, 5.0, 4.0);
+        let b = Vector::vector(4.0, 1.0, 6.0);
 
-        assert_eq!(tuple1 - tuple2, Vector::vector(-3.0, 4.0, -2.0));
+        assert_eq!(Vector::vector(-3.0, 4.0, -2.0), a - b);
     }
 
     #[test]
     fn tuple_vector_negation() {
-        let tuple1 = Vector::vector(0.0, 0.0, 0.0);
-        let tuple2 = Vector::vector(4.0, 1.0, 6.0);
+        let zero = Vector::vector(0.0, 0.0, 0.0);
+        let a = Vector::vector(4.0, 1.0, 6.0);
 
-        assert_eq!(tuple1 - tuple2, -tuple2);
+        assert_eq!(zero - a, -a);
     }
 
     #[test]
-    fn tuple_vector_scalar_multiply() {
-        let tuple1 = Vector::vector(8.0, 2.0, -12.0);
-        let tuple2 = Vector::vector(4.0, 1.0, -6.0);
+    fn vector_scalar_multiply() {
+        let a = Vector::vector(4.0, 1.0, -6.0);
 
-        assert_eq!(tuple1, tuple2 * 2.0);
+        assert_eq!(Vector::vector(8.0, 2.0, -12.0), a * 2.0);
     }
 
     #[test]
-    fn tuple_vector_divide() {
-        let tuple1 = Vector::vector(12.0, 3.0, -18.0);
-        let tuple2 = Vector::vector(4.0, 1.0, -6.0);
+    fn vector_divide() {
+        let a = Vector::vector(12.0, 3.0, -18.0);
 
-        assert_eq!(tuple2, tuple1 / 3.0);
+        assert_eq!(Vector::vector(4.0, 1.0, -6.0), a / 3.0);
     }
 
     #[test]
-    fn tuple_magnitude_vector() {
-        let tuple1 = Vector::vector(3.0, 4.0, 0.0);
+    fn vector_magnitude() {
+        let a = Vector::vector(3.0, 4.0, 0.0);
 
-        assert_eq!(5.0, tuple1.magnitude());
+        assert_eq!(5.0, a.magnitude());
     }
 
     #[test]
-    fn tuple_magnitude_vector_2() {
-        let tuple1 = Vector::vector(7.0, 4.0, 4.0);
+    fn vector_magnitude_2() {
+        let a = Vector::vector(7.0, 4.0, 4.0);
 
-        assert_eq!(9.0, tuple1.magnitude());
+        assert_eq!(9.0, a.magnitude());
     }
 
     #[test]
     fn tuple_magnitude_vector_with_w() {
-        let tuple1 = Vector::new(Tuple::new(7.0, 4.0, 0.0, 4.0));
+        let a = Vector::new(Tuple::new(7.0, 4.0, 0.0, 4.0));
 
-        assert_eq!(9.0, tuple1.magnitude());
+        assert_eq!(9.0, a.magnitude());
     }
 
     #[test]
     fn vector_normalize() {
-        let tuple1 = Vector::vector(4.0, 0.0, 0.0);
-        let tuple2 = Vector::vector(1.0, 0.0, 0.0);
+        let a = Vector::vector(4.0, 0.0, 0.0);
 
-        assert_eq!(tuple2, tuple1.normalize());
+        assert_eq!(Vector::vector(1.0, 0.0, 0.0), a.normalize());
     }
 
     #[test]
     fn vector_normalize_2() {
-        let tuple1 = Vector::vector(1.0, 2.0, 3.0);
-        let tuple2 = Vector::vector(0.26726124, 0.5345225, 0.8017837);
+        let a = Vector::vector(1.0, 2.0, 3.0);
 
-        assert_eq!(tuple2, tuple1.normalize());
+        assert_eq!(
+            Vector::vector(0.26726124, 0.5345225, 0.8017837),
+            a.normalize()
+        );
     }
 
     #[test]
     fn vector_dot_product() {
-        let tuple1 = Vector::vector(1.0, 2.0, 3.0);
-        let tuple2 = Vector::vector(2.0, 3.0, 4.0);
+        let a = Vector::vector(1.0, 2.0, 3.0);
+        let b = Vector::vector(2.0, 3.0, 4.0);
 
-        assert_eq!(20.0, tuple1.dot(tuple2));
+        assert_eq!(20.0, a.dot(b));
     }
 
     #[test]
     fn vector_dot_product_includes_w() {
-        let tuple1 = Vector::new(Tuple::new(1.0, 2.0, 3.0, 4.0));
-        let tuple2 = Vector::new(Tuple::new(2.0, 3.0, 4.0, 5.0));
+        let a = Vector::new(Tuple::new(1.0, 2.0, 3.0, 4.0));
+        let b = Vector::new(Tuple::new(2.0, 3.0, 4.0, 5.0));
 
-        assert_eq!(40.0, tuple1.dot(tuple2));
+        assert_eq!(40.0, a.dot(b));
+    }
+
+    #[test]
+    fn vector_cross_product() {
+        let a = Vector::vector(1.0, 2.0, 3.0);
+        let b = Vector::vector(2.0, 3.0, 4.0);
+
+        assert_eq!(Vector::vector(-1.0, 2.0, -1.0), a.cross(b));
+        assert_eq!(Vector::vector(1.0, -2.0, 1.0), b.cross(a));
     }
 }
