@@ -21,6 +21,10 @@ impl Vector {
     pub fn magnitude(&self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
+
+    pub fn normalize(&self) -> Self {
+        *self / self.magnitude()
+    }
 }
 
 impl From<(f32, f32, f32)> for Vector {
@@ -63,22 +67,6 @@ mod vector_into_tests {
     }
 }
 
-impl Mul<f32> for Tuple {
-    type Output = Tuple;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs, self.w * rhs)
-    }
-}
-
-impl Div<f32> for Tuple {
-    type Output = Tuple;
-
-    fn div(self, rhs: f32) -> Self::Output {
-        Tuple::new(self.x / rhs, self.y / rhs, self.z / rhs, self.w / rhs)
-    }
-}
-
 impl Mul<f32> for Vector {
     type Output = Vector;
 
@@ -96,9 +84,12 @@ impl Div<f32> for Vector {
     type Output = Vector;
 
     fn div(self, rhs: f32) -> Self::Output {
-        Self::Output {
-            tuple: self.tuple / rhs,
-        }
+        Vector::new(Tuple::new(
+            self.x / rhs,
+            self.y / rhs,
+            self.z / rhs,
+            self.w / rhs,
+        ))
     }
 }
 
@@ -129,6 +120,7 @@ mod vector_math_tests {
 
         assert_eq!(tuple1 - tuple2, Vector::vector(-3.0, 4.0, -2.0));
     }
+
     #[test]
     fn tuple_vector_negation() {
         let tuple1 = Vector::vector(0.0, 0.0, 0.0);
@@ -172,5 +164,21 @@ mod vector_math_tests {
         let tuple1 = Vector::new(Tuple::new(7.0, 4.0, 0.0, 4.0));
 
         assert_eq!(9.0, tuple1.magnitude());
+    }
+
+    #[test]
+    fn vector_normalize() {
+        let tuple1 = Vector::vector(4.0, 0.0, 0.0);
+        let tuple2 = Vector::vector(1.0, 0.0, 0.0);
+
+        assert_eq!(tuple2, tuple1.normalize());
+    }
+
+    #[test]
+    fn vector_normalize_2() {
+        let tuple1 = Vector::vector(1.0, 2.0, 3.0);
+        let tuple2 = Vector::vector(0.26726124, 0.5345225, 0.8017837);
+
+        assert_eq!(tuple2, tuple1.normalize());
     }
 }
