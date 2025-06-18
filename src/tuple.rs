@@ -10,6 +10,12 @@ pub struct Tuple {
 }
 
 impl Tuple {
+    pub(crate) fn magnitude(&self) -> f32 {
+        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
+    }
+}
+
+impl Tuple {
     pub(crate) fn point(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z, w: 1.0 }
     }
@@ -188,5 +194,26 @@ mod tuple_math_tests {
         let tuple2 = Tuple::vector(4.0, 1.0, -6.0);
 
         assert_eq!(tuple2, tuple1 / 3.0);
+    }
+
+    #[test]
+    fn tuple_magnitude_vector() {
+        let tuple1 = Tuple::vector(3.0, 4.0, 0.0);
+
+        assert_eq!(5.0, tuple1.magnitude());
+    }
+
+    #[test]
+    fn tuple_magnitude_vector_2() {
+        let tuple1 = Tuple::vector(7.0, 4.0, 4.0);
+
+        assert_eq!(9.0, tuple1.magnitude());
+    }
+
+    #[test]
+    fn tuple_magnitude_pure_tuple() {
+        let tuple1 = Tuple::new(7.0, 4.0, 0.0, 4.0);
+
+        assert_eq!(9.0, tuple1.magnitude());
     }
 }
