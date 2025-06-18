@@ -1,7 +1,8 @@
+use std::fmt::Formatter;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-struct Tuple {
+pub struct Tuple {
     x: f32,
     y: f32,
     z: f32,
@@ -49,6 +50,33 @@ mod tuple_creation_tests {
         assert_eq!(tuple.y, 3.0);
         assert_eq!(tuple.z, 4.0);
         assert_eq!(tuple.w, 1.0);
+    }
+}
+
+impl std::fmt::Display for Tuple {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!(
+            "({}, {}, {}, {})",
+            self.x, self.y, self.z, self.w
+        ))
+    }
+}
+
+#[cfg(test)]
+mod tuple_display_tests {
+    use super::*;
+    #[test]
+    fn tuple_display_vector() {
+        let vector = Tuple::vector(12.0, 3.0, -18.7);
+
+        assert_eq!("(12, 3, -18.7, 0)", format!("{vector}"));
+    }
+
+    #[test]
+    fn tuple_display_point() {
+        let vector = Tuple::point(8.0, 9.5, -4.0);
+
+        assert_eq!("(8, 9.5, -4, 1)", format!("{vector}"));
     }
 }
 
@@ -105,7 +133,6 @@ impl Div<f32> for Tuple {
 #[cfg(test)]
 mod tuple_math_tests {
     use super::*;
-    
 
     #[test]
     fn add_point_to_a_vector_yields_a_point() {
