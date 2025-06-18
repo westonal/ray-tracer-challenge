@@ -4,7 +4,6 @@ mod vector;
 use crate::tuple::point::Point;
 use crate::tuple::vector::Vector;
 use std::fmt::Formatter;
-use std::ops::{Add, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

@@ -17,7 +17,7 @@ impl Vector {
             tuple: Tuple::new(x, y, z, 0.0),
         }
     }
-    
+
     pub fn magnitude(&self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
@@ -102,7 +102,6 @@ impl Div<f32> for Vector {
     }
 }
 
-
 impl Sub for Vector {
     type Output = Vector;
 
@@ -119,12 +118,9 @@ impl Neg for Vector {
     }
 }
 
-
 #[cfg(test)]
 mod vector_math_tests {
     use super::*;
-
-
 
     #[test]
     fn sub_vector_from_vector_yields_a_vector() {
@@ -167,6 +163,13 @@ mod vector_math_tests {
     #[test]
     fn tuple_magnitude_vector_2() {
         let tuple1 = Vector::vector(7.0, 4.0, 4.0);
+
+        assert_eq!(9.0, tuple1.magnitude());
+    }
+
+    #[test]
+    fn tuple_magnitude_vector_with_w() {
+        let tuple1 = Vector::new(Tuple::new(7.0, 4.0, 0.0, 4.0));
 
         assert_eq!(9.0, tuple1.magnitude());
     }
