@@ -1,6 +1,6 @@
 use crate::tuple::Tuple;
 use std::fmt::Formatter;
-use std::ops::{Deref, Div, Mul};
+use std::ops::{Deref, Div, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Vector {
@@ -8,14 +8,18 @@ pub struct Vector {
 }
 
 impl Vector {
-    pub(crate) fn new(tuple: Tuple) -> Vector {
+    pub fn new(tuple: Tuple) -> Vector {
         Self { tuple }
     }
 
-    pub(crate) fn vector(x: f32, y: f32, z: f32) -> Vector {
+    pub fn vector(x: f32, y: f32, z: f32) -> Vector {
         Self {
             tuple: Tuple::new(x, y, z, 0.0),
         }
+    }
+    
+    pub fn magnitude(&self) -> f32 {
+        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 }
 
@@ -95,5 +99,75 @@ impl Div<f32> for Vector {
         Self::Output {
             tuple: self.tuple / rhs,
         }
+    }
+}
+
+
+impl Sub for Vector {
+    type Output = Vector;
+
+    fn sub(self, rhs: Vector) -> Self::Output {
+        Tuple::vector(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Neg for Vector {
+    type Output = Vector;
+
+    fn neg(self) -> Self::Output {
+        Tuple::vector(-self.x, -self.y, -self.z)
+    }
+}
+
+
+#[cfg(test)]
+mod vector_math_tests {
+    use super::*;
+
+
+
+    #[test]
+    fn sub_vector_from_vector_yields_a_vector() {
+        let tuple1 = Vector::vector(1.0, 5.0, 4.0);
+        let tuple2 = Vector::vector(4.0, 1.0, 6.0);
+
+        assert_eq!(tuple1 - tuple2, Vector::vector(-3.0, 4.0, -2.0));
+    }
+    #[test]
+    fn tuple_vector_negation() {
+        let tuple1 = Vector::vector(0.0, 0.0, 0.0);
+        let tuple2 = Vector::vector(4.0, 1.0, 6.0);
+
+        assert_eq!(tuple1 - tuple2, -tuple2);
+    }
+
+    #[test]
+    fn tuple_vector_scalar_multiply() {
+        let tuple1 = Vector::vector(8.0, 2.0, -12.0);
+        let tuple2 = Vector::vector(4.0, 1.0, -6.0);
+
+        assert_eq!(tuple1, tuple2 * 2.0);
+    }
+
+    #[test]
+    fn tuple_vector_divide() {
+        let tuple1 = Vector::vector(12.0, 3.0, -18.0);
+        let tuple2 = Vector::vector(4.0, 1.0, -6.0);
+
+        assert_eq!(tuple2, tuple1 / 3.0);
+    }
+
+    #[test]
+    fn tuple_magnitude_vector() {
+        let tuple1 = Vector::vector(3.0, 4.0, 0.0);
+
+        assert_eq!(5.0, tuple1.magnitude());
+    }
+
+    #[test]
+    fn tuple_magnitude_vector_2() {
+        let tuple1 = Vector::vector(7.0, 4.0, 4.0);
+
+        assert_eq!(9.0, tuple1.magnitude());
     }
 }
