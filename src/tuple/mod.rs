@@ -1,5 +1,10 @@
+mod point;
+mod vector;
+
+use crate::tuple::point::Point;
+use crate::tuple::vector::Vector;
 use std::fmt::Formatter;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
@@ -16,11 +21,11 @@ impl Tuple {
 }
 
 impl Tuple {
-    pub(crate) fn point(x: f32, y: f32, z: f32) -> Self {
-        Self { x, y, z, w: 1.0 }
+    pub(crate) fn point(x: f32, y: f32, z: f32) -> Point {
+        Point::point(x, y, z)
     }
-    pub(crate) fn vector(x: f32, y: f32, z: f32) -> Self {
-        Self { x, y, z, w: 0.0 }
+    pub(crate) fn vector(x: f32, y: f32, z: f32) -> Vector {
+        Vector::vector(x, y, z)
     }
     pub(crate) fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
         Self { x, y, z, w }
@@ -42,7 +47,7 @@ mod tuple_creation_tests {
 
     #[test]
     fn vector_creation() {
-        let tuple = Tuple::vector(2.0, 3.0, 4.0);
+        let tuple: Tuple = *Tuple::vector(2.0, 3.0, 4.0);
         assert_eq!(tuple.x, 2.0);
         assert_eq!(tuple.y, 3.0);
         assert_eq!(tuple.z, 4.0);
@@ -72,17 +77,10 @@ impl std::fmt::Display for Tuple {
 mod tuple_display_tests {
     use super::*;
     #[test]
-    fn tuple_display_vector() {
-        let vector = Tuple::vector(12.0, 3.0, -18.7);
+    fn tuple_display() {
+        let vector = Tuple::new(12.0, 3.0, -18.7, 5.0);
 
-        assert_eq!("(12, 3, -18.7, 0)", format!("{vector}"));
-    }
-
-    #[test]
-    fn tuple_display_point() {
-        let vector = Tuple::point(8.0, 9.5, -4.0);
-
-        assert_eq!("(8, 9.5, -4, 1)", format!("{vector}"));
+        assert_eq!("(12, 3, -18.7, 5)", format!("{vector}"));
     }
 }
 
@@ -99,40 +97,43 @@ impl Add for Tuple {
     }
 }
 
-impl Sub for Tuple {
-    type Output = Tuple;
+impl Add<Vector> for Point {
+    type Output = Point;
+
+    fn add(self, rhs: Vector) -> Self::Output {
+        Tuple::point(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+
+impl Sub for Point {
+    type Output = Vector;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Tuple::new(
-            self.x - rhs.x,
-            self.y - rhs.y,
-            self.z - rhs.z,
-            self.w - rhs.w,
-        )
+        Tuple::vector(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
-impl Neg for Tuple {
-    type Output = Tuple;
+impl Sub<Vector> for Point {
+    type Output = Point;
+
+    fn sub(self, rhs: Vector) -> Self::Output {
+        Tuple::point(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Sub for Vector {
+    type Output = Vector;
+
+    fn sub(self, rhs: Vector) -> Self::Output {
+        Tuple::vector(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Neg for Vector {
+    type Output = Vector;
 
     fn neg(self) -> Self::Output {
-        Tuple::new(-self.x, -self.y, -self.z, -self.w)
-    }
-}
-
-impl Mul<f32> for Tuple {
-    type Output = Tuple;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs, self.w * rhs)
-    }
-}
-
-impl Div<f32> for Tuple {
-    type Output = Tuple;
-
-    fn div(self, rhs: f32) -> Self::Output {
-        Tuple::new(self.x / rhs, self.y / rhs, self.z / rhs, self.w / rhs)
+        Tuple::vector(-self.x, -self.y, -self.z)
     }
 }
 
