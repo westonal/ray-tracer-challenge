@@ -18,8 +18,12 @@ impl Vector {
         }
     }
 
+    pub fn dot(&self, other: Vector) -> f32 {
+        self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
+    }
+
     pub fn magnitude(&self) -> f32 {
-        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
+        self.dot(*self).sqrt()
     }
 
     pub fn normalize(&self) -> Self {
@@ -180,5 +184,21 @@ mod vector_math_tests {
         let tuple2 = Vector::vector(0.26726124, 0.5345225, 0.8017837);
 
         assert_eq!(tuple2, tuple1.normalize());
+    }
+
+    #[test]
+    fn vector_dot_product() {
+        let tuple1 = Vector::vector(1.0, 2.0, 3.0);
+        let tuple2 = Vector::vector(2.0, 3.0, 4.0);
+
+        assert_eq!(20.0, tuple1.dot(tuple2));
+    }
+
+    #[test]
+    fn vector_dot_product_includes_w() {
+        let tuple1 = Vector::new(Tuple::new(1.0, 2.0, 3.0, 4.0));
+        let tuple2 = Vector::new(Tuple::new(2.0, 3.0, 4.0, 5.0));
+
+        assert_eq!(40.0, tuple1.dot(tuple2));
     }
 }
