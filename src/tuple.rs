@@ -105,7 +105,7 @@ impl Div<f32> for Tuple {
 #[cfg(test)]
 mod tuple_math_tests {
     use super::*;
-    use std::ops::{Add, Div, Mul, Sub};
+    
 
     #[test]
     fn add_point_to_a_vector_yields_a_point() {
