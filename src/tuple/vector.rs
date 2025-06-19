@@ -1,6 +1,6 @@
 use crate::tuple::Tuple;
 use std::fmt::Formatter;
-use std::ops::{Deref, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Deref, Div, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Vector {
@@ -104,6 +104,22 @@ impl Div<f32> for Vector {
     }
 }
 
+impl Add for Vector {
+    type Output = Vector;
+
+    fn add(self, rhs: Vector) -> Self::Output {
+        Self {
+            tuple: self.tuple + rhs.tuple,
+        }
+    }
+}
+
+impl AddAssign for Vector {
+    fn add_assign(&mut self, rhs: Self) {
+        self.tuple += rhs.tuple;
+    }
+}
+
 impl Sub for Vector {
     type Output = Vector;
 
@@ -125,6 +141,24 @@ impl Neg for Vector {
 #[cfg(test)]
 mod vector_math_tests {
     use super::*;
+    
+
+    #[test]
+    fn add_vector_from_vector_yields_a_vector() {
+        let a = Vector::vector(1.0, 5.0, 4.0);
+        let b = Vector::vector(4.0, 1.0, 6.0);
+
+        assert_eq!(Vector::vector(5.0, 6.0, 10.0), a + b);
+    }
+
+    #[test]
+    fn add_assign_vector() {
+        let mut a = Vector::vector(1.0, 5.0, 4.0);
+        let b = Vector::vector(4.0, 1.0, 6.0);
+        a += b;
+
+        assert_eq!(Vector::vector(5.0, 6.0, 10.0), a);
+    }
 
     #[test]
     fn sub_vector_from_vector_yields_a_vector() {

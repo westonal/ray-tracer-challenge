@@ -5,14 +5,14 @@ mod vector;
 use crate::tuple::point::Point;
 use crate::tuple::vector::Vector;
 use std::fmt::Formatter;
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, AddAssign, Mul, Sub};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
 }
 
 impl Tuple {
@@ -103,6 +103,15 @@ impl Add for Tuple {
     }
 }
 
+impl AddAssign for Tuple {
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+        self.w += rhs.w;
+    }
+}
+
 impl Sub for Tuple {
     type Output = Tuple;
 
@@ -126,8 +135,8 @@ impl Mul<f32> for Tuple {
 
 #[cfg(test)]
 mod tuple_math_tests {
-
     use super::*;
+    
 
     #[test]
     fn tuple_add() {
@@ -135,6 +144,15 @@ mod tuple_math_tests {
         let b = Tuple::new(1.7, 0.3, 0.35, 1.2);
 
         assert_eq!(Tuple::new(2.6, 0.8, 1.1, 2.2), a + b)
+    }
+
+    #[test]
+    fn tuple_add_assign() {
+        let mut a = Tuple::new(0.9, 0.5, 0.75, 1.0);
+        let b = Tuple::new(1.7, 0.3, 0.35, 1.2);
+        a += b;
+
+        assert_eq!(Tuple::new(2.6, 0.8, 1.1, 2.2), a)
     }
 
     #[test]
