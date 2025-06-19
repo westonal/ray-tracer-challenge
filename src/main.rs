@@ -27,5 +27,4 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
         canvas.write_color(point.x as u32, point.y as u32, color);
         speed = speed + acceleration;
     }
-    canvas.save_png("out.png");
 }
