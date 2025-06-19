@@ -85,12 +85,9 @@ impl Mul<f32> for Vector {
     type Output = Vector;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        Vector::new(Tuple::new(
-            self.x * rhs,
-            self.y * rhs,
-            self.z * rhs,
-            self.w * rhs,
-        ))
+        Self {
+            tuple: self.tuple * rhs,
+        }
     }
 }
 
@@ -111,7 +108,9 @@ impl Sub for Vector {
     type Output = Vector;
 
     fn sub(self, rhs: Vector) -> Self::Output {
-        Tuple::vector(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        Self {
+            tuple: self.tuple - rhs.tuple,
+        }
     }
 }
 
