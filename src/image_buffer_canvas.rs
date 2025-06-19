@@ -10,6 +10,14 @@ pub struct ImageBufferCanvas {
 }
 
 impl Canvas<Color> for ImageBufferCanvas {
+    fn width(&self) -> u32 {
+        self.width
+    }
+
+    fn height(&self) -> u32 {
+        self.height
+    }
+
     fn save_png<Q>(&self, path: Q)
     where
         Q: AsRef<Path>,

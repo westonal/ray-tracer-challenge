@@ -1,6 +1,9 @@
 use std::path::Path;
 
 pub trait Canvas<C> {
+    fn width(&self) -> u32;
+    fn height(&self) -> u32;
+
     fn save_png<Q>(&self, path: Q)
     where
         Q: AsRef<Path>;
