@@ -1,6 +1,6 @@
-mod color;
-mod point;
-mod vector;
+pub mod color;
+pub mod point;
+pub mod vector;
 
 use crate::tuple::point::Point;
 use crate::tuple::vector::Vector;
@@ -136,7 +136,6 @@ impl Mul<f32> for Tuple {
 #[cfg(test)]
 mod tuple_math_tests {
     use super::*;
-    
 
     #[test]
     fn tuple_add() {

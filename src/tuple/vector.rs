@@ -141,7 +141,6 @@ impl Neg for Vector {
 #[cfg(test)]
 mod vector_math_tests {
     use super::*;
-    
 
     #[test]
     fn add_vector_from_vector_yields_a_vector() {
