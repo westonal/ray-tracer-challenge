@@ -1,15 +1,13 @@
 use crate::canvas::Canvas;
 use crate::image_buffer_canvas::ImageBufferCanvas;
-use crate::tuple::color::Color;
-use crate::tuple::Tuple;
+use math::tuple::Tuple;
+use math::tuple::color::Color;
 
 mod canvas;
 mod image_buffer_canvas;
-mod matrix;
-mod tuple;
 
 fn main() {
-    let mut canvas = ImageBufferCanvas::new(300, 200);
+    let mut canvas = ImageBufferCanvas::new(200, 200);
     fill_all_with_gradient(&mut canvas);
     example(&mut canvas);
     canvas.save_png("out.png");

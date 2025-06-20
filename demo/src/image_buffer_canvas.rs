@@ -1,6 +1,6 @@
 use crate::canvas::Canvas;
-use crate::tuple::color::Color;
 use image::{ImageBuffer, ImageFormat, Rgba};
+use math::tuple::color::Color;
 use std::path::Path;
 
 pub struct ImageBufferCanvas {

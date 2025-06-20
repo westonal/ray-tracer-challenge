@@ -27,13 +27,13 @@ impl Tuple {
 }
 
 impl Tuple {
-    pub(crate) fn point(x: f32, y: f32, z: f32) -> Point {
+    pub fn point(x: f32, y: f32, z: f32) -> Point {
         Point::point(x, y, z)
     }
-    pub(crate) fn vector(x: f32, y: f32, z: f32) -> Vector {
+    pub fn vector(x: f32, y: f32, z: f32) -> Vector {
         Vector::vector(x, y, z)
     }
-    pub(crate) fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
+    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
         Self { x, y, z, w }
     }
 }

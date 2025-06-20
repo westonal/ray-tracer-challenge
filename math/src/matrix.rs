@@ -97,7 +97,6 @@ impl Mul<Tuple> for Matrix4x4 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tuple::Tuple;
 
     #[test]
     fn identity() {

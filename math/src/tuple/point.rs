@@ -1,5 +1,5 @@
-use crate::tuple::vector::Vector;
 use crate::tuple::Tuple;
+use crate::tuple::vector::Vector;
 use std::fmt::Formatter;
 use std::ops::{Add, Deref, Sub};
 
@@ -9,7 +9,7 @@ pub struct Point {
 }
 
 impl Point {
-    pub(crate) fn point(x: f32, y: f32, z: f32) -> Point {
+    pub fn point(x: f32, y: f32, z: f32) -> Point {
         Self {
             tuple: Tuple::new(x, y, z, 1.0),
         }
