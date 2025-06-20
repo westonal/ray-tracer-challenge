@@ -5,6 +5,7 @@ use crate::tuple::Tuple;
 
 mod canvas;
 mod image_buffer_canvas;
+mod matrix;
 mod tuple;
 
 fn main() {
@@ -17,9 +18,13 @@ fn main() {
 fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
     for y in 0..canvas.height() {
         for x in 0..canvas.width() {
-            let color = ((x as f32) / (canvas.width() as f32),
-                         (y as f32) / (canvas.height() as f32),
-                         0.0, 1.0).into();
+            let color = (
+                (x as f32) / (canvas.width() as f32),
+                (y as f32) / (canvas.height() as f32),
+                0.0,
+                1.0,
+            )
+                .into();
             canvas.write_color(x, y, color);
         }
     }
