@@ -11,7 +11,7 @@ pub struct Point {
 impl Point {
     pub fn point(x: f32, y: f32, z: f32) -> Point {
         Self {
-            tuple: Tuple::new(x, y, z, 1.0),
+            tuple: Tuple::new(x, y, z, 1.),
         }
     }
 }
@@ -45,7 +45,7 @@ mod point_display_tests {
 
     #[test]
     fn tuple_display_point() {
-        let point = Tuple::point(8.0, 9.5, -4.0);
+        let point = Tuple::point(8., 9.5, -4.);
 
         assert_eq!("Pt(8, 9.5, -4, 1)", format!("{point}"));
     }
@@ -56,7 +56,7 @@ mod point_into_tests {
     use super::*;
     #[test]
     fn tuple_3_into_vector() {
-        assert_eq!(Point::point(12.0, 3.0, -18.7), (12.0, 3.0, -18.7).into());
+        assert_eq!(Point::point(12., 3., -18.7), (12., 3., -18.7).into());
     }
 }
 
@@ -90,25 +90,25 @@ mod point_math_tests {
 
     #[test]
     fn add_point_to_a_vector_yields_a_point() {
-        let tuple1 = Point::point(1.0, 2.0, 3.0);
-        let tuple2 = Tuple::vector(4.0, 5.0, 6.0);
+        let tuple1 = Point::point(1., 2., 3.);
+        let tuple2 = Tuple::vector(4., 5., 6.);
 
-        assert_eq!(tuple1 + tuple2, Point::point(5.0, 7.0, 9.0));
+        assert_eq!(tuple1 + tuple2, Point::point(5., 7., 9.));
     }
 
     #[test]
     fn sub_point_from_point_yields_a_vector() {
-        let tuple1 = Point::point(1.0, 5.0, 4.0);
-        let tuple2 = Point::point(4.0, 1.0, 6.0);
+        let tuple1 = Point::point(1., 5., 4.);
+        let tuple2 = Point::point(4., 1., 6.);
 
-        assert_eq!(tuple1 - tuple2, Tuple::vector(-3.0, 4.0, -2.0));
+        assert_eq!(tuple1 - tuple2, Tuple::vector(-3., 4., -2.));
     }
 
     #[test]
     fn sub_vector_from_point_yields_a_point() {
-        let tuple1 = Point::point(1.0, 5.0, 4.0);
-        let tuple2 = Tuple::vector(4.0, 1.0, 6.0);
+        let tuple1 = Point::point(1., 5., 4.);
+        let tuple2 = Tuple::vector(4., 1., 6.);
 
-        assert_eq!(tuple1 - tuple2, Point::point(-3.0, 4.0, -2.0));
+        assert_eq!(tuple1 - tuple2, Point::point(-3., 4., -2.));
     }
 }

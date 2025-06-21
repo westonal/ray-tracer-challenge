@@ -93,15 +93,15 @@ mod matrix_3x3_tests {
     #[test]
     fn identity() {
         let i = Matrix3x3::identity();
-        assert_eq!(i[0][0], 1.0);
-        assert_eq!(i[1][1], 1.0);
-        assert_eq!(i[2][2], 1.0);
-        assert_eq!(i[0][1], 0.0);
-        assert_eq!(i[0][2], 0.0);
-        assert_eq!(i[1][0], 0.0);
-        assert_eq!(i[1][2], 0.0);
-        assert_eq!(i[2][0], 0.0);
-        assert_eq!(i[2][1], 0.0);
+        assert_eq!(i[0][0], 1.);
+        assert_eq!(i[1][1], 1.);
+        assert_eq!(i[2][2], 1.);
+        assert_eq!(i[0][1], 0.);
+        assert_eq!(i[0][2], 0.);
+        assert_eq!(i[1][0], 0.);
+        assert_eq!(i[1][2], 0.);
+        assert_eq!(i[2][0], 0.);
+        assert_eq!(i[2][1], 0.);
     }
 
     #[test]
@@ -127,28 +127,28 @@ mod matrix_3x3_tests {
 
     #[test]
     fn multiply_matrix() {
-        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [5.0, 6.0, 7.0], [9.0, 8.0, 7.0]]);
-        let b = Matrix3x3::new([[-2.0, 1.0, 2.0], [3.0, 2.0, 1.0], [3.0, 3.0, 6.0]]);
+        let a = Matrix3x3::new([[1., 2., 3.], [5., 6., 7.], [9., 8., 7.]]);
+        let b = Matrix3x3::new([[-2., 1., 2.], [3., 2., 1.], [3., 3., 6.]]);
 
         assert_eq!(
-            Matrix3x3::new([[13.0, 14.0, 22.0], [29.0, 38.0, 58.0], [27.0, 46.0, 68.0]]),
+            Matrix3x3::new([[13., 14., 22.], [29., 38., 58.], [27., 46., 68.]]),
             a * b
         );
     }
 
     #[test]
     fn multiply_matrix_by_identity() {
-        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [5.0, 6.0, 7.0], [9.0, 8.0, 7.0]]);
+        let a = Matrix3x3::new([[1., 2., 3.], [5., 6., 7.], [9., 8., 7.]]);
 
         assert_eq!(a, a * Matrix3x3::identity());
     }
 
     #[test]
     fn transpose_matrix() {
-        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]);
+        let a = Matrix3x3::new([[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
 
         assert_eq!(
-            Matrix3x3::new([[1.0, 4.0, 7.0], [2.0, 5.0, 8.0], [3.0, 6.0, 9.0],]),
+            Matrix3x3::new([[1., 4., 7.], [2., 5., 8.], [3., 6., 9.],]),
             a.transpose()
         );
     }

@@ -3,7 +3,7 @@ mod inversion;
 
 use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};
-use std::ops::{Deref, DerefMut, Mul};
+use std::ops::{Deref, DerefMut, Div, Mul};
 
 ///
 /// Row-major 4x4 matrix
@@ -89,6 +89,34 @@ impl Mul for Matrix4x4 {
     }
 }
 
+impl Mul<f32> for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        let mut result = Matrix4x4::empty();
+        for r in 0..4 {
+            for c in 0..4 {
+                result[r][c] = self[r][c] * rhs;
+            }
+        }
+        result
+    }
+}
+
+impl Div<f32> for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        let mut result = Matrix4x4::empty();
+        for r in 0..4 {
+            for c in 0..4 {
+                result[r][c] = self[r][c] / rhs;
+            }
+        }
+        result
+    }
+}
+
 impl Mul<Tuple> for Matrix4x4 {
     type Output = Tuple;
 
@@ -109,22 +137,22 @@ mod tests {
     #[test]
     fn identity() {
         let i = Matrix4x4::identity();
-        assert_eq!(i[0][0], 1.0);
-        assert_eq!(i[1][1], 1.0);
-        assert_eq!(i[2][2], 1.0);
-        assert_eq!(i[3][3], 1.0);
-        assert_eq!(i[0][1], 0.0);
-        assert_eq!(i[0][2], 0.0);
-        assert_eq!(i[0][3], 0.0);
-        assert_eq!(i[1][0], 0.0);
-        assert_eq!(i[1][2], 0.0);
-        assert_eq!(i[1][3], 0.0);
-        assert_eq!(i[2][0], 0.0);
-        assert_eq!(i[2][1], 0.0);
-        assert_eq!(i[2][3], 0.0);
-        assert_eq!(i[3][0], 0.0);
-        assert_eq!(i[3][1], 0.0);
-        assert_eq!(i[3][2], 0.0);
+        assert_eq!(i[0][0], 1.);
+        assert_eq!(i[1][1], 1.);
+        assert_eq!(i[2][2], 1.);
+        assert_eq!(i[3][3], 1.);
+        assert_eq!(i[0][1], 0.);
+        assert_eq!(i[0][2], 0.);
+        assert_eq!(i[0][3], 0.);
+        assert_eq!(i[1][0], 0.);
+        assert_eq!(i[1][2], 0.);
+        assert_eq!(i[1][3], 0.);
+        assert_eq!(i[2][0], 0.);
+        assert_eq!(i[2][1], 0.);
+        assert_eq!(i[2][3], 0.);
+        assert_eq!(i[3][0], 0.);
+        assert_eq!(i[3][1], 0.);
+        assert_eq!(i[3][2], 0.);
     }
 
     #[test]
@@ -154,36 +182,76 @@ mod tests {
     #[test]
     fn multiply_matrix() {
         let a = Matrix4x4::new([
-            [1.0, 2.0, 3.0, 4.0],
-            [5.0, 6.0, 7.0, 8.0],
-            [9.0, 8.0, 7.0, 6.0],
-            [5.0, 4.0, 3.0, 2.0],
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 8., 7., 6.],
+            [5., 4., 3., 2.],
         ]);
         let b = Matrix4x4::new([
-            [-2.0, 1.0, 2.0, 3.0],
-            [3.0, 2.0, 1.0, -1.0],
-            [4.0, 3.0, 6.0, 5.0],
-            [1.0, 2.0, 7.0, 8.0],
+            [-2., 1., 2., 3.],
+            [3., 2., 1., -1.],
+            [4., 3., 6., 5.],
+            [1., 2., 7., 8.],
         ]);
 
         assert_eq!(
             Matrix4x4::new([
-                [20.0, 22.0, 50.0, 48.0],
-                [44.0, 54.0, 114.0, 108.0],
-                [40.0, 58.0, 110.0, 102.0],
-                [16.0, 26.0, 46.0, 42.0]
+                [20., 22., 50., 48.],
+                [44., 54., 114., 108.],
+                [40., 58., 110., 102.],
+                [16., 26., 46., 42.]
             ]),
             a * b
         );
     }
 
     #[test]
+    fn multiply_matrix_by_scalar() {
+        let a = Matrix4x4::new([
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 8., 7., 6.],
+            [5., 4., 3., 2.],
+        ]);
+
+        assert_eq!(
+            Matrix4x4::new([
+                [5., 10., 15., 20.],
+                [25., 30., 35., 40.],
+                [45., 40., 35., 30.],
+                [25., 20., 15., 10.]
+            ]),
+            a * 5.
+        );
+    }
+
+    #[test]
+    fn divide_matrix_by_scalar() {
+        let a = Matrix4x4::new([
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 8., 7., 6.],
+            [5., 4., 3., 2.],
+        ]);
+
+        assert_eq!(
+            Matrix4x4::new([
+                [0.2, 0.4, 0.6, 0.8],
+                [1., 1.2, 1.4, 1.6],
+                [1.8, 1.6, 1.4, 1.2],
+                [1., 0.8, 0.6, 0.4]
+            ]),
+            a / 5.
+        );
+    }
+
+    #[test]
     fn multiply_matrix_by_identity() {
         let a = Matrix4x4::new([
-            [1.0, 2.0, 3.0, 4.0],
-            [5.0, 6.0, 7.0, 8.0],
-            [9.0, 8.0, 7.0, 6.0],
-            [5.0, 4.0, 3.0, 2.0],
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 8., 7., 6.],
+            [5., 4., 3., 2.],
         ]);
 
         assert_eq!(a, a * Matrix4x4::identity());
@@ -192,33 +260,33 @@ mod tests {
     #[test]
     fn multiply_matrix_by_tuple() {
         let a = Matrix4x4::new([
-            [1.0, 2.0, 3.0, 4.0],
-            [2.0, 4.0, 4.0, 2.0],
-            [8.0, 6.0, 4.0, 1.0],
-            [0.0, 0.0, 0.0, 1.0],
+            [1., 2., 3., 4.],
+            [2., 4., 4., 2.],
+            [8., 6., 4., 1.],
+            [0., 0., 0., 1.],
         ]);
 
         assert_eq!(
-            Tuple::new(18.0, 24.0, 33.0, 1.0),
-            a * Tuple::new(1.0, 2.0, 3.0, 1.0)
+            Tuple::new(18., 24., 33., 1.),
+            a * Tuple::new(1., 2., 3., 1.)
         );
     }
 
     #[test]
     fn transpose_matrix() {
         let a = Matrix4x4::new([
-            [1.0, 2.0, 3.0, 4.0],
-            [5.0, 6.0, 7.0, 8.0],
-            [9.0, 8.0, 7.0, 6.0],
-            [5.0, 4.0, 3.0, 2.0],
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 8., 7., 6.],
+            [5., 4., 3., 2.],
         ]);
 
         assert_eq!(
             Matrix4x4::new([
-                [1.0, 5.0, 9.0, 5.0],
-                [2.0, 6.0, 8.0, 4.0],
-                [3.0, 7.0, 7.0, 3.0],
-                [4.0, 8.0, 6.0, 2.0],
+                [1., 5., 9., 5.],
+                [2., 6., 8., 4.],
+                [3., 7., 7., 3.],
+                [4., 8., 6., 2.],
             ]),
             a.transpose()
         );

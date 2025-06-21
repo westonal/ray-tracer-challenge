@@ -14,7 +14,7 @@ impl Vector {
 
     pub fn vector(x: f32, y: f32, z: f32) -> Vector {
         Self {
-            tuple: Tuple::new(x, y, z, 0.0),
+            tuple: Tuple::new(x, y, z, 0.),
         }
     }
 
@@ -66,7 +66,7 @@ mod vector_display_tests {
     use super::*;
     #[test]
     fn tuple_display_vector() {
-        let vector = Tuple::vector(12.0, 3.0, -18.7);
+        let vector = Tuple::vector(12., 3., -18.7);
 
         assert_eq!("V(12, 3, -18.7, 0)", format!("{vector}"));
     }
@@ -77,7 +77,7 @@ mod vector_into_tests {
     use super::*;
     #[test]
     fn tuple_3_into_vector() {
-        assert_eq!(Vector::vector(12.0, 3.0, -18.7), (12.0, 3.0, -18.7).into());
+        assert_eq!(Vector::vector(12., 3., -18.7), (12., 3., -18.7).into());
     }
 }
 
@@ -144,82 +144,82 @@ mod vector_math_tests {
 
     #[test]
     fn add_vector_from_vector_yields_a_vector() {
-        let a = Vector::vector(1.0, 5.0, 4.0);
-        let b = Vector::vector(4.0, 1.0, 6.0);
+        let a = Vector::vector(1., 5., 4.);
+        let b = Vector::vector(4., 1., 6.);
 
-        assert_eq!(Vector::vector(5.0, 6.0, 10.0), a + b);
+        assert_eq!(Vector::vector(5., 6., 10.), a + b);
     }
 
     #[test]
     fn add_assign_vector() {
-        let mut a = Vector::vector(1.0, 5.0, 4.0);
-        let b = Vector::vector(4.0, 1.0, 6.0);
+        let mut a = Vector::vector(1., 5., 4.);
+        let b = Vector::vector(4., 1., 6.);
         a += b;
 
-        assert_eq!(Vector::vector(5.0, 6.0, 10.0), a);
+        assert_eq!(Vector::vector(5., 6., 10.), a);
     }
 
     #[test]
     fn sub_vector_from_vector_yields_a_vector() {
-        let a = Vector::vector(1.0, 5.0, 4.0);
-        let b = Vector::vector(4.0, 1.0, 6.0);
+        let a = Vector::vector(1., 5., 4.);
+        let b = Vector::vector(4., 1., 6.);
 
-        assert_eq!(Vector::vector(-3.0, 4.0, -2.0), a - b);
+        assert_eq!(Vector::vector(-3., 4., -2.), a - b);
     }
 
     #[test]
     fn tuple_vector_negation() {
-        let zero = Vector::vector(0.0, 0.0, 0.0);
-        let a = Vector::vector(4.0, 1.0, 6.0);
+        let zero = Vector::vector(0., 0., 0.);
+        let a = Vector::vector(4., 1., 6.);
 
         assert_eq!(zero - a, -a);
     }
 
     #[test]
     fn vector_scalar_multiply() {
-        let a = Vector::vector(4.0, 1.0, -6.0);
+        let a = Vector::vector(4., 1., -6.);
 
-        assert_eq!(Vector::vector(8.0, 2.0, -12.0), a * 2.0);
+        assert_eq!(Vector::vector(8., 2., -12.), a * 2.);
     }
 
     #[test]
     fn vector_divide() {
-        let a = Vector::vector(12.0, 3.0, -18.0);
+        let a = Vector::vector(12., 3., -18.);
 
-        assert_eq!(Vector::vector(4.0, 1.0, -6.0), a / 3.0);
+        assert_eq!(Vector::vector(4., 1., -6.), a / 3.);
     }
 
     #[test]
     fn vector_magnitude() {
-        let a = Vector::vector(3.0, 4.0, 0.0);
+        let a = Vector::vector(3., 4., 0.);
 
-        assert_eq!(5.0, a.magnitude());
+        assert_eq!(5., a.magnitude());
     }
 
     #[test]
     fn vector_magnitude_2() {
-        let a = Vector::vector(7.0, 4.0, 4.0);
+        let a = Vector::vector(7., 4., 4.);
 
-        assert_eq!(9.0, a.magnitude());
+        assert_eq!(9., a.magnitude());
     }
 
     #[test]
     fn tuple_magnitude_vector_with_w() {
-        let a = Vector::new(Tuple::new(7.0, 4.0, 0.0, 4.0));
+        let a = Vector::new(Tuple::new(7., 4., 0., 4.));
 
-        assert_eq!(9.0, a.magnitude());
+        assert_eq!(9., a.magnitude());
     }
 
     #[test]
     fn vector_normalize() {
-        let a = Vector::vector(4.0, 0.0, 0.0);
+        let a = Vector::vector(4., 0., 0.);
 
-        assert_eq!(Vector::vector(1.0, 0.0, 0.0), a.normalize());
+        assert_eq!(Vector::vector(1., 0., 0.), a.normalize());
     }
 
     #[test]
     fn vector_normalize_2() {
-        let a = Vector::vector(1.0, 2.0, 3.0);
+        let a = Vector::vector(1., 2., 3.);
 
         assert_eq!(
             Vector::vector(0.26726124, 0.5345225, 0.8017837),
@@ -229,26 +229,26 @@ mod vector_math_tests {
 
     #[test]
     fn vector_dot_product() {
-        let a = Vector::vector(1.0, 2.0, 3.0);
-        let b = Vector::vector(2.0, 3.0, 4.0);
+        let a = Vector::vector(1., 2., 3.);
+        let b = Vector::vector(2., 3., 4.);
 
-        assert_eq!(20.0, a.dot(b));
+        assert_eq!(20., a.dot(b));
     }
 
     #[test]
     fn vector_dot_product_includes_w() {
-        let a = Vector::new(Tuple::new(1.0, 2.0, 3.0, 4.0));
-        let b = Vector::new(Tuple::new(2.0, 3.0, 4.0, 5.0));
+        let a = Vector::new(Tuple::new(1., 2., 3., 4.));
+        let b = Vector::new(Tuple::new(2., 3., 4., 5.));
 
-        assert_eq!(40.0, a.dot(b));
+        assert_eq!(40., a.dot(b));
     }
 
     #[test]
     fn vector_cross_product() {
-        let a = Vector::vector(1.0, 2.0, 3.0);
-        let b = Vector::vector(2.0, 3.0, 4.0);
+        let a = Vector::vector(1., 2., 3.);
+        let b = Vector::vector(2., 3., 4.);
 
-        assert_eq!(Vector::vector(-1.0, 2.0, -1.0), a.cross(b));
-        assert_eq!(Vector::vector(1.0, -2.0, 1.0), b.cross(a));
+        assert_eq!(Vector::vector(-1., 2., -1.), a.cross(b));
+        assert_eq!(Vector::vector(1., -2., 1.), b.cross(a));
     }
 }

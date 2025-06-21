@@ -96,10 +96,10 @@ mod matrix_2x2_tests {
     #[test]
     fn identity() {
         let i = Matrix2x2::identity();
-        assert_eq!(i[0][0], 1.0);
-        assert_eq!(i[1][1], 1.0);
-        assert_eq!(i[0][1], 0.0);
-        assert_eq!(i[1][0], 0.0);
+        assert_eq!(i[0][0], 1.);
+        assert_eq!(i[1][1], 1.);
+        assert_eq!(i[0][1], 0.);
+        assert_eq!(i[1][0], 0.);
     }
 
     #[test]
@@ -122,24 +122,24 @@ mod matrix_2x2_tests {
 
     #[test]
     fn multiply_matrix() {
-        let a = Matrix2x2::new([[1.0, 2.0], [5.0, 6.0]]);
-        let b = Matrix2x2::new([[-2.0, 1.0], [3.0, 2.0]]);
+        let a = Matrix2x2::new([[1., 2.], [5., 6.]]);
+        let b = Matrix2x2::new([[-2., 1.], [3., 2.]]);
 
-        assert_eq!(Matrix2x2::new([[4.0, 5.0], [8.0, 17.0]]), a * b);
+        assert_eq!(Matrix2x2::new([[4., 5.], [8., 17.]]), a * b);
     }
 
     #[test]
     fn multiply_matrix_by_identity() {
-        let a = Matrix2x2::new([[1.0, 2.0], [3.0, 4.0]]);
+        let a = Matrix2x2::new([[1., 2.], [3., 4.]]);
 
         assert_eq!(a, a * Matrix2x2::identity());
     }
 
     #[test]
     fn transpose_matrix() {
-        let a = Matrix2x2::new([[1.0, 2.0], [3.0, 4.0]]);
+        let a = Matrix2x2::new([[1., 2.], [3., 4.]]);
 
-        assert_eq!(Matrix2x2::new([[1.0, 3.0], [2.0, 4.0],]), a.transpose());
+        assert_eq!(Matrix2x2::new([[1., 3.], [2., 4.],]), a.transpose());
     }
 
     #[test]
@@ -149,9 +149,6 @@ mod matrix_2x2_tests {
 
     #[test]
     fn determinant() {
-        assert_eq!(
-            17.0,
-            Matrix2x2::new([[1.0, 5.0], [-3.0, 2.0]]).determinant()
-        );
+        assert_eq!(17., Matrix2x2::new([[1., 5.], [-3., 2.]]).determinant());
     }
 }

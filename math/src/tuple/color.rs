@@ -35,7 +35,7 @@ impl Color {
 
 impl From<(f32, f32, f32)> for Color {
     fn from(tuple: (f32, f32, f32)) -> Color {
-        Color::rgba(tuple.0, tuple.1, tuple.2, 1.0)
+        Color::rgba(tuple.0, tuple.1, tuple.2, 1.)
     }
 }
 
@@ -56,7 +56,7 @@ mod color_display_tests {
     use super::*;
     #[test]
     fn tuple_display_vector() {
-        let color = Color::rgba(1.0, 0.5, 0.0, 0.7);
+        let color = Color::rgba(1., 0.5, 0., 0.7);
 
         assert_eq!("C(1, 0.5, 0, 0.7)", format!("{color}"));
     }
@@ -67,9 +67,9 @@ mod color_rgb_tests {
     use super::*;
     #[test]
     fn color_channel_access() {
-        let color = Color::rgba(1.0, 0.5, 0.2, 0.7);
+        let color = Color::rgba(1., 0.5, 0.2, 0.7);
 
-        assert_eq!(1.0, color.red());
+        assert_eq!(1., color.red());
         assert_eq!(0.5, color.green());
         assert_eq!(0.2, color.blue());
         assert_eq!(0.7, color.alpha());
@@ -81,12 +81,12 @@ mod color_into_tests {
     use super::*;
     #[test]
     fn tuple_3_into_color() {
-        assert_eq!(Color::rgba(1.0, 0.5, 0.6, 1.0), (1.0, 0.5, 0.6).into());
+        assert_eq!(Color::rgba(1., 0.5, 0.6, 1.), (1., 0.5, 0.6).into());
     }
 
     #[test]
     fn tuple_4_into_color() {
-        assert_eq!(Color::rgba(1.0, 0.5, 0.6, 0.3), (1.0, 0.5, 0.6, 0.3).into());
+        assert_eq!(Color::rgba(1., 0.5, 0.6, 0.3), (1., 0.5, 0.6, 0.3).into());
     }
 }
 
@@ -137,32 +137,32 @@ mod color_math_tests {
 
     #[test]
     fn color_add() {
-        let a = Color::rgba(0.9, 0.6, 0.75, 1.0);
-        let b = Color::rgba(1.7, 0.2, 0.25, 1.0);
+        let a = Color::rgba(0.9, 0.6, 0.75, 1.);
+        let b = Color::rgba(1.7, 0.2, 0.25, 1.);
 
-        assert_eq!(Color::rgba(2.6, 0.8, 1.0, 2.0), a + b)
+        assert_eq!(Color::rgba(2.6, 0.8, 1., 2.), a + b)
     }
 
     #[test]
     fn color_sub() {
-        let a = Color::rgba(4.0, 0.7, 0.8, 0.4);
-        let b = Color::rgba(2.0, 0.2, 0.25, 0.2);
+        let a = Color::rgba(4., 0.7, 0.8, 0.4);
+        let b = Color::rgba(2., 0.2, 0.25, 0.2);
 
-        assert_eq!(Color::rgba(2.0, 0.5, 0.55, 0.2), a - b)
+        assert_eq!(Color::rgba(2., 0.5, 0.55, 0.2), a - b)
     }
 
     #[test]
     fn color_multiply_scalar() {
-        let a = Color::rgba(4.0, 0.7, 0.8, 0.4);
+        let a = Color::rgba(4., 0.7, 0.8, 0.4);
 
-        assert_eq!(Color::rgba(8.0, 1.4, 1.6, 0.8), a * 2.0)
+        assert_eq!(Color::rgba(8., 1.4, 1.6, 0.8), a * 2.)
     }
 
     #[test]
     fn color_pairwise_multiply_by_color() {
-        let a = Color::rgba(4.0, 0.7, 0.8, 0.5);
-        let b = Color::rgba(2.0, 0.2, 0.25, 0.2);
+        let a = Color::rgba(4., 0.7, 0.8, 0.5);
+        let b = Color::rgba(2., 0.2, 0.25, 0.2);
 
-        assert_eq!(Color::rgba(8.0, 0.14, 0.2, 0.1), a * b)
+        assert_eq!(Color::rgba(8., 0.14, 0.2, 0.1), a * b)
     }
 }

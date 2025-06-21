@@ -14,10 +14,10 @@ impl Matrix4x4 {
         let mut res = Self::identity();
         for r in 0..4 {
             for c in 0..4 {
-                res[r][c] = self.cofactor(r, c) / det;
+                res[r][c] = self.cofactor(r, c);
             }
         }
-        Some(res.transpose())
+        Some(res.transpose() / det)
     }
 }
 

@@ -44,29 +44,29 @@ mod tuple_creation_tests {
 
     #[test]
     fn tuple_creation() {
-        let tuple = Tuple::new(2.0, 3.0, 4.0, 1.0);
-        assert_eq!(tuple.x, 2.0);
-        assert_eq!(tuple.y, 3.0);
-        assert_eq!(tuple.z, 4.0);
-        assert_eq!(tuple.w, 1.0);
+        let tuple = Tuple::new(2., 3., 4., 1.);
+        assert_eq!(tuple.x, 2.);
+        assert_eq!(tuple.y, 3.);
+        assert_eq!(tuple.z, 4.);
+        assert_eq!(tuple.w, 1.);
     }
 
     #[test]
     fn vector_creation() {
-        let tuple = Tuple::vector(2.0, 3.0, 4.0);
-        assert_eq!(tuple.x, 2.0);
-        assert_eq!(tuple.y, 3.0);
-        assert_eq!(tuple.z, 4.0);
-        assert_eq!(tuple.w, 0.0);
+        let tuple = Tuple::vector(2., 3., 4.);
+        assert_eq!(tuple.x, 2.);
+        assert_eq!(tuple.y, 3.);
+        assert_eq!(tuple.z, 4.);
+        assert_eq!(tuple.w, 0.);
     }
 
     #[test]
     fn point_creation() {
-        let tuple = Tuple::point(2.0, 3.0, 4.0);
-        assert_eq!(tuple.x, 2.0);
-        assert_eq!(tuple.y, 3.0);
-        assert_eq!(tuple.z, 4.0);
-        assert_eq!(tuple.w, 1.0);
+        let tuple = Tuple::point(2., 3., 4.);
+        assert_eq!(tuple.x, 2.);
+        assert_eq!(tuple.y, 3.);
+        assert_eq!(tuple.z, 4.);
+        assert_eq!(tuple.w, 1.);
     }
 }
 
@@ -84,7 +84,7 @@ mod tuple_display_tests {
     use super::*;
     #[test]
     fn tuple_display() {
-        let vector = Tuple::new(12.0, 3.0, -18.7, 5.0);
+        let vector = Tuple::new(12., 3., -18.7, 5.);
 
         assert_eq!("(12, 3, -18.7, 5)", format!("{vector}"));
     }
@@ -139,7 +139,7 @@ mod tuple_math_tests {
 
     #[test]
     fn tuple_add() {
-        let a = Tuple::new(0.9, 0.5, 0.75, 1.0);
+        let a = Tuple::new(0.9, 0.5, 0.75, 1.);
         let b = Tuple::new(1.7, 0.3, 0.35, 1.2);
 
         assert_eq!(Tuple::new(2.6, 0.8, 1.1, 2.2), a + b)
@@ -147,7 +147,7 @@ mod tuple_math_tests {
 
     #[test]
     fn tuple_add_assign() {
-        let mut a = Tuple::new(0.9, 0.5, 0.75, 1.0);
+        let mut a = Tuple::new(0.9, 0.5, 0.75, 1.);
         let b = Tuple::new(1.7, 0.3, 0.35, 1.2);
         a += b;
 
@@ -156,7 +156,7 @@ mod tuple_math_tests {
 
     #[test]
     fn tuple_sub() {
-        let a = Tuple::new(1.8, 0.5, 0.75, 1.0);
+        let a = Tuple::new(1.8, 0.5, 0.75, 1.);
         let b = Tuple::new(0.9, 0.1, 0.35, 0.4);
 
         assert_eq!(Tuple::new(0.9, 0.4, 0.4, 0.6), a - b)
@@ -164,15 +164,15 @@ mod tuple_math_tests {
 
     #[test]
     fn tuple_multiply_scalar() {
-        let a = Tuple::new(1.0, 0.5, 0.75, 0.8);
+        let a = Tuple::new(1., 0.5, 0.75, 0.8);
 
-        assert_eq!(Tuple::new(3.0, 1.5, 2.25, 2.4), a * 3.0)
+        assert_eq!(Tuple::new(3., 1.5, 2.25, 2.4), a * 3.)
     }
 
     #[test]
     fn tuple_hadamard_product() {
         let a = Tuple::new(1.8, 0.5, 0.75, 1.2);
-        let b = Tuple::new(2.0, 0.1, 0.35, 0.5);
+        let b = Tuple::new(2., 0.1, 0.35, 0.5);
 
         assert_eq!(Tuple::new(3.6, 0.05, 0.2625, 0.6), a.hadamard_product(b))
     }
