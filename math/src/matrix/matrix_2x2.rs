@@ -76,8 +76,7 @@ impl Mul for Matrix2x2 {
         let mut result = Matrix2x2::identity();
         for r in 0..2 {
             for c in 0..2 {
-                result[r][c] = self[r][0] * rhs[0][c]
-                    + self[r][1] * rhs[1][c];
+                result[r][c] = self[r][0] * rhs[0][c] + self[r][1] * rhs[1][c];
             }
         }
         result
@@ -112,22 +111,10 @@ mod matrix_2x2_tests {
 
     #[test]
     fn multiply_matrix() {
-        let a = Matrix2x2::new([
-            [1.0, 2.0],
-            [5.0, 6.0]
-        ]);
-        let b = Matrix2x2::new([
-            [-2.0, 1.0],
-            [3.0, 2.0]
-        ]);
+        let a = Matrix2x2::new([[1.0, 2.0], [5.0, 6.0]]);
+        let b = Matrix2x2::new([[-2.0, 1.0], [3.0, 2.0]]);
 
-        assert_eq!(
-            Matrix2x2::new([
-                [4.0, 5.0],
-                [8.0, 17.0]
-            ]),
-            a * b
-        );
+        assert_eq!(Matrix2x2::new([[4.0, 5.0], [8.0, 17.0]]), a * b);
     }
 
     #[test]
@@ -151,6 +138,9 @@ mod matrix_2x2_tests {
 
     #[test]
     fn determinant() {
-        assert_eq!(17.0, Matrix2x2::new([[1.0,5.0],[-3.0,2.0]]).determinant());
+        assert_eq!(
+            17.0,
+            Matrix2x2::new([[1.0, 5.0], [-3.0, 2.0]]).determinant()
+        );
     }
 }

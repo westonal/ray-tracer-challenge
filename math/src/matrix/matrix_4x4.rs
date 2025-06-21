@@ -1,6 +1,6 @@
+use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Mul};
-use crate::tuple::Tuple;
 
 ///
 /// Row-major 4x4 matrix

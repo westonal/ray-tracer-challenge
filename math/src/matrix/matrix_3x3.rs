@@ -1,6 +1,5 @@
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Mul};
-use crate::tuple::Tuple;
 
 ///
 /// Row-major 3x3 matrix
@@ -71,9 +70,8 @@ impl Mul for Matrix3x3 {
         let mut result = Matrix3x3::identity();
         for r in 0..3 {
             for c in 0..3 {
-                result[r][c] = self[r][0] * rhs[0][c]
-                    + self[r][1] * rhs[1][c]
-                    + self[r][2] * rhs[2][c];
+                result[r][c] =
+                    self[r][0] * rhs[0][c] + self[r][1] * rhs[1][c] + self[r][2] * rhs[2][c];
             }
         }
         result
@@ -116,52 +114,28 @@ mod matrix_3x3_tests {
 
     #[test]
     fn multiply_matrix() {
-        let a = Matrix3x3::new([
-            [1.0, 2.0, 3.0],
-            [5.0, 6.0, 7.0],
-            [9.0, 8.0, 7.0],
-        ]);
-        let b = Matrix3x3::new([
-            [-2.0, 1.0, 2.0],
-            [3.0, 2.0, 1.0],
-            [3.0, 3.0, 6.0 ],
-        ]);
+        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [5.0, 6.0, 7.0], [9.0, 8.0, 7.0]]);
+        let b = Matrix3x3::new([[-2.0, 1.0, 2.0], [3.0, 2.0, 1.0], [3.0, 3.0, 6.0]]);
 
         assert_eq!(
-            Matrix3x3::new([
-                [13.0, 14.0, 22.0],
-                [29.0, 38.0, 58.0],
-                [27.0, 46.0, 68.0]
-            ]),
+            Matrix3x3::new([[13.0, 14.0, 22.0], [29.0, 38.0, 58.0], [27.0, 46.0, 68.0]]),
             a * b
         );
     }
 
     #[test]
     fn multiply_matrix_by_identity() {
-        let a = Matrix3x3::new([
-            [1.0, 2.0, 3.0],
-            [5.0, 6.0, 7.0],
-            [9.0, 8.0, 7.0],
-        ]);
+        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [5.0, 6.0, 7.0], [9.0, 8.0, 7.0]]);
 
         assert_eq!(a, a * Matrix3x3::identity());
     }
 
     #[test]
     fn transpose_matrix() {
-        let a = Matrix3x3::new([
-            [1.0, 2.0, 3.0],
-            [4.0, 5.0, 6.0],
-            [7.0, 8.0, 9.0],
-        ]);
+        let a = Matrix3x3::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]);
 
         assert_eq!(
-            Matrix3x3::new([
-               [1.0, 4.0, 7.0],
-               [2.0, 5.0, 8.0],
-               [3.0, 6.0, 9.0],
-            ]),
+            Matrix3x3::new([[1.0, 4.0, 7.0], [2.0, 5.0, 8.0], [3.0, 6.0, 9.0],]),
             a.transpose()
         );
     }
