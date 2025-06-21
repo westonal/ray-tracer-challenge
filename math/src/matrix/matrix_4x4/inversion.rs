@@ -122,4 +122,80 @@ mod invert_matrix4x4_tests {
             ]),
         )
     }
+
+    impl Matrix4x4 {
+        /// Test method - better if we used float EPSILON... but as long as this stays local to this
+        /// test mod I'm OK with it
+        fn round_5dp(&self) -> Matrix4x4 {
+            let mut result = Self::empty();
+            for r in 0..4 {
+                for c in 0..4 {
+                    result[r][c] = (self[r][c] * 100000.0).round() / 100000.0;
+                }
+            }
+            result
+        }
+    }
+
+    #[test]
+    fn multiply_matrix_by_its_inverse() {
+        let a = Matrix4x4::new([
+            [-5., 2., 6., -8.],
+            [1., -5., 1., 8.],
+            [7., 7., -6., -7.],
+            [1., -3., 7., 4.],
+        ]);
+
+        assert_eq!(
+            (a.invert().expect("Matrix is invertible") * a).round_5dp(),
+            Matrix4x4::identity(),
+        )
+    }
+
+    #[test]
+    fn multiply_product_by_its_inverse() {
+        let a = Matrix4x4::new([
+            [3., -9., 7., 3.],
+            [3., -8., 2., -9.],
+            [-4., 4., 4., 1.],
+            [-6., 5., -1., 1.],
+        ]);
+        let b = Matrix4x4::new([
+            [8., 2., 2., 2.],
+            [3., -1., 7., 0.],
+            [7., 0., 5., 4.],
+            [6., -2., 0., 5.],
+        ]);
+        let c = a * b;
+
+        assert_eq!(
+            (c * b.invert().expect("Matrix is invertible")).round_5dp(),
+            a,
+        )
+    }
+
+    #[test]
+    fn invert_identity() {
+        assert_eq!(
+            Matrix4x4::identity()
+                .invert()
+                .expect("Matrix is invertible"),
+            Matrix4x4::identity(),
+        )
+    }
+
+    #[test]
+    fn inverse_transpose_vs_transpose_inverse() {
+        let a = Matrix4x4::new([
+            [-5., 2., 6., -8.],
+            [1., -5., 1., 8.],
+            [7., 7., -6., -7.],
+            [1., -3., 7., 4.],
+        ]);
+
+        assert_eq!(
+            a.invert().expect("Matrix is invertible").transpose(),
+            a.transpose().invert().expect("Matrix is invertible"),
+        )
+    }
 }

@@ -6,6 +6,10 @@ Tuples, Points, Vectors
 
 # Chapter 2
 
+Drawing on a canvas
+
+# Chapter 3
+
 Matrices
 
 # Running
