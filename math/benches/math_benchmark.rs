@@ -1,5 +1,6 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 use math::matrix::matrix_4x4::Matrix4x4;
+use std::f32::consts::PI;
 use std::hint::black_box;
 
 fn inversion_benchmark(c: &mut Criterion) {
@@ -28,5 +29,16 @@ fn multiply_benchmark(c: &mut Criterion) {
     c.bench_function("multiply", |b| b.iter(|| black_box(m1 * m2)));
 }
 
-criterion_group!(benches, inversion_benchmark, multiply_benchmark);
+fn rotate_x_benchmark(c: &mut Criterion) {
+    c.bench_function("rotate x", |b| {
+        b.iter(|| black_box(Matrix4x4::rotation_x(PI / 5.2)))
+    });
+}
+
+criterion_group!(
+    benches,
+    inversion_benchmark,
+    multiply_benchmark,
+    rotate_x_benchmark,
+);
 criterion_main!(benches);

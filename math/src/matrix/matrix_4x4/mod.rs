@@ -1,5 +1,6 @@
 mod cofactors;
 mod inversion;
+mod rotation;
 mod scaling;
 mod translation;
 
