@@ -9,6 +9,10 @@ pub struct Point {
 }
 
 impl Point {
+    pub fn origin() -> Self {
+        Self::point(0., 0., 0.)
+    }
+
     pub fn point(x: f32, y: f32, z: f32) -> Point {
         Self {
             tuple: Tuple::new(x, y, z, 1.),
@@ -63,6 +67,15 @@ mod point_into_tests {
     #[test]
     fn tuple_3_into_vector() {
         assert_eq!(Point::point(12., 3., -18.7), (12., 3., -18.7).into());
+    }
+}
+
+#[cfg(test)]
+mod point_origin {
+    use super::*;
+    #[test]
+    fn origin() {
+        assert_eq!(Point::point(0., 0., 0.), Point::origin());
     }
 }
 

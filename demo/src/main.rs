@@ -1,7 +1,10 @@
 use crate::canvas::Canvas;
 use crate::image_buffer_canvas::ImageBufferCanvas;
+use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::Tuple;
 use math::tuple::color::Color;
+use math::tuple::point::Point;
+use std::f32::consts::TAU;
 
 mod canvas;
 mod image_buffer_canvas;
@@ -10,7 +13,23 @@ fn main() {
     let mut canvas = ImageBufferCanvas::new(200, 200);
     fill_all_with_gradient(&mut canvas);
     example(&mut canvas);
-    canvas.save_png("out.png");
+    draw_clock(&mut canvas);
+    canvas.save_png("demo.png");
+}
+
+fn draw_clock<C: Canvas<Color>>(canvas: &mut C) {
+    for hour in 0..12 {
+        let point = Point::origin();
+        let radius = canvas.width() as f32 * 3. / 8.;
+        let m = Matrix4x4::identity()
+            .pre_translation(canvas.width() as f32 / 2., canvas.height() as f32 / 2., 0.)
+            .pre_scale(radius, radius, 1.)
+            .pre_rotation_z(TAU * hour as f32 / 12.)
+            .pre_translation(0., -1., 0.);
+
+        let tuple = m * point;
+        canvas.write_color(tuple.x as u32, tuple.y as u32, Color::rgba(1., 1., 1., 1.));
+    }
 }
 
 fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
