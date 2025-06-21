@@ -1,10 +1,12 @@
-use crate::matrix::Minor;
+use crate::matrix::{Minor, Submatrix};
 use crate::matrix::matrix_2x2::Matrix2x2;
 use crate::matrix::matrix_3x3::Matrix3x3;
 
-impl Matrix3x3 {
-    pub fn submatrix(&self, row: usize, column: usize) -> Matrix2x2 {
-        let mut result = Matrix2x2::identity();
+impl Submatrix for Matrix3x3 {
+    type Output = Matrix2x2;
+
+    fn submatrix(&self, row: usize, column: usize) -> Self::Output {
+        let mut result = Matrix2x2::empty();
         let mut row_out = 0;
         for r in 0..3 {
             if r == row {
@@ -21,12 +23,6 @@ impl Matrix3x3 {
             row_out += 1;
         }
         result
-    }
-}
-
-impl Minor for Matrix3x3 {
-    fn minor(&self, row: usize, column: usize) -> f32 {
-        self.submatrix(row, column).determinant()
     }
 }
 

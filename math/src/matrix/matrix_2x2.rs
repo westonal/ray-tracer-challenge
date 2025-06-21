@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Mul};
+use crate::matrix::Determinant;
 
 ///
 /// Row-major 2x2 matrix
@@ -7,15 +8,15 @@ use std::ops::{Deref, DerefMut, Mul};
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Matrix2x2([[f32; 2]; 2]);
 
-impl Matrix2x2 {
-    pub fn determinant(&self) -> f32 {
+impl Determinant for Matrix2x2 {
+    fn determinant(&self) -> f32 {
         self[0][0] * self[1][1] - self[0][1] * self[1][0]
     }
 }
 
 impl Matrix2x2 {
     pub fn transpose(&self) -> Self {
-        let mut result = Self::identity();
+        let mut result = Self::empty();
         for r in 0..2 {
             for c in 0..2 {
                 result[c][r] = self[r][c]
@@ -29,12 +30,17 @@ impl Matrix2x2 {
     pub fn new(data: [[f32; 2]; 2]) -> Self {
         Self(data)
     }
+
+    pub fn empty() -> Self {
+        Self([[0.0; 2]; 2])
+    }
+    
     pub fn identity() -> Self {
-        let mut x = [[0.0; 2]; 2];
+        let mut x = Self::empty();
         for i in 0..2 {
             x[i][i] = 1.0;
         }
-        Self(x)
+        x
     }
 }
 
@@ -99,6 +105,11 @@ mod matrix_2x2_tests {
     #[test]
     fn identity_display() {
         assert_eq!("[[1 0][0 1]]", format!("{}", Matrix2x2::identity()));
+    }
+
+    #[test]
+    fn empty_display() {
+        assert_eq!("[[0 0][0 0]]", format!("{}", Matrix2x2::empty()));
     }
 
     #[test]

@@ -12,7 +12,7 @@ pub struct Matrix4x4([[f32; 4]; 4]);
 
 impl Matrix4x4 {
     pub fn transpose(&self) -> Self {
-        let mut result = Self::identity();
+        let mut result = Self::empty();
         for r in 0..4 {
             for c in 0..4 {
                 result[c][r] = self[r][c]
@@ -26,12 +26,17 @@ impl Matrix4x4 {
     pub fn new(data: [[f32; 4]; 4]) -> Self {
         Self(data)
     }
+
+    pub fn empty() -> Self {
+        Self([[0.0; 4]; 4])
+    }
+    
     pub fn identity() -> Self {
-        let mut x = [[0.0; 4]; 4];
+        let mut x = Self::empty();
         for i in 0..4 {
             x[i][i] = 1.0;
         }
-        Self(x)
+        x
     }
 }
 
@@ -70,7 +75,7 @@ impl Mul for Matrix4x4 {
     type Output = Matrix4x4;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let mut result = Matrix4x4::identity();
+        let mut result = Matrix4x4::empty();
         for r in 0..4 {
             for c in 0..4 {
                 result[r][c] = self[r][0] * rhs[0][c]
@@ -126,6 +131,14 @@ mod tests {
         assert_eq!(
             "[[1 0 0 0][0 1 0 0][0 0 1 0][0 0 0 1]]",
             format!("{}", Matrix4x4::identity())
+        );
+    }
+
+    #[test]
+    fn empty_display() {
+        assert_eq!(
+            "[[0 0 0 0][0 0 0 0][0 0 0 0][0 0 0 0]]",
+            format!("{}", Matrix4x4::empty())
         );
     }
 

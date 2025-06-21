@@ -12,7 +12,7 @@ pub struct Matrix3x3([[f32; 3]; 3]);
 
 impl Matrix3x3 {
     pub fn transpose(&self) -> Self {
-        let mut result = Self::identity();
+        let mut result = Self::empty();
         for r in 0..3 {
             for c in 0..3 {
                 result[c][r] = self[r][c]
@@ -26,12 +26,17 @@ impl Matrix3x3 {
     pub fn new(data: [[f32; 3]; 3]) -> Self {
         Self(data)
     }
+
+    pub fn empty() -> Self {
+        Self([[0.0; 3]; 3])
+    }
+
     pub fn identity() -> Self {
-        let mut x = [[0.0; 3]; 3];
+        let mut x = Self::empty();
         for i in 0..3 {
             x[i][i] = 1.0;
         }
-        Self(x)
+        x
     }
 }
 
@@ -70,7 +75,7 @@ impl Mul for Matrix3x3 {
     type Output = Matrix3x3;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let mut result = Matrix3x3::identity();
+        let mut result = Matrix3x3::empty();
         for r in 0..3 {
             for c in 0..3 {
                 result[r][c] =
@@ -104,6 +109,14 @@ mod matrix_3x3_tests {
         assert_eq!(
             "[[1 0 0][0 1 0][0 0 1]]",
             format!("{}", Matrix3x3::identity())
+        );
+    }
+
+    #[test]
+    fn empty_display() {
+        assert_eq!(
+            "[[0 0 0][0 0 0][0 0 0]]",
+            format!("{}", Matrix3x3::empty())
         );
     }
 

@@ -1,10 +1,12 @@
 use crate::matrix::matrix_3x3::Matrix3x3;
 use crate::matrix::matrix_4x4::Matrix4x4;
-use crate::matrix::{Cofactor, Determinant, Minor};
+use crate::matrix::{Cofactor, Determinant, Minor, Submatrix};
 
-impl Matrix4x4 {
-    pub fn submatrix(&self, row: usize, column: usize) -> Matrix3x3 {
-        let mut result = Matrix3x3::identity();
+impl Submatrix for Matrix4x4 {
+    type Output = Matrix3x3;
+
+    fn submatrix(&self, row: usize, column: usize) -> Self::Output {
+        let mut result = Matrix3x3::empty();
         let mut row_out = 0;
         for r in 0..4 {
             if r == row {
@@ -21,12 +23,6 @@ impl Matrix4x4 {
             row_out += 1;
         }
         result
-    }
-}
-
-impl Minor for Matrix4x4 {
-    fn minor(&self, row: usize, column: usize) -> f32 {
-        self.submatrix(row, column).determinant()
     }
 }
 
