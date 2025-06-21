@@ -1,4 +1,5 @@
 mod cofactors;
+mod inversion;
 
 use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};
