@@ -2,6 +2,7 @@ mod cofactors;
 mod inversion;
 mod rotation;
 mod scaling;
+mod shearing;
 mod translation;
 
 use crate::tuple::Tuple;
