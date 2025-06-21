@@ -1,3 +1,4 @@
+use crate::matrix::matrix_3x3::Matrix3x3;
 use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Mul};
@@ -7,6 +8,28 @@ use std::ops::{Deref, DerefMut, Mul};
 ///
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Matrix4x4([[f32; 4]; 4]);
+
+impl Matrix4x4 {
+    pub fn submatrix(&self, row: usize, column: usize) -> Matrix3x3 {
+        let mut result = Matrix3x3::identity();
+        let mut row_out = 0;
+        for r in 0..4 {
+            if r == row {
+                continue;
+            }
+            let mut column_out = 0;
+            for c in 0..4 {
+                if c == column {
+                    continue;
+                }
+                result[row_out][column_out] = self[r][c];
+                column_out += 1;
+            }
+            row_out += 1;
+        }
+        result
+    }
+}
 
 impl Matrix4x4 {
     pub fn transpose(&self) -> Self {
@@ -211,5 +234,25 @@ mod tests {
     #[test]
     fn transpose_identity() {
         assert_eq!(Matrix4x4::identity().transpose(), Matrix4x4::identity());
+    }
+}
+
+#[cfg(test)]
+mod matrix_4x4_sub_matrix_tests {
+    use super::*;
+
+    #[test]
+    fn submatrix() {
+        let a = Matrix4x4::new([
+            [-6.0, 1.0, 1.0, 6.0],
+            [-8.0, 5.0, 8.0, 6.0],
+            [-1.0, 0.0, 8.0, 2.0],
+            [-7.0, 1.0, -1.0, 1.0],
+        ]);
+
+        assert_eq!(
+            Matrix3x3::new([[-6.0, 1.0, 6.0], [-8.0, 8.0, 6.0], [-7.0, -1.0, 1.0],]),
+            a.submatrix(2, 1)
+        );
     }
 }
