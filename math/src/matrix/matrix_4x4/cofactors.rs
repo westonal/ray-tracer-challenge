@@ -1,5 +1,6 @@
 use crate::matrix::matrix_3x3::Matrix3x3;
 use crate::matrix::matrix_4x4::Matrix4x4;
+use crate::matrix::{Cofactor, Determinant, Minor};
 
 impl Matrix4x4 {
     pub fn submatrix(&self, row: usize, column: usize) -> Matrix3x3 {
@@ -21,21 +22,16 @@ impl Matrix4x4 {
         }
         result
     }
+}
 
-    pub fn minor(&self, row: usize, column: usize) -> f32 {
+impl Minor for Matrix4x4 {
+    fn minor(&self, row: usize, column: usize) -> f32 {
         self.submatrix(row, column).determinant()
     }
+}
 
-    pub fn cofactor(&self, row: usize, column: usize) -> f32 {
-        let minor = self.minor(row, column);
-        if (row + column) % 2 == 1 {
-            -minor
-        } else {
-            minor
-        }
-    }
-
-    pub fn determinant(&self) -> f32 {
+impl Determinant for Matrix4x4 {
+    fn determinant(&self) -> f32 {
         self[0][0] * self.cofactor(0, 0)
             + self[0][1] * self.cofactor(0, 1)
             + self[0][2] * self.cofactor(0, 2)

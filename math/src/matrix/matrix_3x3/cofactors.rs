@@ -1,3 +1,4 @@
+use crate::matrix::Minor;
 use crate::matrix::matrix_2x2::Matrix2x2;
 use crate::matrix::matrix_3x3::Matrix3x3;
 
@@ -21,18 +22,11 @@ impl Matrix3x3 {
         }
         result
     }
+}
 
-    pub fn minor(&self, row: usize, column: usize) -> f32 {
+impl Minor for Matrix3x3 {
+    fn minor(&self, row: usize, column: usize) -> f32 {
         self.submatrix(row, column).determinant()
-    }
-
-    pub fn cofactor(&self, row: usize, column: usize) -> f32 {
-        let minor = self.minor(row, column);
-        if (row + column) % 2 == 1 {
-            -minor
-        } else {
-            minor
-        }
     }
 }
 
@@ -51,6 +45,7 @@ mod matrix_3x3_sub_matrix_tests {
 #[cfg(test)]
 mod matrix_3x3_minor_and_cofactor_tests {
     use super::*;
+    use crate::matrix::Cofactor;
 
     #[test]
     fn minors() {

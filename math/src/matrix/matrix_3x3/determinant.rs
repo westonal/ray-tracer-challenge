@@ -1,7 +1,8 @@
 use crate::matrix::matrix_3x3::Matrix3x3;
+use crate::matrix::{Cofactor, Determinant};
 
-impl Matrix3x3 {
-    pub fn determinant(&self) -> f32 {
+impl Determinant for Matrix3x3 {
+    fn determinant(&self) -> f32 {
         self[0][0] * self.cofactor(0, 0)
             + self[0][1] * self.cofactor(0, 1)
             + self[0][2] * self.cofactor(0, 2)
@@ -10,8 +11,8 @@ impl Matrix3x3 {
 
 #[cfg(test)]
 mod tests {
-
     use crate::matrix::matrix_3x3::Matrix3x3;
+    use crate::matrix::{Cofactor, Determinant};
 
     #[test]
     fn a() {
