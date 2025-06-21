@@ -1,4 +1,4 @@
-use crate::matrix::{Minor, Submatrix};
+use crate::matrix::Submatrix;
 use crate::matrix::matrix_2x2::Matrix2x2;
 use crate::matrix::matrix_3x3::Matrix3x3;
 
@@ -41,7 +41,7 @@ mod matrix_3x3_sub_matrix_tests {
 #[cfg(test)]
 mod matrix_3x3_minor_and_cofactor_tests {
     use super::*;
-    use crate::matrix::Cofactor;
+    use crate::matrix::{Cofactor, Minor};
 
     #[test]
     fn minors() {

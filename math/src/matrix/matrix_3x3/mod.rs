@@ -114,10 +114,7 @@ mod matrix_3x3_tests {
 
     #[test]
     fn empty_display() {
-        assert_eq!(
-            "[[0 0 0][0 0 0][0 0 0]]",
-            format!("{}", Matrix3x3::empty())
-        );
+        assert_eq!("[[0 0 0][0 0 0][0 0 0]]", format!("{}", Matrix3x3::empty()));
     }
 
     #[test]

@@ -30,7 +30,7 @@ impl Matrix4x4 {
     pub fn empty() -> Self {
         Self([[0.0; 4]; 4])
     }
-    
+
     pub fn identity() -> Self {
         let mut x = Self::empty();
         for i in 0..4 {

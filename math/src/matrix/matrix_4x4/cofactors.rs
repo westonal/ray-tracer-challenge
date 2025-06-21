@@ -1,6 +1,6 @@
 use crate::matrix::matrix_3x3::Matrix3x3;
 use crate::matrix::matrix_4x4::Matrix4x4;
-use crate::matrix::{Cofactor, Determinant, Minor, Submatrix};
+use crate::matrix::{Cofactor, Determinant, Submatrix};
 
 impl Submatrix for Matrix4x4 {
     type Output = Matrix3x3;
@@ -58,6 +58,7 @@ mod matrix_4x4_sub_matrix_tests {
 #[cfg(test)]
 mod matrix_4x4_cofactors_tests {
     use super::*;
+    use crate::matrix::Minor;
 
     fn matrix_under_test() -> Matrix4x4 {
         Matrix4x4::new([

@@ -1,6 +1,6 @@
+use crate::matrix::Determinant;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Mul};
-use crate::matrix::Determinant;
 
 ///
 /// Row-major 2x2 matrix
@@ -34,7 +34,7 @@ impl Matrix2x2 {
     pub fn empty() -> Self {
         Self([[0.0; 2]; 2])
     }
-    
+
     pub fn identity() -> Self {
         let mut x = Self::empty();
         for i in 0..2 {
