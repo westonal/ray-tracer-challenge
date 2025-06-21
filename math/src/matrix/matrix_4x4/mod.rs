@@ -1,5 +1,7 @@
 mod cofactors;
 mod inversion;
+mod scaling;
+mod translation;
 
 use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};

@@ -47,6 +47,11 @@ impl From<(f32, f32, f32)> for Vector {
     }
 }
 
+impl From<Vector> for Tuple {
+    fn from(value: Vector) -> Self {
+        value.tuple
+    }
+}
 impl Deref for Vector {
     type Target = Tuple;
 

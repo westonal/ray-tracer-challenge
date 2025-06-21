@@ -22,6 +22,12 @@ impl From<(f32, f32, f32)> for Point {
     }
 }
 
+impl From<Point> for Tuple {
+    fn from(value: Point) -> Self {
+        value.tuple
+    }
+}
+
 impl Deref for Point {
     type Target = Tuple;
 

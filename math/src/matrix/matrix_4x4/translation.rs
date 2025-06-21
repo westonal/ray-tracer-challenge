@@ -1,0 +1,54 @@
+use crate::matrix::matrix_4x4::Matrix4x4;
+use crate::tuple::Tuple;
+use crate::tuple::point::Point;
+use crate::tuple::vector::Vector;
+use std::ops::Mul;
+
+impl Matrix4x4 {
+    fn translation(x: f32, y: f32, z: f32) -> Matrix4x4 {
+        let mut m = Self::identity();
+        m[0][3] = x;
+        m[1][3] = y;
+        m[2][3] = z;
+        m
+    }
+}
+
+impl Mul<Point> for Matrix4x4 {
+    type Output = Tuple;
+
+    fn mul(self, rhs: Point) -> Self::Output {
+        let t: Tuple = rhs.into();
+        self * t
+    }
+}
+
+impl Mul<Vector> for Matrix4x4 {
+    type Output = Tuple;
+
+    fn mul(self, rhs: Vector) -> Self::Output {
+        let t: Tuple = rhs.into();
+        self * t
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::tuple::point::Point;
+    use crate::tuple::vector::Vector;
+
+    #[test]
+    fn translate_point() {
+        let m = Matrix4x4::translation(5., -3., 2.);
+        let p = Point::point(-3., 4., 5.);
+        assert_eq!(m * p, Point::point(2., 1., 7.).into());
+    }
+
+    #[test]
+    fn translate_vector_does_not_affect_vector() {
+        let m = Matrix4x4::translation(5., -3., 2.);
+        let p = Vector::vector(-3., 4., 5.);
+        assert_eq!(m * p, p.into());
+    }
+}
