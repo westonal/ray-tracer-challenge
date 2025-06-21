@@ -13,6 +13,18 @@ impl Matrix4x4 {
         m
     }
 
+    pub fn pre_rotation_x(&self, x_radians: f32) -> Matrix4x4 {
+        self.clone() * Self::rotation_x(x_radians)
+    }
+
+    pub fn pre_rotation_y(&self, y_radians: f32) -> Matrix4x4 {
+        self.clone() * Self::rotation_y(y_radians)
+    }
+
+    pub fn pre_rotation_z(&self, z_radians: f32) -> Matrix4x4 {
+        self.clone() * Self::rotation_z(z_radians)
+    }
+
     pub fn rotation_y(y_radians: f32) -> Matrix4x4 {
         let mut m = Self::empty();
         let (sin, cos) = y_radians.sin_cos();
@@ -49,6 +61,21 @@ mod rotation_x_tests {
     #[test]
     fn rotate_point_one_eighth() {
         let eighth = Matrix4x4::rotation_x(PI / 4.0);
+        let p = Point::point(0., 1., 0.);
+        assert_eq!(
+            eighth * p,
+            Point::point(
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2,
+                std::f32::consts::FRAC_1_SQRT_2
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn rotate_point_one_eighth_fluent() {
+        let eighth = Matrix4x4::identity().pre_rotation_x(PI / 4.0);
         let p = Point::point(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -121,6 +148,21 @@ mod rotation_y_tests {
     }
 
     #[test]
+    fn rotate_point_one_eighth_fluent() {
+        let eighth = Matrix4x4::identity().pre_rotation_y(PI / 4.0);
+        let p = Point::point(0., 0., 1.);
+        assert_eq!(
+            eighth * p,
+            Point::point(
+                std::f32::consts::FRAC_1_SQRT_2,
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2
+            )
+            .into()
+        );
+    }
+
+    #[test]
     fn rotate_point_one_eighth_2() {
         let eighth = Matrix4x4::rotation_y(PI / 4.0);
         let p = Point::point(2., 3., 0.);
@@ -170,6 +212,21 @@ mod rotation_z_tests {
     #[test]
     fn rotate_point_one_eighth() {
         let eighth = Matrix4x4::rotation_z(PI / 4.0);
+        let p = Point::point(0., 1., 0.);
+        assert_eq!(
+            eighth * p,
+            Point::point(
+                -std::f32::consts::FRAC_1_SQRT_2,
+                std::f32::consts::FRAC_1_SQRT_2,
+                0.,
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn rotate_point_one_eighth_fluent() {
+        let eighth = Matrix4x4::identity().pre_rotation_z(PI / 4.0);
         let p = Point::point(0., 1., 0.);
         assert_eq!(
             eighth * p,

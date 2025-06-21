@@ -1,7 +1,7 @@
 use crate::matrix::matrix_4x4::Matrix4x4;
 
 impl Matrix4x4 {
-    fn shear(x_y: f32, x_z: f32, y_x: f32, y_z: f32, z_x: f32, z_y: f32) -> Matrix4x4 {
+    pub fn shear(x_y: f32, x_z: f32, y_x: f32, y_z: f32, z_x: f32, z_y: f32) -> Matrix4x4 {
         let mut m = Self::identity();
         m[0][1] = x_y;
         m[0][2] = x_z;
@@ -10,6 +10,18 @@ impl Matrix4x4 {
         m[2][0] = z_x;
         m[2][1] = z_y;
         m
+    }
+
+    pub fn pre_shear(
+        &self,
+        x_y: f32,
+        x_z: f32,
+        y_x: f32,
+        y_z: f32,
+        z_x: f32,
+        z_y: f32,
+    ) -> Matrix4x4 {
+        self.clone() * Self::shear(x_y, x_z, y_x, y_z, z_x, z_y)
     }
 }
 
@@ -58,5 +70,12 @@ mod matrix_4x4_shearing_tests {
         let m = Matrix4x4::shear(0., 0., 0., 0., 0., 1.);
         let p = Point::point(2., 3., 4.);
         assert_eq!(m * p, Point::point(2., 3., 7.).into());
+    }
+
+    #[test]
+    fn shear_fluent() {
+        let m = Matrix4x4::translation(3., 2., 5.).pre_shear(1., 2., 3., 4., 5., 6.);
+        let p = Point::point(2., 3., 4.);
+        assert_eq!(m * p, Point::point(16., 27., 37.).into());
     }
 }

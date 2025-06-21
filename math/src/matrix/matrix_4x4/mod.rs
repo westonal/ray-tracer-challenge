@@ -3,6 +3,7 @@ mod inversion;
 mod rotation;
 mod scaling;
 mod shearing;
+mod transformation_chain_tests;
 mod translation;
 
 use crate::tuple::Tuple;

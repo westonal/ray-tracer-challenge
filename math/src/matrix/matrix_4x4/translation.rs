@@ -5,12 +5,16 @@ use crate::tuple::vector::Vector;
 use std::ops::Mul;
 
 impl Matrix4x4 {
-    fn translation(x: f32, y: f32, z: f32) -> Matrix4x4 {
+    pub fn translation(x: f32, y: f32, z: f32) -> Matrix4x4 {
         let mut m = Self::identity();
         m[0][3] = x;
         m[1][3] = y;
         m[2][3] = z;
         m
+    }
+
+    pub fn pre_translation(&self, x: f32, y: f32, z: f32) -> Matrix4x4 {
+        self.clone() * Matrix4x4::translation(x, y, z)
     }
 }
 
@@ -41,6 +45,13 @@ mod tests {
     #[test]
     fn translate_point() {
         let m = Matrix4x4::translation(5., -3., 2.);
+        let p = Point::point(-3., 4., 5.);
+        assert_eq!(m * p, Point::point(2., 1., 7.).into());
+    }
+
+    #[test]
+    fn translate_point_fluent() {
+        let m = Matrix4x4::identity().pre_translation(5., -3., 2.);
         let p = Point::point(-3., 4., 5.);
         assert_eq!(m * p, Point::point(2., 1., 7.).into());
     }
