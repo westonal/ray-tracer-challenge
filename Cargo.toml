@@ -2,4 +2,5 @@
 members = [
     "demo",
     "math",
+    "ray_tracer",
 ]

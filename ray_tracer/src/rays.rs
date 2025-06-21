@@ -1,9 +1,9 @@
-use crate::tuple::point::Point;
-use crate::tuple::vector::Vector;
+use math::tuple::point::Point;
+use math::tuple::vector::Vector;
 
-struct Ray {
-    origin: Point,
-    direction: Vector,
+pub struct Ray {
+    pub origin: Point,
+    pub direction: Vector,
 }
 
 impl Ray {

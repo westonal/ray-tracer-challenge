@@ -1,8 +1,8 @@
 [package]
-name = "ray_tracer_demo"
+name = "ray_tracer"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-image = "0.25.6"
 math = { path = "../math" }
+uuid = { version = "1.17.0", features = ["v4"] }
