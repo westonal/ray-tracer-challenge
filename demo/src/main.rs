@@ -8,13 +8,14 @@ use ray_tracer::intersection::Intersect;
 use ray_tracer::primatives::sphere::Sphere;
 use ray_tracer::ray;
 use ray_tracer::rays::Ray;
+use std::cmp::min;
 use std::f32::consts::TAU;
 
 mod canvas;
 mod image_buffer_canvas;
 
 fn main() {
-    let mut canvas = ImageBufferCanvas::new(200, 200);
+    let mut canvas = ImageBufferCanvas::new(300, 200);
     fill_all_with_gradient(&mut canvas);
     example(&mut canvas);
     draw_clock(&mut canvas);
@@ -25,7 +26,7 @@ fn main() {
 fn draw_clock<C: Canvas<Color>>(canvas: &mut C) {
     for hour in 0..12 {
         let point = Point::origin();
-        let radius = canvas.width() as f32 * 3. / 8.;
+        let radius = min(canvas.width(), canvas.height()) as f32 * 3. / 8.;
         let m = Matrix4x4::identity()
             .pre_translation(canvas.width() as f32 / 2., canvas.height() as f32 / 2., 0.)
             .pre_scale(radius, radius, 1.)
@@ -71,9 +72,10 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
 fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
     let fovX = TAU / 4.; // 90°
     let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.));
+    let color = (1., 1., 0., 1.).into();
+    let ray = ray!(Point::origin(), (0., 0., 1.));
     for y in 0..canvas.height() {
         for x in 0..canvas.width() {
-            let ray = ray!(Point::origin(), (0., 0., 1.));
             let tube = Matrix4x4::identity()
                 .pre_rotation_x(
                     fovX * (x as f32 - canvas.width() as f32 / 2.) / canvas.width() as f32,
@@ -85,7 +87,7 @@ fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
 
             //println!("{:?}", ray2);
             if !sphere.intersect(ray2).is_empty() {
-                canvas.write_color(x, y, (1., 1., 0., 1.).into());
+                canvas.write_color(x, y, color);
             }
             // let color = (
             //     (x as f32) / (canvas.width() as f32),

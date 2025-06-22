@@ -162,7 +162,6 @@ mod multi_intersection_tests {
 mod tests {
     use super::*;
     use crate::ray;
-    use math::tuple::vector::Vector;
 
     #[test]
     fn intersect_scaled_sphere() {

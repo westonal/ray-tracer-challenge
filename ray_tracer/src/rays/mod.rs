@@ -4,7 +4,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use std::fmt::{Debug, Display, Formatter};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub struct Ray {
     pub origin: Point,
     pub direction: Vector,
@@ -61,6 +61,7 @@ impl Debug for Ray {
 
 #[cfg(test)]
 mod ray_display_tests {
+    use crate::rays::Ray;
 
     #[test]
     fn display_ray() {
