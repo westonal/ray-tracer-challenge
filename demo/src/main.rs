@@ -1,5 +1,6 @@
 use crate::canvas::Canvas;
 use crate::image_buffer_canvas::ImageBufferCanvas;
+use math::color;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::Tuple;
 use math::tuple::color::Color;
@@ -70,7 +71,7 @@ fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
     let fov_y = TAU / 4.; // 90°
     let fov_x = apply_ratio(fov_y, canvas.ratio());
     let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
-    let color = (1., 1., 0., 1.).into();
+    let color = color!(1., 1., 0.);
     let ray = ray!(Point::origin(), (0., 0., 1.));
     for y in 0..canvas.height() {
         let y_norm = y as f32 / canvas.height() as f32 - 0.5;

@@ -2,7 +2,7 @@ use crate::tuple::Tuple;
 use std::fmt::Formatter;
 use std::ops::{Add, Mul, Sub};
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone)]
 pub struct Color {
     tuple: Tuple,
 }
@@ -51,6 +51,12 @@ impl std::fmt::Display for Color {
     }
 }
 
+impl std::fmt::Debug for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{}", self))
+    }
+}
+
 #[cfg(test)]
 mod color_display_tests {
     use super::*;
@@ -87,6 +93,30 @@ mod color_into_tests {
     #[test]
     fn tuple_4_into_color() {
         assert_eq!(Color::rgba(1., 0.5, 0.6, 0.3), (1., 0.5, 0.6, 0.3).into());
+    }
+}
+
+#[macro_export]
+macro_rules! color {
+    ($r:expr, $g:expr, $b:expr, $a:expr) => {
+        Color::rgba($r, $g, $b, $a)
+    };
+    ($r:expr, $g:expr, $b:expr) => {
+        color!($r, $g, $b, 1.)
+    };
+}
+
+#[cfg(test)]
+mod color_macro_creation_tests {
+    use super::*;
+    #[test]
+    fn macro_test() {
+        assert_eq!(Color::rgba(1., 0.5, 0.7, 1.0), color!(1., 0.5, 0.7));
+    }
+
+    #[test]
+    fn macro_test_with_alpha() {
+        assert_eq!(Color::rgba(1., 0.5, 0.7, 0.2), color!(1., 0.5, 0.7, 0.2));
     }
 }
 
