@@ -1,6 +1,10 @@
+mod transform;
+
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
+use std::fmt::{Debug, Display, Formatter};
 
+#[derive(PartialEq)]
 pub struct Ray {
     pub origin: Point,
     pub direction: Vector,
@@ -16,6 +20,13 @@ impl Ray {
     }
 }
 
+#[macro_export]
+macro_rules! ray {
+    ($point: expr, $direction: expr) => {
+        crate::rays::Ray::new($point.into(), $direction.into())
+    };
+}
+
 #[cfg(test)]
 mod ray_construction_tests {
     use super::*;
@@ -26,8 +37,38 @@ mod ray_construction_tests {
         assert_eq!(ray.origin, Point::point(1., 2., 3.));
         assert_eq!(ray.direction, Vector::vector(4., 5., 6.));
     }
+
+    #[test]
+    fn create_by_macro() {
+        let ray = Ray::new((1., 2., 3.).into(), (4., 5., 6.).into());
+        let ray2 = ray!((1., 2., 3.), (4., 5., 6.));
+        assert_eq!(ray, ray2);
+    }
 }
 
+impl Display for Ray {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "R[{} -> {}]", self.origin, self.direction)
+    }
+}
+
+impl Debug for Ray {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
+    }
+}
+
+#[cfg(test)]
+mod ray_display_tests {
+
+    #[test]
+    fn display_ray() {
+        assert_eq!(
+            "R[Pt(1, 2, 3, 1) -> V(4, 5, 6, 0)]",
+            format!("{}", ray!((1., 2., 3.), (4., 5., 6.)))
+        );
+    }
+}
 #[cfg(test)]
 mod ray_tracing_at_time_tests {
     use super::*;

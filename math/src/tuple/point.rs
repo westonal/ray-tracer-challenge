@@ -32,6 +32,18 @@ impl From<Point> for Tuple {
     }
 }
 
+impl TryFrom<Tuple> for Point {
+    type Error = String;
+
+    fn try_from(value: Tuple) -> Result<Self, Self::Error> {
+        if value.w != 1. {
+            Err(format!("Invalid point {:?} w component is not 1.", value))
+        } else {
+            Ok(Point::point(value.x, value.y, value.z))
+        }
+    }
+}
+
 impl Deref for Point {
     type Target = Tuple;
 
@@ -129,5 +141,22 @@ mod point_math_tests {
         let tuple2 = Tuple::vector(4., 1., 6.);
 
         assert_eq!(tuple1 - tuple2, Point::point(-3., 4., -2.));
+    }
+}
+
+#[cfg(test)]
+mod tuple_casting_tests {
+    use super::*;
+    #[test]
+    fn valid_point() {
+        let point: Point = Tuple::new(1., 2., 3., 1.).try_into().unwrap();
+        assert_eq!(Point::point(1., 2., 3.), point);
+    }
+
+    #[test]
+    fn invalid_point() {
+        let result: Result<Point, _> = Tuple::new(1., 2., 3., 0.).try_into();
+        assert!(result.is_err());
+        assert!(result.err().unwrap().contains("Invalid point"));
     }
 }

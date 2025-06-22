@@ -52,6 +52,19 @@ impl From<Vector> for Tuple {
         value.tuple
     }
 }
+
+impl TryFrom<Tuple> for Vector {
+    type Error = String;
+
+    fn try_from(value: Tuple) -> Result<Self, Self::Error> {
+        if value.w != 0. {
+            Err(format!("Invalid vector {:?} w component is not 0.", value))
+        } else {
+            Ok(Vector::vector(value.x, value.y, value.z))
+        }
+    }
+}
+
 impl Deref for Vector {
     type Target = Tuple;
 
@@ -255,5 +268,22 @@ mod vector_math_tests {
 
         assert_eq!(Vector::vector(-1., 2., -1.), a.cross(b));
         assert_eq!(Vector::vector(1., -2., 1.), b.cross(a));
+    }
+}
+
+#[cfg(test)]
+mod tuple_casting_tests {
+    use super::*;
+    #[test]
+    fn valid_vector() {
+        let vector: Vector = Tuple::new(1., 2., 3., 0.).try_into().unwrap();
+        assert_eq!(Vector::vector(1., 2., 3.), vector);
+    }
+
+    #[test]
+    fn invalid_point() {
+        let result: Result<Vector, _> = Tuple::new(1., 2., 3., 1.).try_into();
+        assert!(result.is_err());
+        assert!(result.err().unwrap().contains("Invalid vector"));
     }
 }
