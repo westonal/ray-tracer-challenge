@@ -70,32 +70,29 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
 }
 
 fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
-    let fovX = TAU / 4.; // 90°
+    let fov_y = TAU / 4.; // 90°
+    let fov_x = apply_ratio(fov_y, canvas.ratio());
     let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.));
     let color = (1., 1., 0., 1.).into();
     let ray = ray!(Point::origin(), (0., 0., 1.));
     for y in 0..canvas.height() {
+        let y_norm = y as f32 / canvas.height() as f32 - 0.5;
         for x in 0..canvas.width() {
+            let x_norm = x as f32 / canvas.width() as f32 - 0.5;
             let tube = Matrix4x4::identity()
-                .pre_rotation_x(
-                    fovX * (x as f32 - canvas.width() as f32 / 2.) / canvas.width() as f32,
-                )
-                .pre_rotation_y(
-                    fovX * (y as f32 - canvas.height() as f32 / 2.) / canvas.height() as f32,
-                );
+                .pre_rotation_x(apply_ratio(fov_x, x_norm))
+                .pre_rotation_y(apply_ratio(fov_y, y_norm));
             let ray2 = tube * ray;
 
-            //println!("{:?}", ray2);
             if !sphere.intersect(ray2).is_empty() {
                 canvas.write_color(x, y, color);
             }
-            // let color = (
-            //     (x as f32) / (canvas.width() as f32),
-            //     (y as f32) / (canvas.height() as f32),
-            //     0.0,
-            //     1.0,
-            // )
-            //     .into();
         }
     }
+}
+
+fn apply_ratio(angle_radians: f32, ratio: f32) -> f32 {
+    let a = (angle_radians / 2.).tan().recip();
+    let a2 = a * ratio;
+    a2.recip().atan() * 2.
 }

@@ -18,6 +18,10 @@ impl Canvas<Color> for ImageBufferCanvas {
         self.height
     }
 
+    fn ratio(&self) -> f32 {
+        self.width as f32 / self.height as f32
+    }
+
     fn save_png<Q>(&self, path: Q)
     where
         Q: AsRef<Path>,
