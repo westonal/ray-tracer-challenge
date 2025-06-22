@@ -72,7 +72,7 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
 fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
     let fov_y = TAU / 4.; // 90°
     let fov_x = apply_ratio(fov_y, canvas.ratio());
-    let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.));
+    let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
     let color = (1., 1., 0., 1.).into();
     let ray = ray!(Point::origin(), (0., 0., 1.));
     for y in 0..canvas.height() {
@@ -80,8 +80,8 @@ fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
         for x in 0..canvas.width() {
             let x_norm = x as f32 / canvas.width() as f32 - 0.5;
             let tube = Matrix4x4::identity()
-                .pre_rotation_x(apply_ratio(fov_x, x_norm))
-                .pre_rotation_y(apply_ratio(fov_y, y_norm));
+                .pre_rotation_x(apply_ratio(fov_x, x_norm*2.))//TODO NOT RIGHT, not giving 45° as max I think
+                .pre_rotation_y(apply_ratio(fov_y, y_norm*2.));
             let ray2 = tube * ray;
 
             if !sphere.intersect(ray2).is_empty() {
