@@ -4,6 +4,10 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::Tuple;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
+use ray_tracer::intersection::Intersect;
+use ray_tracer::primatives::sphere::Sphere;
+use ray_tracer::ray;
+use ray_tracer::rays::Ray;
 use std::f32::consts::TAU;
 
 mod canvas;
@@ -14,6 +18,7 @@ fn main() {
     fill_all_with_gradient(&mut canvas);
     example(&mut canvas);
     draw_clock(&mut canvas);
+    ray_trace_silhouette(&mut canvas);
     canvas.save_png("demo.png");
 }
 
@@ -60,5 +65,35 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
         println!("{}: {} = {}", i, point, color);
         canvas.write_color(point.x as u32, point.y as u32, color);
         speed = speed + acceleration;
+    }
+}
+
+fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
+    let fovX = TAU / 4.; // 90°
+    let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.));
+    for y in 0..canvas.height() {
+        for x in 0..canvas.width() {
+            let ray = ray!(Point::origin(), (0., 0., 1.));
+            let tube = Matrix4x4::identity()
+                .pre_rotation_x(
+                    fovX * (x as f32 - canvas.width() as f32 / 2.) / canvas.width() as f32,
+                )
+                .pre_rotation_y(
+                    fovX * (y as f32 - canvas.height() as f32 / 2.) / canvas.height() as f32,
+                );
+            let ray2 = tube * ray;
+
+            //println!("{:?}", ray2);
+            if !sphere.intersect(ray2).is_empty() {
+                canvas.write_color(x, y, (1., 1., 0., 1.).into());
+            }
+            // let color = (
+            //     (x as f32) / (canvas.width() as f32),
+            //     (y as f32) / (canvas.height() as f32),
+            //     0.0,
+            //     1.0,
+            // )
+            //     .into();
+        }
     }
 }

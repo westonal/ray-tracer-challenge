@@ -23,7 +23,7 @@ impl Ray {
 #[macro_export]
 macro_rules! ray {
     ($point: expr, $direction: expr) => {
-        crate::rays::Ray::new($point.into(), $direction.into())
+        Ray::new($point.into(), $direction.into())
     };
 }
 

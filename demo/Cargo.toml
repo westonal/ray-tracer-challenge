@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 image = "0.25.6"
 math = { path = "../math" }
+ray_tracer = { path = "../ray_tracer" }

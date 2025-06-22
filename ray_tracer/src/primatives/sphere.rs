@@ -1,23 +1,34 @@
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::rays::Ray;
+use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use uuid::Uuid;
 
 #[derive(Debug, PartialEq)]
 pub struct Sphere {
     id: String,
+    object_to_world_transform: Matrix4x4,
+    world_to_object_transform: Matrix4x4,
 }
 
 impl Sphere {
-    pub fn new() -> Self {
+    pub fn new_transformed(transform: Matrix4x4) -> Self {
         Self {
             id: format!("{}", Uuid::new_v4()),
+            object_to_world_transform: transform,
+            world_to_object_transform: transform.invert().expect("inverse transform failure"),
         }
+    }
+    pub fn new() -> Self {
+        Self::new_transformed(Matrix4x4::identity())
     }
 }
 
 impl Intersect for Sphere {
     fn intersect(&self, ray: Ray) -> Intersections {
+        // Convert world ray into object space
+        let ray = self.world_to_object_transform * ray;
+
         let sphere_to_ray = ray.origin - Point::origin();
         let a = ray.direction.dot(ray.direction);
         let b = 2. * ray.direction.dot(sphere_to_ray);
@@ -144,5 +155,30 @@ mod multi_intersection_tests {
             Intersection::new(2., &sphere4),
         ]);
         assert_eq!(&sphere4, intersections.hit().expect("Expected hit").sphere);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ray;
+    use math::tuple::vector::Vector;
+
+    #[test]
+    fn intersect_scaled_sphere() {
+        let sphere = Sphere::new_transformed(Matrix4x4::scale(2., 2., 2.));
+        let ray = ray!((0., 0., -5.), (0., 0., 1.));
+        let intersections = sphere.intersect(ray);
+        assert_eq!(intersections.len(), 2);
+        assert_eq!(intersections[0].t, 3.);
+        assert_eq!(intersections[1].t, 7.);
+    }
+
+    #[test]
+    fn intersect_translated_sphere() {
+        let sphere = Sphere::new_transformed(Matrix4x4::translation(5., 0., 0.));
+        let ray = ray!((0., 0., -5.), (0., 0., 1.));
+        let intersections = sphere.intersect(ray);
+        assert_eq!(intersections.len(), 0);
     }
 }
