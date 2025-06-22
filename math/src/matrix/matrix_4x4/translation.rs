@@ -41,25 +41,26 @@ mod tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::point::Point;
     use crate::tuple::vector::Vector;
+    use crate::{point, vector};
 
     #[test]
     fn translate_point() {
         let m = Matrix4x4::translation(5., -3., 2.);
-        let p = Point::point(-3., 4., 5.);
-        assert_eq!(m * p, Point::point(2., 1., 7.).into());
+        let p = point!(-3., 4., 5.);
+        assert_eq!(m * p, point!(2., 1., 7.).into());
     }
 
     #[test]
     fn translate_point_fluent() {
         let m = Matrix4x4::identity().pre_translation(5., -3., 2.);
-        let p = Point::point(-3., 4., 5.);
-        assert_eq!(m * p, Point::point(2., 1., 7.).into());
+        let p = point!(-3., 4., 5.);
+        assert_eq!(m * p, point!(2., 1., 7.).into());
     }
 
     #[test]
     fn translate_vector_does_not_affect_vector() {
         let m = Matrix4x4::translation(5., -3., 2.);
-        let p = Vector::vector(-3., 4., 5.);
+        let p = vector!(-3., 4., 5.);
         assert_eq!(m * p, p.into());
     }
 }

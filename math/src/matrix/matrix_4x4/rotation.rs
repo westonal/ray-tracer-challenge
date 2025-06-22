@@ -56,15 +56,16 @@ mod rotation_x_tests {
     use crate::tuple::Tuple;
     use crate::tuple::point::Point;
 
+    use crate::point;
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
         let eighth = Matrix4x4::rotation_x(PI / 4.0);
-        let p = Point::point(0., 1., 0.);
+        let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 0.,
                 std::f32::consts::FRAC_1_SQRT_2,
                 std::f32::consts::FRAC_1_SQRT_2
@@ -76,10 +77,10 @@ mod rotation_x_tests {
     #[test]
     fn rotate_point_one_eighth_fluent() {
         let eighth = Matrix4x4::identity().pre_rotation_x(PI / 4.0);
-        let p = Point::point(0., 1., 0.);
+        let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 0.,
                 std::f32::consts::FRAC_1_SQRT_2,
                 std::f32::consts::FRAC_1_SQRT_2
@@ -91,10 +92,10 @@ mod rotation_x_tests {
     #[test]
     fn rotate_point_one_eighth_2() {
         let eighth = Matrix4x4::rotation_x(PI / 4.0);
-        let p = Point::point(2., 3., 0.);
+        let p = point!(2., 3., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 2.,
                 3. * std::f32::consts::FRAC_1_SQRT_2,
                 3. * std::f32::consts::FRAC_1_SQRT_2
@@ -106,8 +107,8 @@ mod rotation_x_tests {
     #[test]
     fn rotate_point_one_quarter() {
         let quarter = Matrix4x4::rotation_x(PI / 2.0);
-        let p = Point::point(0., 1., 0.);
-        assert_eq!(quarter * p, Point::point(0., -4.371139e-8, 1.).into());
+        let p = point!(0., 1., 0.);
+        assert_eq!(quarter * p, point!(0., -4.371139e-8, 1.).into());
     }
 
     #[test]
@@ -115,7 +116,7 @@ mod rotation_x_tests {
         let eighth = Matrix4x4::rotation_x(PI / 4.0);
         let eighth_reversed = Matrix4x4::rotation_x(-(PI / 4.0));
         let eighth_inverted = eighth.invert().unwrap();
-        let p = Point::point(1., 2., 3.);
+        let p = point!(1., 2., 3.);
         assert_eq!(Tuple::new(1., 3.535534, 0.7071067, 1.), eighth_reversed * p);
         assert_eq!(
             Tuple::new(1., 3.5355341, 0.7071068, 1.),
@@ -130,15 +131,16 @@ mod rotation_y_tests {
     use crate::tuple::Tuple;
     use crate::tuple::point::Point;
 
+    use crate::point;
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
         let eighth = Matrix4x4::rotation_y(PI / 4.0);
-        let p = Point::point(0., 0., 1.);
+        let p = point!(0., 0., 1.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 std::f32::consts::FRAC_1_SQRT_2,
                 0.,
                 std::f32::consts::FRAC_1_SQRT_2
@@ -150,10 +152,10 @@ mod rotation_y_tests {
     #[test]
     fn rotate_point_one_eighth_fluent() {
         let eighth = Matrix4x4::identity().pre_rotation_y(PI / 4.0);
-        let p = Point::point(0., 0., 1.);
+        let p = point!(0., 0., 1.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 std::f32::consts::FRAC_1_SQRT_2,
                 0.,
                 std::f32::consts::FRAC_1_SQRT_2
@@ -165,10 +167,10 @@ mod rotation_y_tests {
     #[test]
     fn rotate_point_one_eighth_2() {
         let eighth = Matrix4x4::rotation_y(PI / 4.0);
-        let p = Point::point(2., 3., 0.);
+        let p = point!(2., 3., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 2. * std::f32::consts::FRAC_1_SQRT_2,
                 3.,
                 -2. * std::f32::consts::FRAC_1_SQRT_2
@@ -180,8 +182,8 @@ mod rotation_y_tests {
     #[test]
     fn rotate_point_one_quarter() {
         let quarter = Matrix4x4::rotation_y(PI / 2.0);
-        let p = Point::point(0., 1., 0.);
-        assert_eq!(quarter * p, Point::point(0., 1., 0.).into());
+        let p = point!(0., 1., 0.);
+        assert_eq!(quarter * p, point!(0., 1., 0.).into());
     }
 
     #[test]
@@ -189,7 +191,7 @@ mod rotation_y_tests {
         let eighth = Matrix4x4::rotation_y(PI / 4.0);
         let eighth_reversed = Matrix4x4::rotation_y(-(PI / 4.0));
         let eighth_inverted = eighth.invert().unwrap();
-        let p = Point::point(1., 2., 3.);
+        let p = point!(1., 2., 3.);
         assert_eq!(
             Tuple::new(-1.4142134, 2., 2.828427, 1.),
             eighth_reversed * p
@@ -207,18 +209,19 @@ mod rotation_z_tests {
     use crate::tuple::Tuple;
     use crate::tuple::point::Point;
 
+    use crate::point;
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
         let eighth = Matrix4x4::rotation_z(PI / 4.0);
-        let p = Point::point(0., 1., 0.);
+        let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 -std::f32::consts::FRAC_1_SQRT_2,
                 std::f32::consts::FRAC_1_SQRT_2,
-                0.,
+                0.
             )
             .into()
         );
@@ -227,13 +230,13 @@ mod rotation_z_tests {
     #[test]
     fn rotate_point_one_eighth_fluent() {
         let eighth = Matrix4x4::identity().pre_rotation_z(PI / 4.0);
-        let p = Point::point(0., 1., 0.);
+        let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
-            Point::point(
+            point!(
                 -std::f32::consts::FRAC_1_SQRT_2,
                 std::f32::consts::FRAC_1_SQRT_2,
-                0.,
+                0.
             )
             .into()
         );
@@ -242,15 +245,15 @@ mod rotation_z_tests {
     #[test]
     fn rotate_point_one_eighth_2() {
         let eighth = Matrix4x4::rotation_z(PI / 4.0);
-        let p = Point::point(2., 3., 2.);
-        assert_eq!(eighth * p, Point::point(-0.7071067, 3.535534, 2.,).into());
+        let p = point!(2., 3., 2.);
+        assert_eq!(eighth * p, point!(-0.7071067, 3.535534, 2.).into());
     }
 
     #[test]
     fn rotate_point_one_quarter() {
         let quarter = Matrix4x4::rotation_z(PI / 2.0);
-        let p = Point::point(0., 1., 0.);
-        assert_eq!(quarter * p, Point::point(-1., -4.371139e-8, 0.).into());
+        let p = point!(0., 1., 0.);
+        assert_eq!(quarter * p, point!(-1., -4.371139e-8, 0.).into());
     }
 
     #[test]
@@ -258,7 +261,7 @@ mod rotation_z_tests {
         let eighth = Matrix4x4::rotation_z(PI / 4.0);
         let eighth_reversed = Matrix4x4::rotation_z(-(PI / 4.0));
         let eighth_inverted = eighth.invert().unwrap();
-        let p = Point::point(1., 2., 3.);
+        let p = point!(1., 2., 3.);
         assert_eq!(
             Tuple::new(2.1213202, 0.70710677, 3., 1.),
             eighth_reversed * p

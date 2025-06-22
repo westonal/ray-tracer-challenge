@@ -30,12 +30,13 @@ macro_rules! ray {
 #[cfg(test)]
 mod ray_construction_tests {
     use super::*;
+    use math::{point, vector};
 
     #[test]
     fn create() {
         let ray = Ray::new((1., 2., 3.).into(), (4., 5., 6.).into());
-        assert_eq!(ray.origin, Point::point(1., 2., 3.));
-        assert_eq!(ray.direction, Vector::vector(4., 5., 6.));
+        assert_eq!(ray.origin, point!(1., 2., 3.));
+        assert_eq!(ray.direction, vector!(4., 5., 6.));
     }
 
     #[test]

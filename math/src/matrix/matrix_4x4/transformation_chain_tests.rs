@@ -2,6 +2,7 @@
 mod chain_tests {
 
     use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::point;
     use crate::tuple::point::Point;
     use std::f32::consts::PI;
 
@@ -11,8 +12,8 @@ mod chain_tests {
             Matrix4x4::translation(10., 5., 7.)
                 * Matrix4x4::scale(5., 5., 5.,)
                 * Matrix4x4::rotation_x(PI / 2.)
-                * Point::point(1., 0., 1.),
-            Point::point(15., 0., 7.).into()
+                * point!(1., 0., 1.),
+            point!(15., 0., 7.).into()
         )
     }
 
@@ -22,8 +23,8 @@ mod chain_tests {
             Matrix4x4::rotation_x(PI / 2.)
                 * Matrix4x4::scale(5., 5., 5.,)
                 * Matrix4x4::translation(10., 5., 7.)
-                * Point::point(1., 0., 1.),
-            Point::point(55., -40., 24.999998).into()
+                * point!(1., 0., 1.),
+            point!(55., -40., 24.999998).into()
         )
     }
 
@@ -33,8 +34,8 @@ mod chain_tests {
             Matrix4x4::translation(10., 5., 7.)
                 .pre_scale(5., 5., 5.,)
                 .pre_rotation_x(PI / 2.)
-                * Point::point(1., 0., 1.),
-            Point::point(15., 0., 7.).into()
+                * point!(1., 0., 1.),
+            point!(15., 0., 7.).into()
         )
     }
 
@@ -44,8 +45,8 @@ mod chain_tests {
             Matrix4x4::rotation_x(PI / 2.)
                 .pre_scale(5., 5., 5.,)
                 .pre_translation(10., 5., 7.)
-                * Point::point(1., 0., 1.),
-            Point::point(55., -40., 24.999998).into()
+                * point!(1., 0., 1.),
+            point!(55., -40., 24.999998).into()
         )
     }
 }

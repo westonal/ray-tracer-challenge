@@ -28,54 +28,55 @@ impl Matrix4x4 {
 #[cfg(test)]
 mod matrix_4x4_shearing_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::point;
     use crate::tuple::point::Point;
 
     #[test]
     fn shear_x_in_proportion_to_y() {
         let m = Matrix4x4::shear(1., 0., 0., 0., 0., 0.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(5., 3., 4.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(5., 3., 4.).into());
     }
 
     #[test]
     fn shear_x_in_proportion_to_z() {
         let m = Matrix4x4::shear(0., 1., 0., 0., 0., 0.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(6., 3., 4.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(6., 3., 4.).into());
     }
 
     #[test]
     fn shear_y_in_proportion_to_x() {
         let m = Matrix4x4::shear(0., 0., 1., 0., 0., 0.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(2., 5., 4.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(2., 5., 4.).into());
     }
 
     #[test]
     fn shear_y_in_proportion_to_z() {
         let m = Matrix4x4::shear(0., 0., 0., 1., 0., 0.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(2., 7., 4.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(2., 7., 4.).into());
     }
 
     #[test]
     fn shear_x_in_proportion_to_x() {
         let m = Matrix4x4::shear(0., 0., 0., 0., 1., 0.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(2., 3., 6.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(2., 3., 6.).into());
     }
 
     #[test]
     fn shear_z_in_proportion_to_y() {
         let m = Matrix4x4::shear(0., 0., 0., 0., 0., 1.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(2., 3., 7.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(2., 3., 7.).into());
     }
 
     #[test]
     fn shear_fluent() {
         let m = Matrix4x4::translation(3., 2., 5.).pre_shear(1., 2., 3., 4., 5., 6.);
-        let p = Point::point(2., 3., 4.);
-        assert_eq!(m * p, Point::point(16., 27., 37.).into());
+        let p = point!(2., 3., 4.);
+        assert_eq!(m * p, point!(16., 27., 37.).into());
     }
 }

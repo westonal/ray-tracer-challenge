@@ -82,6 +82,22 @@ mod point_into_tests {
     }
 }
 
+#[macro_export]
+macro_rules! point {
+    ($x:expr, $y:expr, $z:expr) => {
+        Point::point($x, $y, $z)
+    };
+}
+
+#[cfg(test)]
+mod point_creation_tests {
+    use super::*;
+    #[test]
+    fn macro_test() {
+        assert_eq!(Point::point(12., 3., -18.7), point!(12., 3., -18.7));
+    }
+}
+
 #[cfg(test)]
 mod point_origin {
     use super::*;

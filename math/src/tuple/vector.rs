@@ -79,6 +79,22 @@ impl std::fmt::Display for Vector {
     }
 }
 
+#[macro_export]
+macro_rules! vector {
+    ($x:expr, $y:expr, $z:expr) => {
+        Vector::vector($x, $y, $z)
+    };
+}
+
+#[cfg(test)]
+mod vector_creation_tests {
+    use super::*;
+    #[test]
+    fn macro_test() {
+        assert_eq!(Vector::vector(12., 3., -18.7), vector!(12., 3., -18.7));
+    }
+}
+
 #[cfg(test)]
 mod vector_display_tests {
     use super::*;
