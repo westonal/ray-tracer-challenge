@@ -302,4 +302,10 @@ mod tuple_casting_tests {
         assert!(result.is_err());
         assert!(result.err().unwrap().contains("Invalid vector"));
     }
+
+    #[test]
+    fn invalid_point_forced_to_vector() {
+        let vector: Vector = Tuple::new(1., 2., 3., 1.).force_vector();
+        assert_eq!(vector!(1., 2., 3.), vector);
+    }
 }

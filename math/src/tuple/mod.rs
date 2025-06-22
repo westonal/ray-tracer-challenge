@@ -16,6 +16,13 @@ pub struct Tuple {
 }
 
 impl Tuple {
+    /// Ignore any non-0 w component    
+    pub fn force_vector(&self) -> Vector {
+        Vector::vector(self.x, self.y, self.z)
+    }
+}
+
+impl Tuple {
     pub fn hadamard_product(&self, other: Tuple) -> Tuple {
         Self::new(
             self.x * other.x,

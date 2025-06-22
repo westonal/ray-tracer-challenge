@@ -33,3 +33,9 @@ cargo bench
 ```shell
 cargo fix --allow-dirty && cargo fmt
 ```
+
+## Pre commit recommendation
+
+```shell
+cargo fix --allow-dirty && cargo fmt && cargo test && cargo run
+```
