@@ -1,4 +1,5 @@
 use crate::intersection::{Intersect, Intersection, Intersections};
+use crate::lighting::Material;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
@@ -8,6 +9,7 @@ use uuid::Uuid;
 #[derive(Debug, PartialEq)]
 pub struct Sphere {
     id: String,
+    pub material: Material,
     object_to_world_transform: Matrix4x4,
     world_to_object_transform: Matrix4x4,
 }
@@ -25,10 +27,12 @@ impl Sphere {
     pub fn new_transformed(transform: Matrix4x4) -> Self {
         Self {
             id: format!("{}", Uuid::new_v4()),
+            material: Material::default(),
             object_to_world_transform: transform,
             world_to_object_transform: transform.invert().expect("inverse transform failure"),
         }
     }
+
     pub fn new() -> Self {
         Self::new_transformed(Matrix4x4::identity())
     }

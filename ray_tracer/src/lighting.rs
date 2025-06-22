@@ -14,6 +14,7 @@ impl PointLight {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Material {
     pub color: Color,
     pub ambient: f32,
@@ -23,7 +24,7 @@ pub struct Material {
 }
 
 impl Material {
-    pub fn light(&self, light: PointLight, point: Point, eye: Vector, normal: Vector) -> Color {
+    pub fn light(&self, light: &PointLight, point: Point, eye: Vector, normal: Vector) -> Color {
         // Combine surface and light color
         let effective_color = self.color * light.color;
 
@@ -83,7 +84,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.9, 1.9, 1.9),
-            material.light(light, point, eye, normal)
+            material.light(&light, point, eye, normal)
         );
     }
 
@@ -96,7 +97,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.0, 1.0, 1.0),
-            material.light(light, point, eye, normal)
+            material.light(&light, point, eye, normal)
         );
     }
 
@@ -109,7 +110,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.7363961, 0.7363961, 0.7363961),
-            material.light(light, point, eye, normal)
+            material.light(&light, point, eye, normal)
         );
     }
 
@@ -122,7 +123,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.6363853, 1.6363853, 1.6363853),
-            material.light(light, point, eye, normal)
+            material.light(&light, point, eye, normal)
         );
     }
 
@@ -135,7 +136,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
-            material.light(light, position, eye, normal)
+            material.light(&light, position, eye, normal)
         );
     }
 }

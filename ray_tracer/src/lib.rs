@@ -1,5 +1,5 @@
 pub mod intersection;
-mod lighting;
+pub mod lighting;
 pub mod primatives;
 pub mod rays;
 

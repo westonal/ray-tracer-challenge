@@ -1,11 +1,12 @@
 use crate::canvas::Canvas;
 use crate::image_buffer_canvas::ImageBufferCanvas;
-use math::color;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::Tuple;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
+use math::{color, point};
 use ray_tracer::intersection::Intersect;
+use ray_tracer::lighting::{Material, PointLight};
 use ray_tracer::primatives::sphere::Sphere;
 use ray_tracer::ray;
 use ray_tracer::rays::Ray;
@@ -18,9 +19,10 @@ mod image_buffer_canvas;
 fn main() {
     let mut canvas = ImageBufferCanvas::new(300, 200);
     fill_all_with_gradient(&mut canvas);
-    example(&mut canvas);
+    //example(&mut canvas);
     draw_clock(&mut canvas);
-    ray_trace_silhouette(&mut canvas);
+    //ray_trace_silhouette(&mut canvas);
+    ray_trace_with_lighting(&mut canvas);
     canvas.save_png("demo.png");
     println!("Saved image to `demo.png`");
 }
@@ -84,6 +86,41 @@ fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
 
             if !sphere.intersect(ray2).is_empty() {
                 canvas.write_color(x, y, color);
+            }
+        }
+    }
+}
+
+fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
+    let mut material = Material::default();
+    material.color = color!(1., 0.5, 1.);
+    let mut sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., 2.0_f32.sqrt()));
+    sphere.material = material;
+    let light = PointLight::new(point!(-10, -10, -7), color!(1., 0.9, 1.));
+
+    let fov_y = TAU / 4.; // 90°
+    let fov_x = apply_ratio(fov_y, canvas.ratio());
+    let ray = ray!(Point::origin(), (0., 0., 1.));
+    for y in 0..canvas.height() {
+        let y_norm = y as f32 / canvas.height() as f32 - 0.5;
+        for x in 0..canvas.width() {
+            let x_norm = x as f32 / canvas.width() as f32 - 0.5;
+            let tube = Matrix4x4::identity()
+                .pre_rotation_x(apply_ratio(fov_y, y_norm)) //TODO NOT RIGHT, not giving 45° as max I think
+                .pre_rotation_y(apply_ratio(fov_x, x_norm));
+            let ray = tube * ray;
+
+            let intersections = sphere.intersect(ray);
+            if let Some(hit) = intersections.hit() {
+                let point = ray.position(hit.t);
+                let color1 = hit.sphere.material.light(
+                    &light,
+                    ray.origin,
+                    -ray.direction.normalize(),
+                    hit.sphere.normal_at(point),
+                );
+
+                canvas.write_color(x, y, color1);
             }
         }
     }
