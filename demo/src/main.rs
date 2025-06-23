@@ -12,6 +12,7 @@ use ray_tracer::ray;
 use ray_tracer::rays::Ray;
 use std::cmp::min;
 use std::f32::consts::TAU;
+use std::time::Instant;
 
 mod canvas;
 mod image_buffer_canvas;
@@ -21,7 +22,11 @@ fn main() {
     fill_all_with_gradient(&mut canvas);
     //example(&mut canvas);
     //ray_trace_silhouette(&mut canvas);
+    let now = Instant::now();
     ray_trace_with_lighting(&mut canvas);
+    let duration = now.elapsed();
+    let pixels = canvas.width() * canvas.height();
+    println!("Ray trace took: {} ms {} px/sec", duration.as_millis(), pixels as f32 / duration.as_secs_f32());
     //draw_clock(&mut canvas);
     canvas.save_png("demo.png");
     println!("Saved image to `demo.png`");
