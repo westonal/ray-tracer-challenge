@@ -16,8 +16,8 @@ pub struct Intersection<'s> {
 pub struct Intersections<'s>(Vec<Intersection<'s>>);
 
 impl<'s> Intersections<'s> {
-    pub fn new(p0: Vec<Intersection<'s>>) -> Intersections<'s> {
-        let mut intersections = Self(p0);
+    pub fn new(vec: Vec<Intersection<'s>>) -> Intersections<'s> {
+        let mut intersections = Self(vec);
         intersections.sort_by_t();
         intersections
     }
@@ -38,23 +38,13 @@ impl Intersections<'_> {
 
 impl<'s> Intersections<'s> {
     pub fn hit(&self) -> Option<&Intersection> {
-        let mut closest_hit: Option<&Intersection> = None;
         for i in self.iter() {
             if i.t < 0. {
                 continue;
             }
-            match closest_hit {
-                None => {
-                    closest_hit = Some(i);
-                }
-                Some(closest_so_far) => {
-                    if i.t < closest_so_far.t {
-                        closest_hit = Some(i);
-                    }
-                }
-            }
+            return Some(i);
         }
-        closest_hit
+        None
     }
 }
 

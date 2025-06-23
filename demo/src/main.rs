@@ -139,7 +139,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
                     hit.sphere.normal_at(point),
                 );
 
-                canvas.write_color(x, y, color1+color2);
+                canvas.write_color(x, y, color1 + color2);
             }
         }
     }
