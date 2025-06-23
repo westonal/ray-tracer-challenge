@@ -17,12 +17,12 @@ mod canvas;
 mod image_buffer_canvas;
 
 fn main() {
-    let mut canvas = ImageBufferCanvas::new(300, 200);
+    let mut canvas = ImageBufferCanvas::new(600, 400);
     fill_all_with_gradient(&mut canvas);
     //example(&mut canvas);
-    draw_clock(&mut canvas);
     //ray_trace_silhouette(&mut canvas);
     ray_trace_with_lighting(&mut canvas);
+    //draw_clock(&mut canvas);
     canvas.save_png("demo.png");
     println!("Saved image to `demo.png`");
 }
@@ -99,16 +99,14 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let light = PointLight::new(point!(-10, -10, -7), color!(1., 0.9, 1.));
 
     let fov_y = TAU / 4.; // 90°
+    let z = 0.5 / (fov_y / 2.0).tan();
     let fov_x = apply_ratio(fov_y, canvas.ratio());
     let ray = ray!(Point::origin(), (0., 0., 1.));
     for y in 0..canvas.height() {
         let y_norm = y as f32 / canvas.height() as f32 - 0.5;
         for x in 0..canvas.width() {
             let x_norm = x as f32 / canvas.width() as f32 - 0.5;
-            let tube = Matrix4x4::identity()
-                .pre_rotation_x(apply_ratio(fov_y, y_norm)) //TODO NOT RIGHT, not giving 45° as max I think
-                .pre_rotation_y(apply_ratio(fov_x, x_norm));
-            let ray = tube * ray;
+            let ray = ray!((0., 0., 0.), (x_norm * canvas.ratio(), y_norm, z));
 
             let intersections = sphere.intersect(ray);
             if let Some(hit) = intersections.hit() {
@@ -116,7 +114,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
                 let color1 = hit.sphere.material.light(
                     &light,
                     ray.origin,
-                    -ray.direction.normalize(),
+                    (-ray.direction).normalize(),
                     hit.sphere.normal_at(point),
                 );
 

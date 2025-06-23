@@ -1,6 +1,8 @@
+pub mod normal;
 mod reflection;
 
 use crate::tuple::Tuple;
+use crate::tuple::vector::normal::Normal;
 use std::fmt::Formatter;
 use std::ops::{Add, AddAssign, Deref, Div, Mul, Neg, Sub};
 
@@ -38,8 +40,8 @@ impl Vector {
         self.dot(*self).sqrt()
     }
 
-    pub fn normalize(&self) -> Self {
-        *self / self.magnitude()
+    pub fn normalize(&self) -> Normal {
+        Normal::new(self.clone())
     }
 }
 
@@ -250,16 +252,18 @@ mod vector_math_tests {
     fn vector_normalize() {
         let a = Vector::vector(4., 0., 0.);
 
-        assert_eq!(Vector::vector(1., 0., 0.), a.normalize());
+        let normal: Normal = a.normalize();
+        assert_eq!(&Vector::vector(1., 0., 0.), normal.deref());
     }
 
     #[test]
     fn vector_normalize_2() {
         let a = Vector::vector(1., 2., 3.);
 
+        let normal: Normal = a.normalize();
         assert_eq!(
-            Vector::vector(0.26726124, 0.5345225, 0.8017837),
-            a.normalize()
+            &Vector::vector(0.26726124, 0.5345225, 0.8017837),
+            normal.deref()
         );
     }
 

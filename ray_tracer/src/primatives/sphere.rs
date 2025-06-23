@@ -3,7 +3,7 @@ use crate::lighting::Material;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
-use math::tuple::vector::Vector;
+use math::tuple::vector::normal::Normal;
 use uuid::Uuid;
 
 #[derive(Debug, PartialEq)]
@@ -15,7 +15,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn normal_at(&self, point: Point) -> Vector {
+    pub fn normal_at(&self, point: Point) -> Normal {
         let object_point: Point = (self.world_to_object_transform * point).try_into().unwrap();
         let object_normal = object_point - Point::origin();
         let world_normal = self.world_to_object_transform.transpose() * object_normal;
@@ -202,13 +202,14 @@ mod normal_tests {
     use math::tuple::vector::Vector;
     use math::{point, vector};
     use std::f32::consts::PI;
+    use std::ops::Deref;
 
     #[test]
     fn normal_of_translated_sphere() {
         let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 1., 0.));
         assert_eq!(
-            vector!(0., 0.7071068, -0.70710677),
-            sphere.normal_at(point!(0., 1.70711, -0.70711))
+            &vector!(0., 0.7071068, -0.70710677),
+            sphere.normal_at(point!(0., 1.70711, -0.70711)).deref()
         );
     }
 
@@ -216,8 +217,10 @@ mod normal_tests {
     fn normal_of_transformed_sphere() {
         let sphere = Sphere::new_transformed(Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(PI / 5.));
         assert_eq!(
-            vector!(-2.0444226e-8, 0.97014254, -0.24253564),
-            sphere.normal_at(point!(0., 2.0_f32.sqrt() / 2., -2.0_f32.sqrt() / 2.))
+            &vector!(-2.0444226e-8, 0.97014254, -0.24253564),
+            sphere
+                .normal_at(point!(0., 2.0_f32.sqrt() / 2., -2.0_f32.sqrt() / 2.))
+                .deref()
         );
     }
 }
