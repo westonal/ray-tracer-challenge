@@ -49,7 +49,7 @@ impl Intersect for Sphere {
         let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
         let discriminant = b * b - 4. * a * c;
         if discriminant < 0. {
-            return Intersections(vec![]);
+            return Intersections::default();
         }
         let mut result: Vec<Intersection> = Vec::with_capacity(2);
         let a2 = 2. * a;
@@ -60,7 +60,7 @@ impl Intersect for Sphere {
             result.push(Intersection::new((-b - discriminant_sqrt) / a2, self));
             result.push(Intersection::new((-b + discriminant_sqrt) / a2, self));
         }
-        Intersections(result)
+        Intersections::new(result)
     }
 }
 
@@ -127,7 +127,7 @@ mod multi_intersection_tests {
     fn the_hit_when_all_intersections_are_positive() {
         let sphere1 = Sphere::new();
         let sphere2 = Sphere::new();
-        let intersections = Intersections(vec![
+        let intersections = Intersections::new(vec![
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),
         ]);
@@ -138,7 +138,7 @@ mod multi_intersection_tests {
     fn the_hit_when_some_intersections_are_negative() {
         let sphere1 = Sphere::new();
         let sphere2 = Sphere::new();
-        let intersections = Intersections(vec![
+        let intersections = Intersections::new(vec![
             Intersection::new(-1., &sphere1),
             Intersection::new(1., &sphere2),
         ]);
@@ -149,7 +149,7 @@ mod multi_intersection_tests {
     fn the_hit_when_all_intersections_are_negative() {
         let sphere1 = Sphere::new();
         let sphere2 = Sphere::new();
-        let intersections = Intersections(vec![
+        let intersections = Intersections::new(vec![
             Intersection::new(-2., &sphere1),
             Intersection::new(-1., &sphere2),
         ]);
@@ -162,7 +162,7 @@ mod multi_intersection_tests {
         let sphere2 = Sphere::new();
         let sphere3 = Sphere::new();
         let sphere4 = Sphere::new();
-        let intersections = Intersections(vec![
+        let intersections = Intersections::new(vec![
             Intersection::new(5., &sphere1),
             Intersection::new(7., &sphere2),
             Intersection::new(-3., &sphere3),

@@ -10,6 +10,7 @@ use ray_tracer::lighting::{Material, PointLight};
 use ray_tracer::primatives::sphere::Sphere;
 use ray_tracer::ray;
 use ray_tracer::rays::Ray;
+use ray_tracer::world::World;
 use std::cmp::min;
 use std::f32::consts::TAU;
 use std::time::Instant;
@@ -105,6 +106,10 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     material.color = color!(1., 0.5, 1.);
     let mut sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., 2.0_f32.sqrt()));
     sphere.material = material;
+    let mut world = World::default();
+    world.add(sphere);
+    let world = world;
+
     let light = PointLight::new(point!(-10, -10, -7), color!(1., 0.9, 1.));
 
     let fov_y = TAU / 4.; // 90°
@@ -117,7 +122,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
             let x_norm = x as f32 / canvas.width() as f32 - 0.5;
             let ray = ray!((0., 0., 0.), (x_norm * canvas.ratio(), y_norm, z));
 
-            let intersections = sphere.intersect(ray);
+            let intersections = world.intersect(ray);
             if let Some(hit) = intersections.hit() {
                 let point = ray.position(hit.t);
                 let color1 = hit.sphere.material.light(

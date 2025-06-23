@@ -2,6 +2,7 @@ pub mod intersection;
 pub mod lighting;
 pub mod primatives;
 pub mod rays;
+pub mod world;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
