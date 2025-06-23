@@ -22,7 +22,7 @@ impl Vector {
         }
     }
 
-    pub fn dot(&self, other: Vector) -> f32 {
+    pub fn dot(&self, other: &Vector) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
@@ -37,7 +37,7 @@ impl Vector {
     }
 
     pub fn magnitude(&self) -> f32 {
-        self.dot(*self).sqrt()
+        self.dot(self).sqrt()
     }
 
     pub fn normalize(&self) -> Normal {
@@ -272,7 +272,7 @@ mod vector_math_tests {
         let a = Vector::vector(1., 2., 3.);
         let b = Vector::vector(2., 3., 4.);
 
-        assert_eq!(20., a.dot(b));
+        assert_eq!(20., a.dot(&b));
     }
 
     #[test]
@@ -280,7 +280,7 @@ mod vector_math_tests {
         let a = Vector::new(Tuple::new(1., 2., 3., 4.));
         let b = Vector::new(Tuple::new(2., 3., 4., 5.));
 
-        assert_eq!(40., a.dot(b));
+        assert_eq!(40., a.dot(&b));
     }
 
     #[test]

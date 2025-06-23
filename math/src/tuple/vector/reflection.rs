@@ -2,7 +2,7 @@ use crate::tuple::vector::Vector;
 
 impl Vector {
     pub fn reflect(&self, normal: Vector) -> Vector {
-        self.clone() - normal * 2. * self.dot(normal)
+        self.clone() - normal * 2. * self.dot(&normal)
     }
 }
 

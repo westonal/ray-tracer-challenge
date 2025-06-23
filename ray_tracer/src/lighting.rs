@@ -37,13 +37,13 @@ impl Material {
         let mut result = ambient;
 
         //
-        let light_dot_normal = light_v.dot(normal.clone_vector());
+        let light_dot_normal = light_v.dot(&normal);
         if light_dot_normal >= 0.0 {
             let diffuse = effective_color * self.diffuse * light_dot_normal;
             result = result + diffuse;
 
             let reflect_v = -light_v.reflect(normal.clone_vector());
-            let reflect_dot_eye = reflect_v.dot(eye.normalize().clone_vector());
+            let reflect_dot_eye = reflect_v.dot(&eye);
             if reflect_dot_eye > 0.0 {
                 // compute the specular contribution
                 let factor = reflect_dot_eye.powf(self.shininess);

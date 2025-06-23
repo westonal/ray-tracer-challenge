@@ -16,6 +16,10 @@ impl Normal {
     pub fn clone_vector(&self) -> Vector {
         self.vector.clone()
     }
+
+    pub fn to_vector(self) -> Vector {
+        self.vector
+    }
 }
 
 impl Deref for Normal {

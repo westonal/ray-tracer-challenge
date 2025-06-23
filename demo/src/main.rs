@@ -26,7 +26,11 @@ fn main() {
     ray_trace_with_lighting(&mut canvas);
     let duration = now.elapsed();
     let pixels = canvas.width() * canvas.height();
-    println!("Ray trace took: {} ms {} px/sec", duration.as_millis(), pixels as f32 / duration.as_secs_f32());
+    println!(
+        "Ray trace took: {} ms {} px/sec",
+        duration.as_millis(),
+        pixels as f32 / duration.as_secs_f32()
+    );
     //draw_clock(&mut canvas);
     canvas.save_png("demo.png");
     println!("Saved image to `demo.png`");
