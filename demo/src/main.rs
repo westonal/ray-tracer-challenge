@@ -111,6 +111,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let world = world;
 
     let light = PointLight::new(point!(-10, -10, -7), color!(1., 0.9, 1.));
+    let light2 = PointLight::new(point!(0, -10, -7), color!(0., 0.9, 1.));
 
     let fov_y = TAU / 4.; // 90°
     let z = 0.5 / (fov_y / 2.0).tan();
@@ -131,8 +132,14 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
                     (-ray.direction).normalize(),
                     hit.sphere.normal_at(point),
                 );
+                let color2 = hit.sphere.material.light(
+                    &light2,
+                    ray.origin,
+                    (-ray.direction).normalize(),
+                    hit.sphere.normal_at(point),
+                );
 
-                canvas.write_color(x, y, color1);
+                canvas.write_color(x, y, color1+color2);
             }
         }
     }
