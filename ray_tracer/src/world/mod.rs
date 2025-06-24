@@ -1,3 +1,5 @@
+mod shading;
+
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
 use crate::primatives::sphere::Sphere;

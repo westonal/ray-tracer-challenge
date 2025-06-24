@@ -1,4 +1,4 @@
-mod pre_calculations;
+pub mod pre_calculations;
 
 use math::color;
 use math::tuple::color::Color;

@@ -6,9 +6,9 @@ use std::ops::Deref;
 
 pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,
-    point: Point,
-    eye: Normal,
-    normal: Normal,
+    pub point: Point,
+    pub eye: Normal,
+    pub normal: Normal,
     inside: bool,
 }
 
