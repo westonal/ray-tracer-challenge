@@ -4,11 +4,13 @@ use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
 use crate::primatives::sphere::Sphere;
 use crate::rays::Ray;
+use math::tuple::color::Color;
 
 #[derive(Default)]
 pub struct World {
     objects: Vec<Sphere>,
     pub light: Option<PointLight>,
+    pub background: Color,
 }
 
 impl World {

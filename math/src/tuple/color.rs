@@ -120,6 +120,12 @@ mod color_macro_creation_tests {
     }
 }
 
+impl Default for Color {
+    fn default() -> Self {
+        Color::rgba(0., 0., 0., 0.)
+    }
+}
+
 impl Add for Color {
     type Output = Color;
 

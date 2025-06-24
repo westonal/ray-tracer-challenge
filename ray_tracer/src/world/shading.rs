@@ -1,4 +1,6 @@
+use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
+use crate::rays::Ray;
 use crate::world::World;
 use math::tuple::color::Color;
 
@@ -10,6 +12,16 @@ impl World {
             pre_calculations.eye,
             pre_calculations.normal,
         )
+    }
+
+    pub fn color_at(&self, ray: Ray) -> Color {
+        let intersections = self.intersect(ray);
+        if let Some(hit) = intersections.hit() {
+            let pre_calculations = hit.to_pre_calculation(ray);
+            self.shade(pre_calculations)
+        } else {
+            self.background
+        }
     }
 }
 
@@ -61,5 +73,30 @@ mod world_shading_tests {
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
         assert_eq!(color!(0.9049845, 0.9049845, 0.9049845), c);
+    }
+
+    #[test]
+    fn color_when_ray_misses() {
+        let world = default_world();
+        let ray = Ray::new(point!(0, 0, -5), vector!(0, 1, 0));
+        let c = world.color_at(ray);
+        assert_eq!(color!(0., 0., 0., 0.), c);
+    }
+
+    #[test]
+    fn color_when_ray_misses_alt_background_color() {
+        let mut world = default_world();
+        world.background = color!(0., 1., 0.);
+        let ray = Ray::new(point!(0, 0, -5), vector!(0, 1, 0));
+        let c = world.color_at(ray);
+        assert_eq!(color!(0., 1., 0., 1.), c);
+    }
+
+    #[test]
+    fn shade_an_intersection_with_color_at() {
+        let world = default_world();
+        let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
+        let c = world.color_at(ray);
+        assert_eq!(color!(0.38066125, 0.4758265, 0.28549594), c);
     }
 }
