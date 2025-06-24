@@ -83,7 +83,7 @@ mod sorting_tests {
     }
 
     #[test]
-    fn intersections_are_sorted_when_jonied() {
+    fn intersections_are_sorted_when_joined() {
         let sphere1 = Sphere::new();
         let sphere2 = Sphere::new();
         let intersections1 = Intersections::new(vec![

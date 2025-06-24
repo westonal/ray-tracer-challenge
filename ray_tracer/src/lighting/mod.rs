@@ -1,3 +1,5 @@
+mod pre_calculations;
+
 use math::color;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
