@@ -86,7 +86,7 @@ impl std::fmt::Display for Vector {
 #[macro_export]
 macro_rules! vector {
     ($x:expr, $y:expr, $z:expr) => {
-        Vector::vector($x as f32, $y as f32, $z as f32)
+        $crate::tuple::vector::Vector::vector($x as f32, $y as f32, $z as f32)
     };
 }
 

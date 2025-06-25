@@ -38,13 +38,11 @@ impl<'s> Deref for PreCalculations<'s> {
 
 #[cfg(test)]
 mod precalculation_tests {
-    use super::*;
+use super::*;
     use crate::intersection::Intersection;
     use crate::primatives::sphere::Sphere;
-    use crate::ray;
-    use crate::rays::Ray;
-    use math::tuple::vector::Vector;
     use math::{point, vector};
+    use crate::ray;
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {

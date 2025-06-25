@@ -85,7 +85,7 @@ mod point_into_tests {
 #[macro_export]
 macro_rules! point {
     ($x:expr, $y:expr, $z:expr) => {
-        Point::point($x as f32, $y as f32, $z as f32)
+        $crate::tuple::point::Point::point($x as f32, $y as f32, $z as f32)
     };
 }
 

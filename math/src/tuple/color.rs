@@ -99,7 +99,7 @@ mod color_into_tests {
 #[macro_export]
 macro_rules! color {
     ($r:expr, $g:expr, $b:expr, $a:expr) => {
-        Color::rgba($r, $g, $b, $a)
+        $crate::tuple::color::Color::rgba($r, $g, $b, $a)
     };
     ($r:expr, $g:expr, $b:expr) => {
         color!($r, $g, $b, 1.)

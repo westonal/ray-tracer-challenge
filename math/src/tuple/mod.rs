@@ -20,6 +20,11 @@ impl Tuple {
     pub fn force_vector(&self) -> Vector {
         Vector::vector(self.x, self.y, self.z)
     }
+
+    /// Ignore any non-1 w component    
+    pub fn force_point(&self) -> Point {
+        Point::point(self.x, self.y, self.z)
+    }
 }
 
 impl Tuple {
