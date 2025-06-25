@@ -4,12 +4,10 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::Tuple;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
-use math::{color, degrees, point};
+use math::{color, degrees, point, radians};
 use ray_tracer::camera::Camera;
-use ray_tracer::intersection::Intersect;
 use ray_tracer::lighting::{Material, PointLight};
 use ray_tracer::primatives::sphere::Sphere;
-use ray_tracer::ray;
 use ray_tracer::world::World;
 use std::cmp::min;
 use std::f32::consts::TAU;
@@ -44,7 +42,7 @@ fn draw_clock<C: Canvas<Color>>(canvas: &mut C) {
         let m = Matrix4x4::identity()
             .pre_translation(canvas.width() as f32 / 2., canvas.height() as f32 / 2., 0.)
             .pre_scale(radius, radius, 1.)
-            .pre_rotation_z(TAU * hour as f32 / 12.)
+            .pre_rotation_z(radians!(TAU * hour as f32 / 12.))
             .pre_translation(0., -1., 0.);
 
         let tuple = m * point;
@@ -79,28 +77,6 @@ fn example<C: Canvas<Color>>(canvas: &mut C) {
     }
 }
 
-fn ray_trace_silhouette<C: Canvas<Color>>(canvas: &mut C) {
-    let fov_y = TAU / 4.; // 90°
-    let fov_x = apply_ratio(fov_y, canvas.ratio());
-    let sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
-    let color = color!(1., 1., 0.);
-    let ray = ray!(Point::origin(), (0., 0., 1.));
-    for y in 0..canvas.height() {
-        let y_norm = y as f32 / canvas.height() as f32 - 0.5;
-        for x in 0..canvas.width() {
-            let x_norm = x as f32 / canvas.width() as f32 - 0.5;
-            let tube = Matrix4x4::identity()
-                .pre_rotation_x(apply_ratio(fov_x, x_norm * 2.)) //TODO NOT RIGHT, not giving 45° as max I think
-                .pre_rotation_y(apply_ratio(fov_y, y_norm * 2.));
-            let ray2 = tube * ray;
-
-            if !sphere.intersect(ray2).is_empty() {
-                canvas.write_color(x, y, color);
-            }
-        }
-    }
-}
-
 fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let mut material = Material::default();
     material.color = color!(1., 0.5, 1.);
@@ -111,8 +87,6 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     world.light = Some(PointLight::new(point!(10, 10, 7), color!(0., 0.9, 1.)));
     let world = world;
 
-    let fov_y = TAU / 4.; // 90°
-    let z = 0.5 / (fov_y / 2.0).tan();
     let camera = Camera::new((canvas.width(), canvas.height()), degrees!(90));
     for y in 0..canvas.height() {
         for x in 0..canvas.width() {

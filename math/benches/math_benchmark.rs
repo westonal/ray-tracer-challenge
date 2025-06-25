@@ -1,5 +1,6 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 use math::matrix::matrix_4x4::Matrix4x4;
+use math::radians;
 use std::f32::consts::PI;
 use std::hint::black_box;
 
@@ -31,7 +32,7 @@ fn multiply_benchmark(c: &mut Criterion) {
 
 fn rotate_x_benchmark(c: &mut Criterion) {
     c.bench_function("rotate x", |b| {
-        b.iter(|| black_box(Matrix4x4::rotation_x(PI / 5.2)))
+        b.iter(|| black_box(Matrix4x4::rotation_x(radians!(PI / 5.2))))
     });
 }
 

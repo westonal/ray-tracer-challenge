@@ -1,9 +1,10 @@
+use crate::Angle;
 use crate::matrix::matrix_4x4::Matrix4x4;
 
 impl Matrix4x4 {
-    pub fn rotation_x(x_radians: f32) -> Matrix4x4 {
+    pub fn rotation_x(angle: Angle) -> Matrix4x4 {
         let mut m = Self::empty();
-        let (sin, cos) = x_radians.sin_cos();
+        let (sin, cos) = angle.sin_cos();
         m[0][0] = 1.;
         m[1][1] = cos;
         m[2][2] = cos;
@@ -13,21 +14,9 @@ impl Matrix4x4 {
         m
     }
 
-    pub fn pre_rotation_x(&self, x_radians: f32) -> Matrix4x4 {
-        self.clone() * Self::rotation_x(x_radians)
-    }
-
-    pub fn pre_rotation_y(&self, y_radians: f32) -> Matrix4x4 {
-        self.clone() * Self::rotation_y(y_radians)
-    }
-
-    pub fn pre_rotation_z(&self, z_radians: f32) -> Matrix4x4 {
-        self.clone() * Self::rotation_z(z_radians)
-    }
-
-    pub fn rotation_y(y_radians: f32) -> Matrix4x4 {
+    pub fn rotation_y(angle: Angle) -> Matrix4x4 {
         let mut m = Self::empty();
-        let (sin, cos) = y_radians.sin_cos();
+        let (sin, cos) = angle.sin_cos();
         m[0][0] = cos;
         m[0][2] = sin;
         m[1][1] = 1.;
@@ -37,9 +26,9 @@ impl Matrix4x4 {
         m
     }
 
-    pub fn rotation_z(z_radians: f32) -> Matrix4x4 {
+    pub fn rotation_z(angle: Angle) -> Matrix4x4 {
         let mut m = Self::empty();
-        let (sin, cos) = z_radians.sin_cos();
+        let (sin, cos) = angle.sin_cos();
         m[0][0] = cos;
         m[0][1] = -sin;
         m[1][0] = sin;
@@ -48,6 +37,18 @@ impl Matrix4x4 {
         m[3][3] = 1.;
         m
     }
+
+    pub fn pre_rotation_x(&self, angle: Angle) -> Matrix4x4 {
+        self.clone() * Self::rotation_x(angle)
+    }
+
+    pub fn pre_rotation_y(&self, angle: Angle) -> Matrix4x4 {
+        self.clone() * Self::rotation_y(angle)
+    }
+
+    pub fn pre_rotation_z(&self, angle: Angle) -> Matrix4x4 {
+        self.clone() * Self::rotation_z(angle)
+    }
 }
 
 #[cfg(test)]
@@ -55,12 +56,12 @@ mod rotation_x_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
 
-    use crate::point;
+    use crate::{point, radians};
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
-        let eighth = Matrix4x4::rotation_x(PI / 4.0);
+        let eighth = Matrix4x4::rotation_x(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -75,7 +76,7 @@ mod rotation_x_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_x(PI / 4.0);
+        let eighth = Matrix4x4::identity().pre_rotation_x(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -90,7 +91,7 @@ mod rotation_x_tests {
 
     #[test]
     fn rotate_point_one_eighth_2() {
-        let eighth = Matrix4x4::rotation_x(PI / 4.0);
+        let eighth = Matrix4x4::rotation_x(radians!(PI / 4.0));
         let p = point!(2., 3., 0.);
         assert_eq!(
             eighth * p,
@@ -105,15 +106,15 @@ mod rotation_x_tests {
 
     #[test]
     fn rotate_point_one_quarter() {
-        let quarter = Matrix4x4::rotation_x(PI / 2.0);
+        let quarter = Matrix4x4::rotation_x(radians!(PI / 2.0));
         let p = point!(0., 1., 0.);
         assert_eq!(quarter * p, point!(0., -4.371139e-8, 1.).into());
     }
 
     #[test]
     fn rotate_point_one_eighth_inverted() {
-        let eighth = Matrix4x4::rotation_x(PI / 4.0);
-        let eighth_reversed = Matrix4x4::rotation_x(-(PI / 4.0));
+        let eighth = Matrix4x4::rotation_x(radians!(PI / 4.0));
+        let eighth_reversed = Matrix4x4::rotation_x(radians!(-(PI / 4.0)));
         let eighth_inverted = eighth.invert().unwrap();
         let p = point!(1., 2., 3.);
         assert_eq!(Tuple::new(1., 3.535534, 0.7071067, 1.), eighth_reversed * p);
@@ -129,12 +130,12 @@ mod rotation_y_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
 
-    use crate::point;
+    use crate::{point, radians};
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
-        let eighth = Matrix4x4::rotation_y(PI / 4.0);
+        let eighth = Matrix4x4::rotation_y(radians!(PI / 4.0));
         let p = point!(0., 0., 1.);
         assert_eq!(
             eighth * p,
@@ -149,7 +150,7 @@ mod rotation_y_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_y(PI / 4.0);
+        let eighth = Matrix4x4::identity().pre_rotation_y(radians!(PI / 4.0));
         let p = point!(0., 0., 1.);
         assert_eq!(
             eighth * p,
@@ -164,7 +165,7 @@ mod rotation_y_tests {
 
     #[test]
     fn rotate_point_one_eighth_2() {
-        let eighth = Matrix4x4::rotation_y(PI / 4.0);
+        let eighth = Matrix4x4::rotation_y(radians!(PI / 4.0));
         let p = point!(2., 3., 0.);
         assert_eq!(
             eighth * p,
@@ -179,15 +180,15 @@ mod rotation_y_tests {
 
     #[test]
     fn rotate_point_one_quarter() {
-        let quarter = Matrix4x4::rotation_y(PI / 2.0);
+        let quarter = Matrix4x4::rotation_y(radians!(PI / 2.0));
         let p = point!(0., 1., 0.);
         assert_eq!(quarter * p, point!(0., 1., 0.).into());
     }
 
     #[test]
     fn rotate_point_one_eighth_inverted() {
-        let eighth = Matrix4x4::rotation_y(PI / 4.0);
-        let eighth_reversed = Matrix4x4::rotation_y(-(PI / 4.0));
+        let eighth = Matrix4x4::rotation_y(radians!(PI / 4.0));
+        let eighth_reversed = Matrix4x4::rotation_y(radians!(-(PI / 4.0)));
         let eighth_inverted = eighth.invert().unwrap();
         let p = point!(1., 2., 3.);
         assert_eq!(
@@ -206,12 +207,12 @@ mod rotation_z_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
 
-    use crate::point;
+    use crate::{point, radians};
     use std::f32::consts::PI;
 
     #[test]
     fn rotate_point_one_eighth() {
-        let eighth = Matrix4x4::rotation_z(PI / 4.0);
+        let eighth = Matrix4x4::rotation_z(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -226,7 +227,7 @@ mod rotation_z_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_z(PI / 4.0);
+        let eighth = Matrix4x4::identity().pre_rotation_z(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -241,22 +242,22 @@ mod rotation_z_tests {
 
     #[test]
     fn rotate_point_one_eighth_2() {
-        let eighth = Matrix4x4::rotation_z(PI / 4.0);
+        let eighth = Matrix4x4::rotation_z(radians!(PI / 4.0));
         let p = point!(2., 3., 2.);
         assert_eq!(eighth * p, point!(-0.7071067, 3.535534, 2.).into());
     }
 
     #[test]
     fn rotate_point_one_quarter() {
-        let quarter = Matrix4x4::rotation_z(PI / 2.0);
+        let quarter = Matrix4x4::rotation_z(radians!(PI / 2.0));
         let p = point!(0., 1., 0.);
         assert_eq!(quarter * p, point!(-1., -4.371139e-8, 0.).into());
     }
 
     #[test]
     fn rotate_point_one_eighth_inverted() {
-        let eighth = Matrix4x4::rotation_z(PI / 4.0);
-        let eighth_reversed = Matrix4x4::rotation_z(-(PI / 4.0));
+        let eighth = Matrix4x4::rotation_z(radians!(PI / 4.0));
+        let eighth_reversed = Matrix4x4::rotation_z(radians!(-(PI / 4.0)));
         let eighth_inverted = eighth.invert().unwrap();
         let p = point!(1., 2., 3.);
         assert_eq!(

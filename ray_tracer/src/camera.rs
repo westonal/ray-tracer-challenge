@@ -104,9 +104,7 @@ mod camera_tests {
     #[test]
     fn ray_for_transformed_view() {
         let mut camera = Camera::new((101, 201), degrees!(90));
-        camera.set_transform(
-            Matrix4x4::rotation_y(degrees!(45).to_radians()).pre_translation(0., -2., 5.),
-        );
+        camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).pre_translation(0., -2., 5.));
         let ray = camera.ray_for_pixel((50, 100));
         assert_eq!(ray.origin, point!(0, 2, -5.0000005));
         assert_eq!(ray.direction, vector!(0.70710665, 0, -0.7071069));

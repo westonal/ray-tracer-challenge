@@ -200,7 +200,7 @@ mod intersection_of_transformed_sphere_tests {
 mod normal_tests {
     use super::*;
 
-    use math::{point, vector};
+    use math::{point, radians, vector};
     use std::f32::consts::PI;
 
     #[test]
@@ -214,7 +214,9 @@ mod normal_tests {
 
     #[test]
     fn normal_of_transformed_sphere() {
-        let sphere = Sphere::new_transformed(Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(PI / 5.));
+        let sphere = Sphere::new_transformed(
+            Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(radians!(PI / 5.)),
+        );
         assert_eq!(
             vector!(-2.0444226e-8, 0.97014254, -0.24253564),
             sphere
