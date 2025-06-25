@@ -61,7 +61,6 @@ impl Debug for Ray {
 
 #[cfg(test)]
 mod ray_display_tests {
-    use crate::rays::Ray;
 
     #[test]
     fn display_ray() {

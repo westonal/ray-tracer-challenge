@@ -33,9 +33,7 @@ mod world_shading_tests {
     use crate::rays::Ray;
     use crate::world::World;
     use math::matrix::matrix_4x4::Matrix4x4;
-    use math::tuple::color::Color;
-    use math::tuple::point::Point;
-    use math::tuple::vector::Vector;
+
     use math::{color, point, vector};
 
     fn default_world() -> World {

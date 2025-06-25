@@ -36,7 +36,7 @@ macro_rules! degrees {
 
 #[cfg(test)]
 mod angle_tests {
-    use super::*;
+
     use std::f32::consts::PI;
 
     #[test]

@@ -3,7 +3,7 @@ mod chain_tests {
 
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::point;
-    use crate::tuple::point::Point;
+
     use std::f32::consts::PI;
 
     #[test]

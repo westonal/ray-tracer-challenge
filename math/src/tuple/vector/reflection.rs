@@ -8,7 +8,7 @@ impl Vector {
 
 #[cfg(test)]
 mod vector_reflection_tests {
-    use super::*;
+
     use crate::vector;
 
     #[test]

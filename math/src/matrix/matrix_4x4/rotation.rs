@@ -54,7 +54,6 @@ impl Matrix4x4 {
 mod rotation_x_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
-    use crate::tuple::point::Point;
 
     use crate::point;
     use std::f32::consts::PI;
@@ -129,7 +128,6 @@ mod rotation_x_tests {
 mod rotation_y_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
-    use crate::tuple::point::Point;
 
     use crate::point;
     use std::f32::consts::PI;
@@ -207,7 +205,6 @@ mod rotation_y_tests {
 mod rotation_z_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
-    use crate::tuple::point::Point;
 
     use crate::point;
     use std::f32::consts::PI;

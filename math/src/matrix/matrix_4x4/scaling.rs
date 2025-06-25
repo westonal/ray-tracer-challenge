@@ -19,8 +19,7 @@ impl Matrix4x4 {
 mod scale_tests {
 
     use crate::matrix::matrix_4x4::Matrix4x4;
-    use crate::tuple::point::Point;
-    use crate::tuple::vector::Vector;
+
     use crate::{point, vector};
 
     #[test]

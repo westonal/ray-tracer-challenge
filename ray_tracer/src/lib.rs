@@ -1,10 +1,10 @@
+pub mod camera;
 pub mod intersection;
 pub mod lighting;
 pub mod primatives;
 pub mod rays;
 mod view_matrix;
 pub mod world;
-mod camera;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

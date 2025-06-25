@@ -1,10 +1,10 @@
 use crate::ray;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::{Angle, point, vector};
+use math::{Angle, point};
 
-struct Camera {
-    view_port: (usize, usize),
+pub struct Camera {
+    view_port: (u32, u32),
     aspect_ratio: f32,
     fov_y: Angle,
     transform: Matrix4x4,
@@ -13,7 +13,7 @@ struct Camera {
 }
 
 impl Camera {
-    pub fn new(view_port: (usize, usize), fov_y: Angle) -> Self {
+    pub fn new(view_port: (u32, u32), fov_y: Angle) -> Self {
         let aspect_ratio = view_port.0 as f32 / view_port.1 as f32;
         let canvas_height = (fov_y.to_radians() / 2.).tan() * 2.;
         let canvas_width = canvas_height * aspect_ratio;
@@ -27,7 +27,7 @@ impl Camera {
         }
     }
 
-    pub fn ray_for_pixel(&self, x_y: (usize, usize)) -> Ray {
+    pub fn ray_for_pixel(&self, x_y: (u32, u32)) -> Ray {
         let (x, y) = x_y;
         let (width, height) = self.canvas_size;
 
@@ -65,7 +65,7 @@ impl Camera {
 #[cfg(test)]
 mod camera_tests {
     use super::*;
-    use math::tuple::point::Point;
+
     use math::{degrees, point, vector};
 
     #[test]

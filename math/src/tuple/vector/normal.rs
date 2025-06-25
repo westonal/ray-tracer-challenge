@@ -40,7 +40,7 @@ impl Neg for Normal {
 
 #[cfg(test)]
 mod normal_negation_tests {
-    use super::*;
+
     use crate::vector;
 
     #[test]

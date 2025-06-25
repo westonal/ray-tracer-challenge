@@ -29,7 +29,6 @@ impl Matrix4x4 {
 mod matrix_4x4_shearing_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::point;
-    use crate::tuple::point::Point;
 
     #[test]
     fn shear_x_in_proportion_to_y() {

@@ -54,8 +54,7 @@ mod world_tests {
     use crate::primatives::sphere::Sphere;
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
-    use math::tuple::color::Color;
-    use math::tuple::point::Point;
+
     use math::{color, point};
 
     #[test]

@@ -33,8 +33,7 @@ impl Deref for ViewMatrix {
 #[cfg(test)]
 mod view_matrix_tests {
     use super::*;
-    use math::tuple::point::Point;
-    use math::tuple::vector::Vector;
+
     use math::{point, vector};
 
     #[test]

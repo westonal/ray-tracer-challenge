@@ -74,7 +74,7 @@ impl Material {
 #[cfg(test)]
 mod lighting_tests {
     use super::*;
-    use math::tuple::vector::Vector;
+
     use math::{color, point, vector};
 
     #[test]

@@ -199,7 +199,7 @@ mod intersection_of_transformed_sphere_tests {
 #[cfg(test)]
 mod normal_tests {
     use super::*;
-    use math::tuple::vector::Vector;
+
     use math::{point, vector};
     use std::f32::consts::PI;
 

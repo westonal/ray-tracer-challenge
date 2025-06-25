@@ -18,7 +18,7 @@ impl Mul<Ray> for Matrix4x4 {
 
 #[cfg(test)]
 mod ray_transform_tests {
-    use super::*;
+
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
