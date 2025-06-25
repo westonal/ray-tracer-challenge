@@ -22,6 +22,12 @@ impl ViewMatrix {
     }
 }
 
+impl From<ViewMatrix> for Matrix4x4 {
+    fn from(value: ViewMatrix) -> Self {
+        value.0
+    }
+}
+
 impl Deref for ViewMatrix {
     type Target = Matrix4x4;
 

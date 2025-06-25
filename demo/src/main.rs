@@ -116,8 +116,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let camera = Camera::new((canvas.width(), canvas.height()), degrees!(90));
     for y in 0..canvas.height() {
         for x in 0..canvas.width() {
-            let ray = camera.ray_for_pixel((x, y));
-            let color = world.color_at(ray);
+            let color = camera.color_at((x, y), &world);
             if color.alpha() > 0. {
                 canvas.write_color(x, y, color);
             }

@@ -1,4 +1,4 @@
-mod shading;
+pub mod shading;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;

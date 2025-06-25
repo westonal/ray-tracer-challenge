@@ -1,8 +1,12 @@
 use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
+use crate::lighting::{Material, PointLight};
+use crate::primatives::sphere::Sphere;
 use crate::rays::Ray;
 use crate::world::World;
+use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
+use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
@@ -25,30 +29,30 @@ impl World {
     }
 }
 
+/// A test world
+pub fn default_world() -> World {
+    let mut world = World::new();
+    world.light = Some(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+    let mut sphere = Sphere::new();
+    let mut material = Material::default();
+    material.color = color!(0.8, 1., 0.6);
+    material.diffuse = 0.7;
+    material.specular = 0.2;
+    sphere.material = material;
+    world.add(sphere);
+    world.add(Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5)));
+    world
+}
+
 #[cfg(test)]
 mod world_shading_tests {
     use crate::intersection::Intersection;
-    use crate::lighting::{Material, PointLight};
-    use crate::primatives::sphere::Sphere;
+    use crate::lighting::PointLight;
+
     use crate::rays::Ray;
-    use crate::world::World;
-    use math::matrix::matrix_4x4::Matrix4x4;
 
+    use crate::world::shading::default_world;
     use math::{color, point, vector};
-
-    fn default_world() -> World {
-        let mut world = World::new();
-        world.light = Some(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
-        let mut sphere = Sphere::new();
-        let mut material = Material::default();
-        material.color = color!(0.8, 1., 0.6);
-        material.diffuse = 0.7;
-        material.specular = 0.2;
-        sphere.material = material;
-        world.add(sphere);
-        world.add(Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5)));
-        world
-    }
 
     #[test]
     fn shade_an_intersection() {
