@@ -12,6 +12,11 @@ pub struct Intersection<'s> {
     pub sphere: &'s Sphere,
 }
 
+impl<'s> Intersection<'s> {
+    // TODO, this is quite large
+    pub(crate) const EPSILON: f32 = 0.01;
+}
+
 #[derive(Default)]
 pub struct Intersections<'s>(Vec<Intersection<'s>>);
 
@@ -100,5 +105,21 @@ mod sorting_tests {
         assert_eq!(1., intersections2[1].t);
         assert_eq!(2., intersections2[2].t);
         assert_eq!(3., intersections2[3].t);
+    }
+}
+
+#[cfg(test)]
+mod intersection_over_point_tests {
+    use super::*;
+    use crate::ray;
+    use math::matrix::matrix_4x4::Matrix4x4;
+
+    #[test]
+    fn the_hit_should_offset_the_point() {
+        let shape = Sphere::new_transformed(Matrix4x4::translation(0., 0., 1.));
+        let i = Intersection::new(5., &shape);
+        let calcs = i.to_pre_calculation(ray!((0., 0., -5.), (0., 0., 1.)));
+        assert!(calcs.over_point.z < -Intersection::EPSILON / 2.);
+        assert!(calcs.point.z > calcs.over_point.z);
     }
 }

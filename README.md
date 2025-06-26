@@ -1,4 +1,5 @@
 
+![Demo](demo.png)
 
 # Chapter 1
 

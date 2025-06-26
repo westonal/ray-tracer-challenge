@@ -10,13 +10,13 @@ use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
-        let direct_lights = self.direct_lights(pre_calculations.point);
+        let direct_lights = self.direct_lights(pre_calculations.over_point);
         let light = &self.light.as_ref().unwrap();
         // TODO, multilight support would light each in turn if they were direct.
         let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
         pre_calculations.sphere.material.light(
             light,
-            pre_calculations.point,
+            pre_calculations.over_point,
             pre_calculations.eye,
             pre_calculations.normal,
             shadow_factor,
@@ -73,7 +73,7 @@ mod world_shading_tests {
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
-        assert_eq!(color!(0.38066125, 0.4758265, 0.28549594), c);
+        assert_eq!(color!(0.3804233, 0.4755291, 0.28531748), c);
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod world_shading_tests {
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
-        assert_eq!(color!(0.9049845, 0.9049845, 0.9049845), c);
+        assert_eq!(color!(0.90168566, 0.90168566, 0.90168566), c);
     }
 
     #[test]
@@ -110,7 +110,7 @@ mod world_shading_tests {
         let world = default_world();
         let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
         let c = world.color_at(ray);
-        assert_eq!(color!(0.38066125, 0.4758265, 0.28549594), c);
+        assert_eq!(color!(0.3804233, 0.4755291, 0.28531748), c);
     }
 }
 

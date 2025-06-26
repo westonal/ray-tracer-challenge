@@ -118,6 +118,6 @@ mod camera_tests {
             ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
         let color = camera.color_at((5, 5), &world);
-        assert_eq!(color!(0.38066125, 0.4758265, 0.28549594), color);
+        assert_eq!(color!(0.3804233, 0.4755291, 0.28531748), color);
     }
 }

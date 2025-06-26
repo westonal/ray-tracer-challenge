@@ -3,7 +3,6 @@ use crate::lighting::PointLight;
 use crate::ray;
 use crate::world::World;
 use math::tuple::point::Point;
-use std::ops::Deref;
 
 impl World {
     /// Which lights are not occluded by objects in the scene
@@ -23,7 +22,7 @@ impl World {
 
 #[cfg(test)]
 mod shadow_tests {
-    use super::*;
+
     use crate::lighting::PointLight;
     use crate::primatives::sphere::Sphere;
     use crate::world::World;

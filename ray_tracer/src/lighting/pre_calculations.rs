@@ -1,14 +1,13 @@
-use std::fmt::Pointer;
 use crate::intersection::Intersection;
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
 use std::ops::Deref;
-use crate::lighting::PointLight;
 
 pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,
     pub point: Point,
+    pub over_point: Point,
     pub eye: Normal,
     pub normal: Normal,
     inside: bool,
@@ -23,6 +22,7 @@ impl<'s> Intersection<'s> {
         PreCalculations {
             intersection: self,
             point,
+            over_point: point + normal.clone_vector() * Intersection::EPSILON,
             eye: (-ray.direction).normalize(),
             normal,
             inside,
