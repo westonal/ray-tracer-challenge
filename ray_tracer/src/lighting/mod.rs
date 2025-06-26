@@ -6,8 +6,8 @@ use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
 
 pub struct PointLight {
-    position: Point,
-    color: Color,
+    pub position: Point,
+    pub color: Color,
 }
 
 impl PointLight {
@@ -23,15 +23,25 @@ pub struct Material {
     pub diffuse: f32,
     pub specular: f32,
     pub shininess: f32,
+    pub shadow_boost: f32,
 }
 
 impl Material {
-    pub fn light(&self, light: &PointLight, point: Point, eye: Normal, normal: Normal) -> Color {
+    pub fn light(
+        &self,
+        light: &PointLight,
+        point: Point,
+        eye: Normal,
+        normal: Normal,
+        shadow_factor: f32,
+    ) -> Color {
         // Combine surface and light color
         let effective_color = self.color * light.color;
 
         // find direction to light source
         let light_v = (light.position - point).normalize();
+
+        let anti_shadow = (1. + self.shadow_boost - shadow_factor.clamp(0.0, 1.0)).clamp(0.0, 1.0);
 
         // find ambient contribution
         let ambient = effective_color * self.ambient;
@@ -42,13 +52,13 @@ impl Material {
         let light_dot_normal = light_v.dot(&normal);
         if light_dot_normal >= 0.0 {
             let diffuse = effective_color * self.diffuse * light_dot_normal;
-            result = result + diffuse;
+            result = result + diffuse * anti_shadow;
 
             let reflect_v = -light_v.reflect(normal.clone_vector());
             let reflect_dot_eye = reflect_v.dot(&eye);
             if reflect_dot_eye > 0.0 {
                 // compute the specular contribution
-                let factor = reflect_dot_eye.powf(self.shininess);
+                let factor = reflect_dot_eye.powf(self.shininess) * anti_shadow;
                 let specular = light.color * self.specular * factor;
                 result = result + specular;
             }
@@ -67,6 +77,7 @@ impl Material {
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
+            shadow_boost: 0.,
         }
     }
 }
@@ -86,7 +97,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.9, 1.9, 1.9),
-            material.light(&light, point, eye, normal)
+            material.light(&light, point, eye, normal, 0.)
         );
     }
 
@@ -99,7 +110,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.0, 1.0, 1.0),
-            material.light(&light, point, eye, normal)
+            material.light(&light, point, eye, normal, 0.)
         );
     }
 
@@ -112,7 +123,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.7363961, 0.7363961, 0.7363961),
-            material.light(&light, point, eye, normal)
+            material.light(&light, point, eye, normal, 0.)
         );
     }
 
@@ -125,7 +136,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.636396, 1.636396, 1.636396),
-            material.light(&light, point, eye, normal)
+            material.light(&light, point, eye, normal, 0.)
         );
     }
 
@@ -138,7 +149,20 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
-            material.light(&light, position, eye, normal)
+            material.light(&light, position, eye, normal, 0.)
+        );
+    }
+
+    #[test]
+    fn lighting_with_the_eye_between_the_light_and_the_surface_but_in_full_shadow() {
+        let point = Point::origin();
+        let eye = vector!(0, 0, -1).normalize();
+        let normal = vector!(0, 0, -1).normalize();
+        let light = PointLight::new(point!(0, 0, -10), color!(1., 1., 1.));
+        let material = Material::default();
+        assert_eq!(
+            color!(0.1, 0.1, 0.1),
+            material.light(&light, point, eye, normal, 1.)
         );
     }
 }

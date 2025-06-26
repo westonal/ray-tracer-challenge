@@ -1,5 +1,6 @@
 pub mod render_world;
 pub mod shading;
+mod shadows;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;

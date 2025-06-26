@@ -1,8 +1,10 @@
+use std::fmt::Pointer;
 use crate::intersection::Intersection;
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
 use std::ops::Deref;
+use crate::lighting::PointLight;
 
 pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,

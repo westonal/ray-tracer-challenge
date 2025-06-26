@@ -10,11 +10,16 @@ use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
+        let direct_lights = self.direct_lights(pre_calculations.point);
+        let light = &self.light.as_ref().unwrap();
+        // TODO, multilight support would light each in turn if they were direct.
+        let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
         pre_calculations.sphere.material.light(
-            &self.light.as_ref().unwrap(),
+            light,
             pre_calculations.point,
             pre_calculations.eye,
             pre_calculations.normal,
+            shadow_factor,
         )
     }
 
@@ -38,9 +43,15 @@ pub fn default_world() -> World {
     material.color = color!(0.8, 1., 0.6);
     material.diffuse = 0.7;
     material.specular = 0.2;
+    // turn off shadows
+    material.shadow_boost = 1.;
     sphere.material = material;
     world.add(sphere);
-    world.add(Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5)));
+    let mut material = Material::default();
+    material.shadow_boost = 1.;
+    let mut sphere = Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5));
+    sphere.material = material;
+    world.add(sphere);
     world
 }
 
@@ -100,5 +111,25 @@ mod world_shading_tests {
         let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
         let c = world.color_at(ray);
         assert_eq!(color!(0.38066125, 0.4758265, 0.28549594), c);
+    }
+}
+
+#[cfg(test)]
+mod world_shadow_shading_tests {
+    use super::*;
+    use crate::intersection::Intersection;
+    use math::vector;
+    #[test]
+    fn shade_when_given_intersection_in_shadow() {
+        let mut world = World::new();
+        world.light = Some(PointLight::new(point!(0, 0, -10), color!(1., 1., 1.)));
+        world.add(Sphere::new());
+        world.add(Sphere::new_transformed(Matrix4x4::translation(0., 0., 10.)));
+        let second = world.objects.get(1).unwrap();
+        let intersection = Intersection::new(4., &second);
+        let ray = Ray::new(point!(0, 0, 5), vector!(0, 0, 1));
+        let pre_calculations = intersection.to_pre_calculation(ray);
+        let color = world.shade(pre_calculations);
+        assert_eq!(color!(0.1, 0.1, 0.1), color);
     }
 }
