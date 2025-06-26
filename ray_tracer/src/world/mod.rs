@@ -1,3 +1,4 @@
+pub mod render_world;
 pub mod shading;
 
 use crate::intersection::{Intersect, Intersections};

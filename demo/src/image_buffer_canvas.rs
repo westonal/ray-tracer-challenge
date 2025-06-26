@@ -1,6 +1,7 @@
-use crate::canvas::Canvas;
+use crate::png_write::PngWrite;
 use image::{ImageBuffer, ImageFormat, Rgba};
 use math::tuple::color::Color;
+use ray_tracer::canvas::Canvas;
 use std::path::Path;
 
 pub struct ImageBufferCanvas {
@@ -22,15 +23,6 @@ impl Canvas<Color> for ImageBufferCanvas {
         self.width as f32 / self.height as f32
     }
 
-    fn save_png<Q>(&self, path: Q)
-    where
-        Q: AsRef<Path>,
-    {
-        self.image_buffer
-            .save_with_format(path, ImageFormat::Png)
-            .unwrap();
-    }
-
     fn write_color(&mut self, x_offset: u32, y_offset: u32, color: Color) {
         let img = &mut self.image_buffer;
         let c = Rgba::<u8>([
@@ -40,6 +32,17 @@ impl Canvas<Color> for ImageBufferCanvas {
             (color.alpha() * 255.0).clamp(0.0, 255.0) as u8,
         ]);
         img.put_pixel(x_offset, y_offset, c);
+    }
+}
+
+impl PngWrite for ImageBufferCanvas {
+    fn save_png<Q>(&self, path: Q)
+    where
+        Q: AsRef<Path>,
+    {
+        self.image_buffer
+            .save_with_format(path, ImageFormat::Png)
+            .unwrap();
     }
 }
 
