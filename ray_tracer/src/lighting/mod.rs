@@ -26,7 +26,7 @@ impl Material {
         normal: Normal,
         shadow_factor: f32,
     ) -> Color {
-        let surface_color = self.pattern.color_at(&point);
+        let surface_color = self.pattern.color_at(point);
 
         // Combine surface and light color
         let effective_color = surface_color * light.color;
@@ -150,6 +150,7 @@ mod lighting_tests {
 #[cfg(test)]
 mod non_solid_pattern_tests {
     use super::*;
+    use crate::Transform::Transform;
     use crate::material::pattern::Pattern;
     use math::{point, vector};
 
@@ -166,7 +167,7 @@ mod non_solid_pattern_tests {
         let a = color!(1, 1, 0);
         let b = color!(0, 0, 1);
         assert_ne!(a, b);
-        material.pattern = Pattern::Stripe(a, b);
+        material.pattern = Pattern::Stripe(a, b, Transform::identity());
         assert_eq!(
             a,
             material.light(&light, point!(0.9, 0, 0), eye, normal, 0.)

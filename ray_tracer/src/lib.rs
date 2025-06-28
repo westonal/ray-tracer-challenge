@@ -1,4 +1,4 @@
-mod Transform;
+pub mod Transform;
 pub mod camera;
 pub mod canvas;
 pub mod intersection;

@@ -2,6 +2,7 @@ use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
 use math::{Angle, color, degrees, point, vector};
+use ray_tracer::Transform::Transform;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
 use ray_tracer::lighting::PointLight;
@@ -33,7 +34,11 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
 fn floor() -> Shape {
     let mut floor = Shape::new_plane_transformed(Matrix4x4::scale(10., 0.01, 10.));
     let mut material = Material::default();
-    material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1, 0, 1));
+    material.pattern = Pattern::Stripe(
+        color!(1, 0.9, 0.9),
+        color!(1, 0, 1),
+        Transform::new(Matrix4x4::scale(0.5, 1., 1.)),
+    );
     material.specular = 0.;
     floor.material = material;
     floor
@@ -47,7 +52,7 @@ fn wall(y: Angle) -> Shape {
             .pre_scale(10., 0.01, 10.),
     );
     let mut material = Material::default();
-    material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1, 0, 1));
+    material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1, 0, 1), Transform::identity());
     material.specular = 0.;
     wall.material = material;
     wall
