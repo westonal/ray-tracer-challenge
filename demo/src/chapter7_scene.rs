@@ -29,7 +29,7 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
 }
 
 fn floor() -> Shape {
-    let mut floor = Shape::new_sphere_transformed(Matrix4x4::scale(10., 0.01, 10.));
+    let mut floor = Shape::new_plane_transformed(Matrix4x4::scale(10., 0.01, 10.));
     let mut material = Material::default();
     material.color = color!(1., 0.9, 0.9);
     material.specular = 0.;
@@ -38,7 +38,7 @@ fn floor() -> Shape {
 }
 
 fn wall(y: Angle) -> Shape {
-    let mut wall = Shape::new_sphere_transformed(
+    let mut wall = Shape::new_plane_transformed(
         Matrix4x4::translation(0., 0., 5.)
             .pre_rotation_y(y)
             .pre_rotation_x(degrees!(90))

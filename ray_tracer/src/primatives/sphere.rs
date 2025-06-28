@@ -1,6 +1,10 @@
 use crate::primatives::Shape;
+use crate::primatives::surface::Surface;
 use crate::primatives::surface::Surface::UnitSphere;
+use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
+use math::tuple::point::Point;
+use math::tuple::vector::Vector;
 
 impl Shape {
     pub fn new_sphere_transformed(transform: Matrix4x4) -> Self {
@@ -9,6 +13,33 @@ impl Shape {
 
     pub fn new_sphere() -> Self {
         Self::new_sphere_transformed(Matrix4x4::identity())
+    }
+}
+
+impl Surface {
+    pub(crate) fn sphere_intersect(&self, ray: Ray) -> Vec<f32> {
+        let sphere_to_ray = ray.origin - Point::origin();
+        let a = ray.direction.dot(&ray.direction);
+        let b = 2. * ray.direction.dot(&sphere_to_ray);
+        let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
+        let discriminant = b * b - 4. * a * c;
+        if discriminant < 0. {
+            return Default::default();
+        }
+        let mut result = Vec::with_capacity(2);
+        let a2 = 2. * a;
+        if discriminant == 0. {
+            result.push(-b / a2);
+        } else {
+            let discriminant_sqrt = discriminant.sqrt();
+            result.push((-b - discriminant_sqrt) / a2);
+            result.push((-b + discriminant_sqrt) / a2);
+        }
+        result
+    }
+
+    pub(crate) fn sphere_normal_at(&self, object_point: Point) -> Vector {
+        object_point - Point::origin()
     }
 }
 
