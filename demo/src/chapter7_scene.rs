@@ -33,7 +33,7 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
 fn floor() -> Shape {
     let mut floor = Shape::new_plane_transformed(Matrix4x4::scale(10., 0.01, 10.));
     let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(1, 0.9, 0.9));
+    material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1,0,1));
     material.specular = 0.;
     floor.material = material;
     floor
@@ -47,7 +47,7 @@ fn wall(y: Angle) -> Shape {
             .pre_scale(10., 0.01, 10.),
     );
     let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(1, 0.9, 0.9));
+    material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1,0,1));
     material.specular = 0.;
     wall.material = material;
     wall
