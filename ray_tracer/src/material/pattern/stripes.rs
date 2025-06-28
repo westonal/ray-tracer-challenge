@@ -1,34 +1,20 @@
 use crate::Transform::Transform;
-use crate::material::pattern::Pattern::Solid;
-use math::tuple::color::{Color, WHITE};
+use crate::material::pattern::Pattern;
+use math::tuple::color::Color;
 use math::tuple::point::Point;
 
-#[derive(Debug, PartialEq)]
-pub enum Pattern {
-    Solid(Color),
-    Stripe(Color, Color, Transform),
-}
-
-impl Default for Pattern {
-    fn default() -> Self {
-        Solid(*WHITE)
-    }
-}
-
 impl Pattern {
-    pub(crate) fn color_at(&self, point: Point, transform: &Transform) -> Color {
-        match self {
-            Solid(c) => c,
-            Pattern::Stripe(a, b, pattern_transform) => {
-                let point = transform.world_point_to_object_point(
-                    pattern_transform.world_point_to_object_point(point),
-                );
-                if point.x.floor() as i32 % 2 == 0 {
-                    a
-                } else {
-                    b
-                }
-            }
+    pub(crate) fn stripe_color_at(
+        a: &Color,
+        b: &Color,
+        pattern_transform: &Transform,
+        object_point: Point,
+    ) -> Color {
+        let point = pattern_transform.world_point_to_object_point(object_point);
+        if point.x.floor() as i32 % 2 == 0 {
+            a
+        } else {
+            b
         }
         .clone()
     }
@@ -39,7 +25,7 @@ mod stripe_pattern_tests {
     use super::*;
     use crate::material::pattern::Pattern::Stripe;
     use math::matrix::matrix_4x4::Matrix4x4;
-    use math::tuple::color::BLACK;
+    use math::tuple::color::{BLACK, WHITE};
     use math::{degrees, point};
 
     #[test]

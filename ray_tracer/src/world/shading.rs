@@ -222,14 +222,14 @@ mod world_pattern_shading_tests {
     #[test]
     fn stripes_on_rotated_pattern_and_scene() {
         let stripe_transform = Matrix4x4::rotation_y(degrees!(90));
-        let plane_transformation = Matrix4x4::rotation_z(degrees!(90));
+        let plane_transformation = Matrix4x4::rotation_z(degrees!(-90));
         let scene = TestScene::given(stripe_transform, plane_transformation);
         assert_eq!(
-            scene.color_ray(ray!(point!(3, 0, 0), vector!(-1, 0, 0))),
+            scene.color_ray(ray!(point!(3, 0.1, 0), vector!(-1, 0, 0))),
             *GREEN
         );
         assert_eq!(
-            scene.color_ray(ray!(point!(3, 1, 0), vector!(-1, 0, 0))),
+            scene.color_ray(ray!(point!(3, 0.1, 1), vector!(-1, 0, 0))),
             *RED
         );
     }
