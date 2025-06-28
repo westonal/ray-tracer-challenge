@@ -1,6 +1,5 @@
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::lighting::Material;
-use crate::primatives::shape::Surface::UnitSphere;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -18,27 +17,23 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn normal_at(&self, point: Point) -> Normal {
-        let object_point: Point = (self.world_to_object_transform * point).try_into().unwrap();
-        let object_normal = self.surface.normal_at(object_point);
-        let world_normal = self.world_to_object_transform.transpose() * object_normal;
-        world_normal.force_vector().normalize()
-    }
-}
-
-impl Shape {
-    pub fn new_sphere_transformed(transform: Matrix4x4) -> Self {
+    pub fn new(transform: Matrix4x4, surface: Surface) -> Self {
         Self {
             id: format!("{}", Uuid::new_v4()),
             material: Material::default(),
             object_to_world_transform: transform,
             world_to_object_transform: transform.invert().expect("inverse transform failure"),
-            surface: UnitSphere,
+            surface,
         }
     }
+}
 
-    pub fn new_sphere() -> Self {
-        Self::new_sphere_transformed(Matrix4x4::identity())
+impl Shape {
+    pub fn normal_at(&self, point: Point) -> Normal {
+        let object_point: Point = (self.world_to_object_transform * point).try_into().unwrap();
+        let object_normal = self.surface.normal_at(object_point);
+        let world_normal = self.world_to_object_transform.transpose() * object_normal;
+        world_normal.force_vector().normalize()
     }
 }
 

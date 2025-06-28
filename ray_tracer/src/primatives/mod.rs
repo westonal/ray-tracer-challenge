@@ -1,5 +1,6 @@
+mod plane;
 mod shape;
-mod sphere_tests;
+mod sphere;
 mod surface;
 
 pub use shape::Shape;

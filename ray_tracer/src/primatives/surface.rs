@@ -1,10 +1,12 @@
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
+use math::vector;
 
 #[derive(PartialEq, Debug)]
 pub(crate) enum Surface {
     UnitSphere,
+    PlaneXZ,
 }
 
 impl Surface {
@@ -29,6 +31,9 @@ impl Surface {
         result
     }
     pub(crate) fn normal_at(&self, object_point: Point) -> Vector {
-        object_point - Point::origin()
+        match self {
+            Surface::UnitSphere => object_point - Point::origin(),
+            Surface::PlaneXZ => vector!(0, 1, 0),
+        }
     }
 }
