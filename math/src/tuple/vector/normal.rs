@@ -1,7 +1,7 @@
 use crate::tuple::vector::Vector;
 use std::ops::{Deref, Neg};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Normal {
     vector: Vector,
 }

@@ -2,6 +2,7 @@ use crate::intersection::Intersect;
 use crate::lighting::PointLight;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::Material;
+use crate::material::pattern::Pattern;
 use crate::primatives::Shape;
 use crate::rays::Ray;
 use crate::world::World;
@@ -41,7 +42,7 @@ pub fn default_world() -> World {
     world.light = Some(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
     let mut sphere = Shape::new_sphere();
     let mut material = Material::default();
-    material.color = color!(0.8, 1., 0.6);
+    material.pattern = Pattern::Solid(color!(0.8, 1., 0.6));
     material.diffuse = 0.7;
     material.specular = 0.2;
     // turn off shadows
@@ -80,7 +81,7 @@ mod world_shading_tests {
     #[test]
     fn shade_an_intersection_from_inside() {
         let mut world = default_world();
-        world.light = Some(PointLight::new(point!(0, 0.25, 0), color!(1., 1., 1.)));
+        world.light = Some(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = Ray::new(point!(0, 0, 0), vector!(0, 0, 1));
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
@@ -123,7 +124,7 @@ mod world_shadow_shading_tests {
     #[test]
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::new();
-        world.light = Some(PointLight::new(point!(0, 0, -10), color!(1., 1., 1.)));
+        world.light = Some(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
             0., 0., 10.,

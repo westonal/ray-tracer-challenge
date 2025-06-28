@@ -66,7 +66,7 @@ mod world_tests {
         world.add(Shape::new_sphere());
         assert_eq!(2, world.object_count());
         assert!(world.light.is_none());
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1., 1., 1.)));
+        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
         assert!(world.light.is_some());
     }
 

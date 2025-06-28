@@ -1,9 +1,10 @@
-use math::color;
-use math::tuple::color::Color;
+pub mod pattern;
+
+use crate::material::pattern::Pattern;
 
 #[derive(Debug, PartialEq)]
 pub struct Material {
-    pub color: Color,
+    pub pattern: Pattern,
     pub ambient: f32,
     pub diffuse: f32,
     pub specular: f32,
@@ -14,7 +15,7 @@ pub struct Material {
 impl Default for Material {
     fn default() -> Self {
         Self {
-            color: color!(1., 1., 1.),
+            pattern: Pattern::default(),
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,

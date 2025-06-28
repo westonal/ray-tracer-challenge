@@ -8,6 +8,7 @@ use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
+use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::world::World;
 use ray_tracer::world::render_world::RenderWorld;
@@ -51,7 +52,7 @@ fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
 
 fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let mut material = Material::default();
-    material.color = color!(1., 0.5, 1.);
+    material.pattern = Pattern::Solid(color!(1., 0.5, 1.));
     let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
     sphere.material = material;
     let mut world = World::default();

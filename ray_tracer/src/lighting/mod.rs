@@ -26,8 +26,10 @@ impl Material {
         normal: Normal,
         shadow_factor: f32,
     ) -> Color {
+        let surface_color = self.pattern.color_at(&point);
+
         // Combine surface and light color
-        let effective_color = self.color * light.color;
+        let effective_color = surface_color * light.color;
 
         // find direction to light source
         let light_v = (light.position - point).normalize();
@@ -71,7 +73,7 @@ mod lighting_tests {
         let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 0, -10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(1.9, 1.9, 1.9),
@@ -84,7 +86,7 @@ mod lighting_tests {
         let point = Point::origin();
         let eye = vector!(0, 2.0_f32.sqrt() / 2., -2.0_f32.sqrt() / 2.).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 0, -10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(1.0, 1.0, 1.0),
@@ -97,7 +99,7 @@ mod lighting_tests {
         let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 10, -10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 10, -10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(0.7363961, 0.7363961, 0.7363961),
@@ -110,7 +112,7 @@ mod lighting_tests {
         let point = Point::origin();
         let eye = vector!(0, -2.0_f32.sqrt() / 2., -2.0_f32.sqrt() / 2.).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 10, -10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 10, -10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(1.636396, 1.636396, 1.636396),
@@ -123,7 +125,7 @@ mod lighting_tests {
         let position = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 0, 10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 0, 10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
@@ -136,11 +138,42 @@ mod lighting_tests {
         let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
-        let light = PointLight::new(point!(0, 0, -10), color!(1., 1., 1.));
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
             material.light(&light, point, eye, normal, 1.)
+        );
+    }
+}
+
+#[cfg(test)]
+mod non_solid_pattern_tests {
+    use super::*;
+    use crate::material::pattern::Pattern;
+    use math::{point, vector};
+
+    #[test]
+    fn lighting_with_stripe_applied() {
+        let point = Point::origin();
+        let eye = vector!(0, 0, -1).normalize();
+        let normal = vector!(0, 0, -1).normalize();
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
+        let mut material = Material::default();
+        material.ambient = 1.;
+        material.diffuse = 0.;
+        material.specular = 0.;
+        let a = color!(1, 1, 0);
+        let b = color!(0, 0, 1);
+        assert_ne!(a, b);
+        material.pattern = Pattern::Stripe(a, b);
+        assert_eq!(
+            a,
+            material.light(&light, point!(0.9, 0, 0), eye, normal, 0.)
+        );
+        assert_eq!(
+            b,
+            material.light(&light, point!(1.1, 0, 0), eye, normal, 0.)
         );
     }
 }

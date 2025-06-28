@@ -1,6 +1,7 @@
 use crate::tuple::Tuple;
 use std::fmt::Formatter;
 use std::ops::{Add, Mul, Sub};
+use std::sync::LazyLock;
 
 #[derive(PartialEq, Copy, Clone)]
 pub struct Color {
@@ -99,12 +100,23 @@ mod color_into_tests {
 #[macro_export]
 macro_rules! color {
     ($r:expr, $g:expr, $b:expr, $a:expr) => {
-        $crate::tuple::color::Color::rgba($r, $g, $b, $a)
+        $crate::tuple::color::Color::rgba($r as f32, $g as f32, $b as f32, $a as f32)
     };
     ($r:expr, $g:expr, $b:expr) => {
-        color!($r, $g, $b, 1.)
+        color!($r, $g, $b, 1)
     };
 }
+
+#[macro_export]
+macro_rules! pub_static_color {
+    ($name:ident= $color:expr) => {
+        pub static $name: LazyLock<Color> = LazyLock::new(|| $color);
+    };
+}
+
+pub_static_color! {WHITE = color!(1,1,1)}
+pub_static_color! {BLACK = color!(0,0,0)}
+pub_static_color! {RED = color!(1,0,0)}
 
 #[cfg(test)]
 mod color_macro_creation_tests {
