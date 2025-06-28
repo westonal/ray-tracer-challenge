@@ -9,6 +9,13 @@ pub struct Color {
 }
 
 impl Color {
+    pub fn cross_blend(&self, other: Color, ratio: f32) -> Color {
+        let a = *self;
+        a + (other - a) * ratio.clamp(0., 1.)
+    }
+}
+
+impl Color {
     pub fn red(&self) -> f32 {
         self.tuple.x
     }
@@ -182,7 +189,6 @@ impl Mul<Color> for Color {
 
 #[cfg(test)]
 mod color_math_tests {
-
     use super::*;
 
     #[test]
@@ -214,5 +220,31 @@ mod color_math_tests {
         let b = Color::rgba(2., 0.2, 0.25, 0.2);
 
         assert_eq!(Color::rgba(8., 0.14, 0.2, 0.1), a * b)
+    }
+}
+
+#[cfg(test)]
+mod cross_blend_tests {
+
+    #[test]
+    fn cross_blend() {
+        let c1 = color!(1, 0.5, 0.25);
+        let c2 = color!(0, 1., 0.75);
+        assert_eq!(c1, c1.cross_blend(c2, -0.1));
+        assert_eq!(c1, c1.cross_blend(c2, 0.));
+        assert_eq!(c2, c1.cross_blend(c2, 1.));
+        assert_eq!(c2, c1.cross_blend(c2, 1.1));
+        assert_eq!(color!(0.5, 0.75, 0.5), c1.cross_blend(c2, 0.5));
+        assert_eq!(color!(0.75, 0.625, 0.375), c1.cross_blend(c2, 0.25));
+    }
+
+    #[test]
+    fn cross_blend_with_alpha() {
+        let c1 = color!(1, 0.5, 0.25, 0.1);
+        let c2 = color!(0, 1., 0.75, 0.6);
+        assert_eq!(c1, c1.cross_blend(c2, 0.));
+        assert_eq!(c2, c1.cross_blend(c2, 1.));
+        assert_eq!(color!(0.5, 0.75, 0.5, 0.35), c1.cross_blend(c2, 0.5));
+        assert_eq!(color!(0.25, 0.875, 0.625, 0.475), c1.cross_blend(c2, 0.75));
     }
 }

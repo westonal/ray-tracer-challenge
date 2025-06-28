@@ -1,10 +1,11 @@
 use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{Color, RED};
+use math::tuple::color::{BLUE, Color, GREEN, RED};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::Transform::Transform;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
+use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
@@ -73,10 +74,25 @@ fn green_sphere() -> Shape {
 
 fn small_green_sphere() -> Shape {
     let mut sphere = Shape::new_sphere_transformed(
-        Matrix4x4::translation(1.5, 0.5, -0.5).pre_scale(0.5, 0.5, 0.5),
+        Matrix4x4::translation(1.5, 0.5, -0.5)
+            .pre_scale(0.5, 0.5, 0.5)
+            .pre_rotation_y(degrees!(30))
+            .pre_rotation_x(degrees!(30)),
     );
     let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(0.5, 1, 0.1));
+    material.pattern = Pattern::Gradient(
+        gradient_stops!(
+            0. => *RED,
+            0.25 => *RED,
+            0.5 => *BLUE,
+            0.75 => *GREEN,
+            1. => *GREEN),
+        Transform::new(
+            Matrix4x4::rotation_z(degrees!(90))
+                .pre_translation(-1., 0., 0.)
+                .pre_scale(2., 2., 2.),
+        ),
+    );
     material.diffuse = 0.7;
     material.specular = 0.3;
     sphere.material = material;
