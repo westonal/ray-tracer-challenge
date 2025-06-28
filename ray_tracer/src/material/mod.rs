@@ -1,6 +1,7 @@
 pub mod pattern;
 
 use crate::material::pattern::Pattern;
+use math::tuple::color::Color;
 
 #[derive(Debug, PartialEq)]
 pub struct Material {
@@ -20,6 +21,20 @@ impl Default for Material {
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
+            shadow_boost: 0.,
+        }
+    }
+}
+
+impl Material {
+    /// All shading disabled, pure ambient solid color
+    pub fn solid(color: Color) -> Self {
+        Self {
+            pattern: Pattern::Solid(color),
+            ambient: 1.,
+            diffuse: 0.,
+            specular: 0.,
+            shininess: 0.0,
             shadow_boost: 0.,
         }
     }

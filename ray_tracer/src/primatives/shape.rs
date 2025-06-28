@@ -12,7 +12,7 @@ use uuid::Uuid;
 pub struct Shape {
     id: String,
     pub material: Material,
-    transform: Transform,
+    pub(crate) transform: Transform,
     surface: Surface,
 }
 

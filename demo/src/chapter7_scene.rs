@@ -1,6 +1,6 @@
 use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::Color;
+use math::tuple::color::{Color, RED};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::Transform::Transform;
 use ray_tracer::camera::Camera;
@@ -32,7 +32,7 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
 }
 
 fn floor() -> Shape {
-    let mut floor = Shape::new_plane_transformed(Matrix4x4::scale(10., 0.01, 10.));
+    let mut floor = Shape::new_plane();
     let mut material = Material::default();
     material.pattern = Pattern::Stripe(
         color!(1, 0.9, 0.9),
@@ -48,8 +48,7 @@ fn wall(y: Angle) -> Shape {
     let mut wall = Shape::new_plane_transformed(
         Matrix4x4::translation(0., 0., 5.)
             .pre_rotation_y(y)
-            .pre_rotation_x(degrees!(90))
-            .pre_scale(10., 0.01, 10.),
+            .pre_rotation_x(degrees!(90)),
     );
     let mut material = Material::default();
     material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1, 0, 1), Transform::identity());
@@ -61,7 +60,11 @@ fn wall(y: Angle) -> Shape {
 fn green_sphere() -> Shape {
     let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
     let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(0.1, 1, 0.5));
+    material.pattern = Pattern::Stripe(
+        color!(0.1, 1, 0.5),
+        *RED,
+        Transform::new(Matrix4x4::scale(0.1, 0.1, 0.1).pre_rotation_z(degrees!(45))),
+    );
     material.diffuse = 0.7;
     material.specular = 0.3;
     sphere.material = material;

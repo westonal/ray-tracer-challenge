@@ -1,5 +1,6 @@
 pub mod pre_calculations;
 
+use crate::Transform::Transform;
 use crate::material::Material;
 use math::color;
 use math::tuple::color::Color;
@@ -21,18 +22,19 @@ impl Material {
     pub fn light(
         &self,
         light: &PointLight,
-        point: Point,
+        transform: &Transform,
+        world_point: Point,
         eye: Normal,
         normal: Normal,
         shadow_factor: f32,
     ) -> Color {
-        let surface_color = self.pattern.color_at(point);
+        let surface_color = self.pattern.color_at(world_point, transform);
 
         // Combine surface and light color
         let effective_color = surface_color * light.color;
 
         // find direction to light source
-        let light_v = (light.position - point).normalize();
+        let light_v = (light.position - world_point).normalize();
 
         let anti_shadow = (1. + self.shadow_boost - shadow_factor.clamp(0.0, 1.0)).clamp(0.0, 1.0);
 
@@ -77,7 +79,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.9, 1.9, 1.9),
-            material.light(&light, point, eye, normal, 0.)
+            material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }
 
@@ -90,7 +92,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.0, 1.0, 1.0),
-            material.light(&light, point, eye, normal, 0.)
+            material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }
 
@@ -103,7 +105,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.7363961, 0.7363961, 0.7363961),
-            material.light(&light, point, eye, normal, 0.)
+            material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }
 
@@ -116,7 +118,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(1.636396, 1.636396, 1.636396),
-            material.light(&light, point, eye, normal, 0.)
+            material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }
 
@@ -129,7 +131,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
-            material.light(&light, position, eye, normal, 0.)
+            material.light(&light, &Transform::identity(), position, eye, normal, 0.)
         );
     }
 
@@ -142,7 +144,7 @@ mod lighting_tests {
         let material = Material::default();
         assert_eq!(
             color!(0.1, 0.1, 0.1),
-            material.light(&light, point, eye, normal, 1.)
+            material.light(&light, &Transform::identity(), point, eye, normal, 1.)
         );
     }
 }
@@ -152,7 +154,9 @@ mod non_solid_pattern_tests {
     use super::*;
     use crate::Transform::Transform;
     use crate::material::pattern::Pattern;
-    use math::{point, vector};
+    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::tuple::color::{RED, WHITE};
+    use math::{degrees, point, vector};
 
     #[test]
     fn lighting_with_stripe_applied() {
@@ -160,21 +164,84 @@ mod non_solid_pattern_tests {
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
-        let mut material = Material::default();
-        material.ambient = 1.;
-        material.diffuse = 0.;
-        material.specular = 0.;
-        let a = color!(1, 1, 0);
-        let b = color!(0, 0, 1);
-        assert_ne!(a, b);
-        material.pattern = Pattern::Stripe(a, b, Transform::identity());
+        let mut material = Material::solid(*WHITE);
+        material.pattern = Pattern::Stripe(*WHITE, *RED, Transform::identity());
         assert_eq!(
-            a,
-            material.light(&light, point!(0.9, 0, 0), eye, normal, 0.)
+            *WHITE,
+            material.light(
+                &light,
+                &Transform::identity(),
+                point!(0.9, 0, 0),
+                eye,
+                normal,
+                0.
+            )
         );
         assert_eq!(
-            b,
-            material.light(&light, point!(1.1, 0, 0), eye, normal, 0.)
+            *RED,
+            material.light(
+                &light,
+                &Transform::identity(),
+                point!(1.1, 0, 0),
+                eye,
+                normal,
+                0.
+            )
+        );
+    }
+
+    #[test]
+    fn lighting_with_stripe_applied_rotate_in_pattern_transform() {
+        let point = Point::origin();
+        let eye = vector!(0, 0, -1).normalize();
+        let normal = vector!(0, 0, -1).normalize();
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
+        let mut material = Material::solid(*WHITE);
+        material.pattern = Pattern::Stripe(
+            *WHITE,
+            *RED,
+            Transform::new(Matrix4x4::rotation_z(degrees!(90))),
+        );
+        assert_eq!(
+            *WHITE,
+            material.light(
+                &light,
+                &Transform::identity(),
+                point!(0, 0.9, 0),
+                eye,
+                normal,
+                0.
+            )
+        );
+        assert_eq!(
+            *RED,
+            material.light(
+                &light,
+                &Transform::identity(),
+                point!(0, 1.1, 0),
+                eye,
+                normal,
+                0.
+            )
+        );
+    }
+
+    #[test]
+    fn lighting_with_stripe_applied_rotate_in_object_transform() {
+        let point = Point::origin();
+        let eye = vector!(0, 0, -1).normalize();
+        let normal = vector!(0, 0, -1).normalize();
+        let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
+        let mut material = Material::solid(*WHITE);
+        material.pattern = Pattern::Stripe(*WHITE, *RED, Transform::identity());
+        let transform = Transform::new(Matrix4x4::rotation_z(degrees!(90)));
+        assert_eq!(
+            *WHITE,
+            material.light(&light, &transform, point!(0, 0.9, 0), eye, normal, 0.)
+        );
+        assert_eq!(
+            *RED,
+            material.light(&light, &transform, point!(0, 1.1, 0), eye, normal, 0.)
         );
     }
 }
