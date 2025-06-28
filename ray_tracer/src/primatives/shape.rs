@@ -1,3 +1,4 @@
+use crate::Transform::Transform;
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::material::Material;
 use crate::primatives::surface::Surface;
@@ -11,18 +12,16 @@ use uuid::Uuid;
 pub struct Shape {
     id: String,
     pub material: Material,
-    object_to_world_transform: Matrix4x4,
-    world_to_object_transform: Matrix4x4,
+    transform: Transform,
     surface: Surface,
 }
 
 impl Shape {
-    pub fn new(transform: Matrix4x4, surface: Surface) -> Self {
+    pub(crate) fn new(object_to_world_matrix: Matrix4x4, surface: Surface) -> Self {
         Self {
             id: format!("{}", Uuid::new_v4()),
             material: Material::default(),
-            object_to_world_transform: transform,
-            world_to_object_transform: transform.invert().expect("inverse transform failure"),
+            transform: Transform::new(object_to_world_matrix),
             surface,
         }
     }
@@ -30,17 +29,16 @@ impl Shape {
 
 impl Shape {
     pub fn normal_at(&self, point: Point) -> Normal {
-        let object_point: Point = (self.world_to_object_transform * point).try_into().unwrap();
+        let object_point: Point = self.transform.world_point_to_object_point(point);
         let object_normal = self.surface.normal_at(object_point);
-        let world_normal = self.world_to_object_transform.transpose() * object_normal;
-        world_normal.force_vector().normalize()
+        self.transform.object_normal_to_world_normal(object_normal)
     }
 }
 
 impl Intersect for Shape {
     fn intersect(&self, ray: Ray) -> Intersections {
         // Convert world ray into object space
-        let ray = self.world_to_object_transform * ray;
+        let ray = self.transform.world_ray_to_object_ray(ray);
         let result = self
             .surface
             .intersect(ray)
