@@ -1,7 +1,7 @@
 use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::{Material, PointLight};
-use crate::primatives::sphere::Sphere;
+use crate::primatives::Shape;
 use crate::rays::Ray;
 use crate::world::World;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -14,7 +14,7 @@ impl World {
         let light = &self.light.as_ref().unwrap();
         // TODO, multilight support would light each in turn if they were direct.
         let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
-        pre_calculations.sphere.material.light(
+        pre_calculations.shape.material.light(
             light,
             pre_calculations.over_point,
             pre_calculations.eye,
@@ -38,7 +38,7 @@ impl World {
 pub fn default_world() -> World {
     let mut world = World::new();
     world.light = Some(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
-    let mut sphere = Sphere::new();
+    let mut sphere = Shape::new_sphere();
     let mut material = Material::default();
     material.color = color!(0.8, 1., 0.6);
     material.diffuse = 0.7;
@@ -49,7 +49,7 @@ pub fn default_world() -> World {
     world.add(sphere);
     let mut material = Material::default();
     material.shadow_boost = 1.;
-    let mut sphere = Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5));
+    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::scale(0.5, 0.5, 0.5));
     sphere.material = material;
     world.add(sphere);
     world
@@ -69,7 +69,7 @@ mod world_shading_tests {
     fn shade_an_intersection() {
         let world = default_world();
         let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
-        let first = world.objects.get(0).unwrap();
+        let first = world.shapes.get(0).unwrap();
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
@@ -81,7 +81,7 @@ mod world_shading_tests {
         let mut world = default_world();
         world.light = Some(PointLight::new(point!(0, 0.25, 0), color!(1., 1., 1.)));
         let ray = Ray::new(point!(0, 0, 0), vector!(0, 0, 1));
-        let second = world.objects.get(1).unwrap();
+        let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
@@ -123,9 +123,11 @@ mod world_shadow_shading_tests {
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::new();
         world.light = Some(PointLight::new(point!(0, 0, -10), color!(1., 1., 1.)));
-        world.add(Sphere::new());
-        world.add(Sphere::new_transformed(Matrix4x4::translation(0., 0., 10.)));
-        let second = world.objects.get(1).unwrap();
+        world.add(Shape::new_sphere());
+        world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
+            0., 0., 10.,
+        )));
+        let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
         let ray = Ray::new(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);

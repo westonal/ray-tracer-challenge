@@ -7,7 +7,7 @@ use math::{color, degrees, point};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
 use ray_tracer::lighting::{Material, PointLight};
-use ray_tracer::primatives::sphere::Sphere;
+use ray_tracer::primatives::Shape;
 use ray_tracer::world::World;
 use ray_tracer::world::render_world::RenderWorld;
 use std::time::Instant;
@@ -51,7 +51,7 @@ fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
 fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     let mut material = Material::default();
     material.color = color!(1., 0.5, 1.);
-    let mut sphere = Sphere::new_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
+    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
     sphere.material = material;
     let mut world = World::default();
     world.add(sphere);

@@ -1,4 +1,4 @@
-use crate::primatives::sphere::Sphere;
+use crate::primatives::Shape;
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
 
@@ -8,8 +8,7 @@ pub trait Intersect {
 
 pub struct Intersection<'s> {
     pub t: f32,
-    // TODO, will worry about making this generic when we have more than one type
-    pub sphere: &'s Sphere,
+    pub shape: &'s Shape,
 }
 
 impl<'s> Intersection<'s> {
@@ -62,8 +61,8 @@ impl<'s> Deref for Intersections<'s> {
 }
 
 impl<'s> Intersection<'s> {
-    pub fn new(t: f32, s: &'s Sphere) -> Self {
-        Self { t, sphere: s }
+    pub fn new(t: f32, shape: &'s Shape) -> Self {
+        Self { t, shape }
     }
 }
 
@@ -73,8 +72,8 @@ mod sorting_tests {
 
     #[test]
     fn intersections_are_sorted_in_create() {
-        let sphere1 = Sphere::new();
-        let sphere2 = Sphere::new();
+        let sphere1 = Shape::new_sphere();
+        let sphere2 = Shape::new_sphere();
         let intersections = Intersections::new(vec![
             Intersection::new(2., &sphere1),
             Intersection::new(1., &sphere2),
@@ -89,8 +88,8 @@ mod sorting_tests {
 
     #[test]
     fn intersections_are_sorted_when_joined() {
-        let sphere1 = Sphere::new();
-        let sphere2 = Sphere::new();
+        let sphere1 = Shape::new_sphere();
+        let sphere2 = Shape::new_sphere();
         let intersections1 = Intersections::new(vec![
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),
@@ -116,7 +115,7 @@ mod intersection_over_point_tests {
 
     #[test]
     fn the_hit_should_offset_the_point() {
-        let shape = Sphere::new_transformed(Matrix4x4::translation(0., 0., 1.));
+        let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
         let calcs = i.to_pre_calculation(ray!((0., 0., -5.), (0., 0., 1.)));
         assert!(calcs.over_point.z < -Intersection::EPSILON / 2.);

@@ -16,7 +16,7 @@ pub struct PreCalculations<'s> {
 impl<'s> Intersection<'s> {
     pub fn to_pre_calculation(&'s self, ray: Ray) -> PreCalculations<'s> {
         let point = ray.position(self.t);
-        let normal = self.sphere.normal_at(point);
+        let normal = self.shape.normal_at(point);
         let inside = normal.dot(&ray.direction) >= 0.;
         let normal = if inside { -normal } else { normal };
         PreCalculations {
@@ -41,18 +41,18 @@ impl<'s> Deref for PreCalculations<'s> {
 #[cfg(test)]
 mod precalculation_tests {
     use crate::intersection::Intersection;
-    use crate::primatives::sphere::Sphere;
+    use crate::primatives::Shape;
     use crate::ray;
     use math::{point, vector};
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
-        let sphere = Sphere::new();
+        let sphere = Shape::new_sphere();
         let intersection = Intersection::new(4., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(4., pre_calculations.t);
-        assert_eq!(&sphere, pre_calculations.sphere);
+        assert_eq!(&sphere, pre_calculations.shape);
         assert_eq!(point!(0, 0, -1), pre_calculations.point);
         assert_eq!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_eq!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
@@ -62,11 +62,11 @@ mod precalculation_tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_inside() {
         let ray = ray!((0., 0., 0.), (0., 0., 1.));
-        let sphere = Sphere::new();
+        let sphere = Shape::new_sphere();
         let intersection = Intersection::new(1., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(1., pre_calculations.t);
-        assert_eq!(&sphere, pre_calculations.sphere);
+        assert_eq!(&sphere, pre_calculations.shape);
         assert_eq!(point!(0, 0, 1), pre_calculations.point);
         assert_eq!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_eq!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());

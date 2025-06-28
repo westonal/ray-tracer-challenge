@@ -4,7 +4,7 @@ use math::{Angle, color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
 use ray_tracer::lighting::{Material, PointLight};
-use ray_tracer::primatives::sphere::Sphere;
+use ray_tracer::primatives::Shape;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::world::render_world::RenderWorld;
@@ -28,8 +28,8 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
     canvas.render(&world, &camera);
 }
 
-fn floor() -> Sphere {
-    let mut floor = Sphere::new_transformed(Matrix4x4::scale(10., 0.01, 10.));
+fn floor() -> Shape {
+    let mut floor = Shape::new_sphere_transformed(Matrix4x4::scale(10., 0.01, 10.));
     let mut material = Material::default();
     material.color = color!(1., 0.9, 0.9);
     material.specular = 0.;
@@ -37,8 +37,8 @@ fn floor() -> Sphere {
     floor
 }
 
-fn wall(y: Angle) -> Sphere {
-    let mut wall = Sphere::new_transformed(
+fn wall(y: Angle) -> Shape {
+    let mut wall = Shape::new_sphere_transformed(
         Matrix4x4::translation(0., 0., 5.)
             .pre_rotation_y(y)
             .pre_rotation_x(degrees!(90))
@@ -51,8 +51,8 @@ fn wall(y: Angle) -> Sphere {
     wall
 }
 
-fn green_sphere() -> Sphere {
-    let mut sphere = Sphere::new_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
+fn green_sphere() -> Shape {
+    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
     let mut material = Material::default();
     material.color = color!(0.1, 1., 0.5);
     material.diffuse = 0.7;
@@ -61,9 +61,10 @@ fn green_sphere() -> Sphere {
     sphere
 }
 
-fn small_green_sphere() -> Sphere {
-    let mut sphere =
-        Sphere::new_transformed(Matrix4x4::translation(1.5, 0.5, -0.5).pre_scale(0.5, 0.5, 0.5));
+fn small_green_sphere() -> Shape {
+    let mut sphere = Shape::new_sphere_transformed(
+        Matrix4x4::translation(1.5, 0.5, -0.5).pre_scale(0.5, 0.5, 0.5),
+    );
     let mut material = Material::default();
     material.color = color!(0.5, 1., 0.1);
     material.diffuse = 0.7;
@@ -72,8 +73,8 @@ fn small_green_sphere() -> Sphere {
     sphere
 }
 
-fn smallest_yellow_sphere() -> Sphere {
-    let mut sphere = Sphere::new_transformed(
+fn smallest_yellow_sphere() -> Shape {
+    let mut sphere = Shape::new_sphere_transformed(
         Matrix4x4::translation(-1.5, 0.33, -0.75).pre_scale(0.33, 0.33, 0.33),
     );
     let mut material = Material::default();

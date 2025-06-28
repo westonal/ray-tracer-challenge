@@ -4,13 +4,13 @@ mod shadows;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
-use crate::primatives::sphere::Sphere;
+use crate::primatives::Shape;
 use crate::rays::Ray;
 use math::tuple::color::Color;
 
 #[derive(Default)]
 pub struct World {
-    objects: Vec<Sphere>,
+    shapes: Vec<Shape>,
     pub light: Option<PointLight>,
     pub background: Color,
 }
@@ -23,13 +23,13 @@ impl World {
 
 impl World {
     pub fn object_count(&self) -> usize {
-        self.objects.len()
+        self.shapes.len()
     }
 }
 
 impl World {
-    pub fn add(&mut self, object: Sphere) {
-        self.objects.push(object);
+    pub fn add(&mut self, object: Shape) {
+        self.shapes.push(object);
     }
 }
 
@@ -42,7 +42,7 @@ impl World {
 impl Intersect for World {
     fn intersect(&self, ray: Ray) -> Intersections {
         let mut results = Intersections::default();
-        for object in &self.objects {
+        for object in &self.shapes {
             results += object.intersect(ray);
         }
         results
@@ -53,7 +53,7 @@ impl Intersect for World {
 mod world_tests {
     use super::*;
     use crate::lighting::PointLight;
-    use crate::primatives::sphere::Sphere;
+    use crate::primatives::Shape;
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
@@ -62,8 +62,8 @@ mod world_tests {
     #[test]
     fn setup_world() {
         let mut world = World::new();
-        world.add(Sphere::new());
-        world.add(Sphere::new());
+        world.add(Shape::new_sphere());
+        world.add(Shape::new_sphere());
         assert_eq!(2, world.object_count());
         assert!(world.light.is_none());
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1., 1., 1.)));
@@ -73,8 +73,10 @@ mod world_tests {
     #[test]
     fn intersecting_world() {
         let mut world = World::new();
-        world.add(Sphere::new());
-        world.add(Sphere::new_transformed(Matrix4x4::scale(0.5, 0.5, 0.5)));
+        world.add(Shape::new_sphere());
+        world.add(Shape::new_sphere_transformed(Matrix4x4::scale(
+            0.5, 0.5, 0.5,
+        )));
         let world = world;
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = world.intersect(ray);

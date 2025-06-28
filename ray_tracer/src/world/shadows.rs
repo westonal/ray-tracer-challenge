@@ -24,7 +24,7 @@ impl World {
 mod shadow_tests {
 
     use crate::lighting::PointLight;
-    use crate::primatives::sphere::Sphere;
+    use crate::primatives::Shape;
     use crate::world::World;
     use math::point;
     use math::tuple::color::Color;
@@ -34,7 +34,7 @@ mod shadow_tests {
         let mut world = World::new();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
-        world.add(Sphere::new());
+        world.add(Shape::new_sphere());
         let point = point!(0, 10, 0);
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
@@ -45,7 +45,7 @@ mod shadow_tests {
         let mut world = World::new();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
-        world.add(Sphere::new());
+        world.add(Shape::new_sphere());
         let point = point!(5, -5, 0);
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 0);
@@ -56,7 +56,7 @@ mod shadow_tests {
         let mut world = World::new();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
-        world.add(Sphere::new());
+        world.add(Shape::new_sphere());
         let point = point!(-11, 11, 0);
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
