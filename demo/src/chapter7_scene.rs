@@ -1,9 +1,10 @@
+use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Canvas;
-use ray_tracer::lighting::{Material, PointLight};
+use ray_tracer::lighting::PointLight;
 use ray_tracer::primatives::Shape;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;

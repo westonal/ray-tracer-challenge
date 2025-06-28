@@ -1,5 +1,6 @@
 pub mod pre_calculations;
 
+use crate::material::Material;
 use math::color;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
@@ -14,16 +15,6 @@ impl PointLight {
     pub fn new(position: Point, color: Color) -> Self {
         Self { position, color }
     }
-}
-
-#[derive(Debug, PartialEq)]
-pub struct Material {
-    pub color: Color,
-    pub ambient: f32,
-    pub diffuse: f32,
-    pub specular: f32,
-    pub shininess: f32,
-    pub shadow_boost: f32,
 }
 
 impl Material {
@@ -66,19 +57,6 @@ impl Material {
 
         // set to solid color
         color!(result.red(), result.green(), result.blue())
-    }
-}
-
-impl Material {
-    pub fn default() -> Self {
-        Self {
-            color: color!(1., 1., 1.),
-            ambient: 0.1,
-            diffuse: 0.9,
-            specular: 0.9,
-            shininess: 200.0,
-            shadow_boost: 0.,
-        }
     }
 }
 

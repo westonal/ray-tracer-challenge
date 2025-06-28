@@ -1,6 +1,7 @@
 use crate::intersection::Intersect;
+use crate::lighting::PointLight;
 use crate::lighting::pre_calculations::PreCalculations;
-use crate::lighting::{Material, PointLight};
+use crate::material::Material;
 use crate::primatives::Shape;
 use crate::rays::Ray;
 use crate::world::World;

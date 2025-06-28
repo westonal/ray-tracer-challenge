@@ -1,5 +1,5 @@
 use crate::intersection::{Intersect, Intersection, Intersections};
-use crate::lighting::Material;
+use crate::material::Material;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
