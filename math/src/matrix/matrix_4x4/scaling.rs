@@ -10,8 +10,16 @@ impl Matrix4x4 {
         m
     }
 
+    pub fn scale_all(scale: f32) -> Matrix4x4 {
+        Self::scale(scale, scale, scale)
+    }
+
     pub fn pre_scale(&self, x: f32, y: f32, z: f32) -> Matrix4x4 {
         self.clone() * Matrix4x4::scale(x, y, z)
+    }
+
+    pub fn pre_scale_all(&self, scale: f32) -> Matrix4x4 {
+        self.pre_scale(scale, scale, scale)
     }
 }
 
@@ -30,10 +38,24 @@ mod scale_tests {
     }
 
     #[test]
+    fn scale_all_point() {
+        let m = Matrix4x4::scale_all(2.);
+        let p = point!(-4., 6., 8.);
+        assert_eq!(m * p, point!(-8., 12., 16.).into());
+    }
+
+    #[test]
     fn scale_point_fluent() {
         let m = Matrix4x4::identity().pre_scale(2., 3., 4.);
         let p = point!(-4., 6., 8.);
         assert_eq!(m * p, point!(-8., 18., 32.).into());
+    }
+
+    #[test]
+    fn scale_all_point_fluent() {
+        let m = Matrix4x4::identity().pre_scale_all(2.);
+        let p = point!(-4., 6., 8.);
+        assert_eq!(m * p, point!(-8., 12., 16.).into());
     }
 
     #[test]

@@ -13,6 +13,12 @@ Drawing on a canvas
 
 Matrices
 
+# Chapter 10
+
+Patterns
+
+To Visit - couple of patterns left out, Ring and Perturbed. 
+
 # Running
 
 ## Testing 

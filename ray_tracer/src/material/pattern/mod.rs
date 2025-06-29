@@ -1,3 +1,4 @@
+pub mod checker;
 pub mod gradient;
 mod stripes;
 
@@ -11,6 +12,7 @@ pub enum Pattern {
     Solid(Color),
     Stripe(Color, Color, Transform),
     Gradient(GradientStops, Transform),
+    Checker(Color, Color, Transform),
 }
 
 impl Default for Pattern {
@@ -31,6 +33,12 @@ impl Pattern {
             ),
             Pattern::Gradient(stops, pattern_transform) => Self::gradient_color_at(
                 stops,
+                pattern_transform,
+                transform.world_point_to_object_point(point),
+            ),
+            Pattern::Checker(a, b, pattern_transform) => Self::checker_color_at(
+                a,
+                b,
                 pattern_transform,
                 transform.world_point_to_object_point(point),
             ),

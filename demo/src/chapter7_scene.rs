@@ -1,6 +1,6 @@
 use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{BLUE, Color, GREEN, RED};
+use math::tuple::color::{BLUE, Color, GREEN, RED, WHITE};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::Transform::Transform;
 use ray_tracer::camera::Camera;
@@ -35,10 +35,10 @@ pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
 fn floor() -> Shape {
     let mut floor = Shape::new_plane();
     let mut material = Material::default();
-    material.pattern = Pattern::Stripe(
+    material.pattern = Pattern::Checker(
         color!(1, 0.9, 0.9),
         color!(1, 0, 1),
-        Transform::new(Matrix4x4::scale(0.5, 1., 1.)),
+        Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(0.25)),
     );
     material.specular = 0.;
     floor.material = material;
@@ -75,7 +75,7 @@ fn green_sphere() -> Shape {
 fn small_green_sphere() -> Shape {
     let mut sphere = Shape::new_sphere_transformed(
         Matrix4x4::translation(1.5, 0.5, -0.5)
-            .pre_scale(0.5, 0.5, 0.5)
+            .pre_scale_all(0.5)
             .pre_rotation_y(degrees!(30))
             .pre_rotation_x(degrees!(30)),
     );
@@ -90,7 +90,7 @@ fn small_green_sphere() -> Shape {
         Transform::new(
             Matrix4x4::rotation_z(degrees!(90))
                 .pre_translation(-1., 0., 0.)
-                .pre_scale(2., 2., 2.),
+                .pre_scale_all(2.),
         ),
     );
     material.diffuse = 0.7;
@@ -101,10 +101,19 @@ fn small_green_sphere() -> Shape {
 
 fn smallest_yellow_sphere() -> Shape {
     let mut sphere = Shape::new_sphere_transformed(
-        Matrix4x4::translation(-1.5, 0.33, -0.75).pre_scale(0.33, 0.33, 0.33),
+        Matrix4x4::translation(-1.5, 0.33, -0.75)
+            .pre_scale_all(0.33)
+            .pre_rotation_y(degrees!(30))
+            .pre_rotation_x(degrees!(-30)),
     );
     let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(1, 0.8, 0.1));
+    material.pattern = Pattern::Checker(
+        color!(1, 0.8, 0.1),
+        *WHITE,
+        // TODO: BUG, without some scale, the pattern does not align exactly
+        //  Even though it's a unit sphere and unit repeating pattern.
+        Transform::new(Matrix4x4::scale_all(1.2)),
+    );
     material.diffuse = 0.7;
     material.specular = 0.3;
     sphere.material = material;

@@ -10,7 +10,7 @@ mod chain_tests {
     fn chain() {
         assert_eq!(
             Matrix4x4::translation(10., 5., 7.)
-                * Matrix4x4::scale(5., 5., 5.,)
+                * Matrix4x4::scale_all(5.)
                 * Matrix4x4::rotation_x(radians!(PI / 2.))
                 * point!(1., 0., 1.),
             point!(15., 0., 7.).into()
@@ -21,7 +21,7 @@ mod chain_tests {
     fn chain_reversed() {
         assert_eq!(
             Matrix4x4::rotation_x(radians!(PI / 2.))
-                * Matrix4x4::scale(5., 5., 5.,)
+                * Matrix4x4::scale_all(5.)
                 * Matrix4x4::translation(10., 5., 7.)
                 * point!(1., 0., 1.),
             point!(55., -40., 24.999998).into()
@@ -32,7 +32,7 @@ mod chain_tests {
     fn chain_fluent() {
         assert_eq!(
             Matrix4x4::translation(10., 5., 7.)
-                .pre_scale(5., 5., 5.,)
+                .pre_scale_all(5.)
                 .pre_rotation_x(radians!(PI / 2.))
                 * point!(1., 0., 1.),
             point!(15., 0., 7.).into()
@@ -43,7 +43,7 @@ mod chain_tests {
     fn chain_fluent_reversed() {
         assert_eq!(
             Matrix4x4::rotation_x(radians!(PI / 2.))
-                .pre_scale(5., 5., 5.,)
+                .pre_scale_all(5.)
                 .pre_translation(10., 5., 7.)
                 * point!(1., 0., 1.),
             point!(55., -40., 24.999998).into()
