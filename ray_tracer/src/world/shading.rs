@@ -4,6 +4,7 @@ use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::Material;
 use crate::material::pattern::Pattern;
 use crate::primatives::Shape;
+use crate::ray;
 use crate::rays::Ray;
 use crate::world::World;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -16,14 +17,28 @@ impl World {
         let light = &self.light.as_ref().unwrap();
         // TODO, multilight support would light each in turn if they were direct.
         let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
-        pre_calculations.shape.material.light(
+        let mut result = pre_calculations.shape.material.light(
             light,
             &pre_calculations.shape.transform,
             pre_calculations.over_point,
             pre_calculations.eye,
             pre_calculations.normal,
             shadow_factor,
-        )
+        ) + self.reflection_color(pre_calculations);
+        result.clamp_alpha();
+        result
+    }
+
+    fn reflection_color(&self, pre_calculations: PreCalculations) -> Color {
+        let r = pre_calculations.shape.material.reflectivity;
+        if r > 0. {
+            self.color_at(ray!(
+                pre_calculations.over_point,
+                pre_calculations.reflection
+            )) * r
+        } else {
+            color!(0, 0, 0, 0)
+        }
     }
 
     pub fn color_at(&self, ray: Ray) -> Color {

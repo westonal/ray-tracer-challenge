@@ -2,7 +2,6 @@ pub mod pre_calculations;
 
 use crate::Transform::Transform;
 use crate::material::Material;
-use math::color;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
@@ -59,8 +58,8 @@ impl Material {
             }
         }
 
-        // set to solid color
-        color!(result.red(), result.green(), result.blue())
+        result.set_alpha(1.);
+        result
     }
 }
 
@@ -160,7 +159,6 @@ mod non_solid_pattern_tests {
 
     #[test]
     fn lighting_with_stripe_applied() {
-        let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
@@ -192,7 +190,6 @@ mod non_solid_pattern_tests {
 
     #[test]
     fn lighting_with_stripe_applied_rotate_in_pattern_transform() {
-        let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
@@ -228,7 +225,6 @@ mod non_solid_pattern_tests {
 
     #[test]
     fn lighting_with_stripe_applied_rotate_in_object_transform() {
-        let point = Point::origin();
         let eye = vector!(0, 0, -1).normalize();
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 0, -10), color!(1, 1, 1));
@@ -242,6 +238,37 @@ mod non_solid_pattern_tests {
         assert_eq!(
             *RED,
             material.light(&light, &transform, point!(0, 1.1, 0), eye, normal, 0.)
+        );
+    }
+}
+
+#[cfg(test)]
+mod reflection_lighting_tests {
+    use super::*;
+    use crate::primatives::Shape;
+    use crate::ray;
+    use crate::world::World;
+    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::tuple::color::{GREEN, RED, WHITE};
+
+    #[test]
+    fn g() {
+        let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 10., 10.));
+        sphere.material = Material::solid(*RED);
+        let mut material = Material::solid(*GREEN);
+        material.reflectivity = 0.25;
+        let mut plane = Shape::new_plane();
+        plane.material = material;
+        let mut world = World::new();
+        world.set_light(PointLight::new(Point::origin(), *WHITE));
+        world.add(sphere);
+        world.add(plane);
+        // Shoot straight at sphere
+        assert_eq!(*RED, world.color_at(ray!((0., 5., 5.), (0., 10., 10.))));
+        // Bounce off
+        assert_eq!(
+            color!(0.25, 1, 0, 1),
+            world.color_at(ray!((0., 10., -10.), (0., -10., 10.)))
         );
     }
 }

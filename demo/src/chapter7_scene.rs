@@ -41,6 +41,7 @@ fn floor() -> Shape {
         Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(0.25)),
     );
     material.specular = 0.;
+    material.reflectivity = 0.6;
     floor.material = material;
     floor
 }

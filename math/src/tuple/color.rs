@@ -13,6 +13,14 @@ impl Color {
         let a = *self;
         a + (other - a) * ratio.clamp(0., 1.)
     }
+
+    pub fn set_alpha(&mut self, alpha: f32) {
+        self.tuple.w = alpha;
+    }
+
+    pub fn clamp_alpha(&mut self) {
+        self.set_alpha(self.alpha().clamp(0.,1.))
+    }
 }
 
 impl Color {
@@ -246,5 +254,38 @@ mod cross_blend_tests {
         assert_eq!(c2, c1.cross_blend(c2, 1.));
         assert_eq!(color!(0.5, 0.75, 0.5, 0.35), c1.cross_blend(c2, 0.5));
         assert_eq!(color!(0.25, 0.875, 0.625, 0.475), c1.cross_blend(c2, 0.75));
+    }
+}
+
+#[cfg(test)]
+mod alpha_setting_tests {
+    
+
+    #[test]
+    fn set_alpha() {
+        let mut color = color!(1, 2, 3, 1.1);
+        color.set_alpha(1.);
+        assert_eq!(color!(1, 2, 3, 1), color);
+    }
+
+    #[test]
+    fn clamp_alpha() {
+        let mut color = color!(1, 2, 3, 1.1);
+        color.clamp_alpha();
+        assert_eq!(color!(1, 2, 3, 1), color);
+    }
+
+    #[test]
+    fn set_alpha_2() {
+        let mut color = color!(1, 2, 3, -0.1);
+        color.set_alpha(0.2);
+        assert_eq!(color!(1, 2, 3, 0.2), color);
+    }
+
+    #[test]
+    fn clamp_alpha_negative() {
+        let mut color = color!(1, 2, 3, -0.1);
+        color.clamp_alpha();
+        assert_eq!(color!(1, 2, 3, 0), color);
     }
 }
