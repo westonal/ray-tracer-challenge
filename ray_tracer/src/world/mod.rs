@@ -11,13 +11,19 @@ use math::tuple::color::Color;
 #[derive(Default)]
 pub struct World {
     shapes: Vec<Shape>,
-    pub light: Option<PointLight>,
+    pub lights: Vec<PointLight>,
     pub background: Color,
 }
 
 impl World {
+    pub fn add_light(&mut self, light: PointLight) {
+        self.lights.push(light);
+    }
+
+    /// Set lighting to a single light, use add light for multiple lights
     pub fn set_light(&mut self, light: PointLight) {
-        self.light = Some(light);
+        self.lights.clear();
+        self.add_light(light);
     }
 }
 
@@ -65,9 +71,9 @@ mod world_tests {
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere());
         assert_eq!(2, world.object_count());
-        assert!(world.light.is_none());
+        assert!(world.lights.is_empty());
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
-        assert!(world.light.is_some());
+        assert!(!world.lights.is_empty());
     }
 
     #[test]

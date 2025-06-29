@@ -57,7 +57,7 @@ fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
     sphere.material = material;
     let mut world = World::default();
     world.add(sphere);
-    world.light = Some(PointLight::new(point!(10, 10, 7), color!(0., 0.9, 1.)));
+    world.set_light(PointLight::new(point!(10, 10, 7), color!(0., 0.9, 1.)));
     let world = world;
 
     let camera = Camera::new((canvas.width(), canvas.height()), degrees!(90));

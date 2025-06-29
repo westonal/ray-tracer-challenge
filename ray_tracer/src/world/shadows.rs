@@ -7,16 +7,17 @@ use math::tuple::point::Point;
 impl World {
     /// Which lights are not occluded by objects in the scene
     pub(crate) fn direct_lights(&self, point: Point) -> Vec<&PointLight> {
-        if let Some(l) = &self.light {
-            let intersections = self.intersect(ray!(point, l.position - point));
-            if let Some(hit) = intersections.hit() {
-                if hit.t < 1. { vec![] } else { vec![l] }
-            } else {
-                vec![l]
-            }
-        } else {
-            vec![]
-        }
+        self.lights
+            .iter()
+            .filter_map(|l| {
+                let intersections = self.intersect(ray!(point, l.position - point));
+                if let Some(hit) = intersections.hit() {
+                    if hit.t < 1. { None } else { Some(l) }
+                } else {
+                    Some(l)
+                }
+            })
+            .collect::<Vec<&PointLight>>()
     }
 }
 

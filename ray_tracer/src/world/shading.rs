@@ -13,18 +13,22 @@ use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
+        let mut result = color!(0, 0, 0, 0);
         let direct_lights = self.direct_lights(pre_calculations.over_point);
-        let light = &self.light.as_ref().unwrap();
-        // TODO, multilight support would light each in turn if they were direct.
-        let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
-        let mut result = pre_calculations.shape.material.light(
-            light,
-            &pre_calculations.shape.transform,
-            pre_calculations.over_point,
-            pre_calculations.eye,
-            pre_calculations.normal,
-            shadow_factor,
-        ) + self.reflection_color(pre_calculations);
+        for light in &self.lights {
+            // TODO, multilight support would light each in turn if they were direct.
+            let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
+            result = result
+                + pre_calculations.shape.material.light(
+                    light,
+                    &pre_calculations.shape.transform,
+                    pre_calculations.over_point,
+                    pre_calculations.eye,
+                    pre_calculations.normal,
+                    shadow_factor,
+                )
+        }
+        result = result + self.reflection_color(pre_calculations);
         result.clamp_alpha();
         result
     }
@@ -55,7 +59,7 @@ impl World {
 /// A test world
 pub fn default_world() -> World {
     let mut world = World::new();
-    world.light = Some(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+    world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
     let mut sphere = Shape::new_sphere();
     let mut material = Material::default();
     material.pattern = Pattern::Solid(color!(0.8, 1., 0.6));
@@ -97,7 +101,7 @@ mod world_shading_tests {
     #[test]
     fn shade_an_intersection_from_inside() {
         let mut world = default_world();
-        world.light = Some(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
+        world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = Ray::new(point!(0, 0, 0), vector!(0, 0, 1));
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
@@ -140,7 +144,7 @@ mod world_shadow_shading_tests {
     #[test]
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::new();
-        world.light = Some(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+        world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
             0., 0., 10.,
@@ -179,7 +183,7 @@ mod world_pattern_shading_tests {
     impl TestScene {
         fn given(stripe_transform: Matrix4x4, plane_transformation: Matrix4x4) -> TestScene {
             let mut world = World::new();
-            world.light = Some(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+            world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
             let mut plane = Shape::new_plane_transformed(plane_transformation);
             let mut material = Material::solid(*BLUE);
             material.pattern = Pattern::Stripe(*GREEN, *RED, Transform::new(stripe_transform));

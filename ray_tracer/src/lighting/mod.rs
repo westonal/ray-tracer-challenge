@@ -155,7 +155,7 @@ mod non_solid_pattern_tests {
     use crate::material::pattern::Pattern;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{RED, WHITE};
-    use math::{degrees, point, vector};
+    use math::{color, degrees, point, vector};
 
     #[test]
     fn lighting_with_stripe_applied() {
@@ -248,6 +248,7 @@ mod reflection_lighting_tests {
     use crate::primatives::Shape;
     use crate::ray;
     use crate::world::World;
+    use math::color;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{GREEN, RED, WHITE};
 

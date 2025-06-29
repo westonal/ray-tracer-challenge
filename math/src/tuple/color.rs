@@ -19,7 +19,7 @@ impl Color {
     }
 
     pub fn clamp_alpha(&mut self) {
-        self.set_alpha(self.alpha().clamp(0.,1.))
+        self.set_alpha(self.alpha().clamp(0., 1.))
     }
 }
 
@@ -259,7 +259,6 @@ mod cross_blend_tests {
 
 #[cfg(test)]
 mod alpha_setting_tests {
-    
 
     #[test]
     fn set_alpha() {

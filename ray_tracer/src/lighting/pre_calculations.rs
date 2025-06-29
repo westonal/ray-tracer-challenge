@@ -88,7 +88,10 @@ mod reflection_pre_calc_tests {
     #[test]
     fn precompute_the_reflection_vector() {
         let plane = Shape::new_plane();
-        let ray = ray!((0., 1., -1.), (0., -(2.0_f32.sqrt() / 2.), 2.0_f32.sqrt() / 2.));
+        let ray = ray!(
+            (0., 1., -1.),
+            (0., -(2.0_f32.sqrt() / 2.), 2.0_f32.sqrt() / 2.)
+        );
         let i = Intersection::new(2.0_f32.sqrt(), &plane);
         let calculations = i.to_pre_calculation(ray);
         assert_eq!(
