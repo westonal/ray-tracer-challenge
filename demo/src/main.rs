@@ -2,7 +2,7 @@ use crate::chapter7_scene::ray_trace_end_chapter_7_scene;
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
 use math::tuple::color::Color;
-use ray_tracer::canvas::{Canvas, ViewPort};
+use ray_tracer::canvas::{Canvas, Size, ViewPort};
 use ray_tracer::material::Material;
 use std::ops::DerefMut;
 use std::time::Instant;
@@ -13,22 +13,21 @@ mod png_write;
 mod threaded_canvas;
 
 fn main() {
-    render(32);
+    let size_multiplier = 2;
+    render(Size::new(600 * size_multiplier, 400 * size_multiplier), 32);
 }
 
-fn render(block_size: u32) {
-    let size_multiplier = 2;
-    let mut canvas =
-        ThreadedCanvas::new((600 * size_multiplier, 400 * size_multiplier), block_size);
+fn render(size: Size, block_size: u32) {
+    let mut canvas = ThreadedCanvas::new(size, block_size);
     fill_all_with_gradient(canvas.deref_mut());
     let now = Instant::now();
     // Multithread
     ray_trace_end_chapter_7_scene(&mut canvas);
-    // Single thread
+    // If passed as a regular canvas, that causes single thread rendering
     //ray_trace_end_chapter_7_scene(canvas.deref_mut());
     // ray_trace_with_lighting(&mut canvas);
     let duration = now.elapsed();
-    let pixels = canvas.width() * canvas.height();
+    let pixels = canvas.size().width() * canvas.size().height();
     println!(
         "Ray trace, block size {} took: {} ms {} px/sec",
         block_size,
@@ -40,11 +39,12 @@ fn render(block_size: u32) {
 }
 
 fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
-    for y in 0..canvas.height() {
-        for x in 0..canvas.width() {
+    let size = canvas.size();
+    for y in 0..size.height() {
+        for x in 0..size.width() {
             let color = (
-                (x as f32) / (canvas.width() as f32),
-                (y as f32) / (canvas.height() as f32),
+                (x as f32) / (size.width() as f32),
+                (y as f32) / (size.height() as f32),
                 0.0,
                 1.0,
             )

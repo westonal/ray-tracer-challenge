@@ -24,7 +24,7 @@ pub fn ray_trace_end_chapter_7_scene<C: ViewPort + RenderWorld>(canvas: &mut C) 
     world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
     let world = world;
 
-    let mut camera = Camera::new((canvas.width(), canvas.height()), degrees!(60));
+    let mut camera = Camera::new(canvas.size(), degrees!(60));
     camera.set_transform(
         ViewMatrix::new_look_at(point!(0, 1.5, -5), point!(0, 1, 0), vector!(0, 1, 0)).into(),
     );

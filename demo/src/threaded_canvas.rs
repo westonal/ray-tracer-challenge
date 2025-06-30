@@ -1,20 +1,20 @@
 use crate::image_buffer_canvas::ImageBufferCanvas;
 use ray_tracer::camera::Camera;
-use ray_tracer::canvas::{Block, BlockIterator, Canvas, PixelIterator, ViewPort};
+use ray_tracer::canvas::{Block, BlockIterator, Canvas, PixelIterator, Size, ViewPort};
 use ray_tracer::world::World;
 use ray_tracer::world::render_world::{RenderPartialWorld, RenderWorld};
 use rayon::prelude::*;
 use std::ops::{Deref, DerefMut};
 
 pub struct ThreadedCanvas {
-    block_size: (u32, u32),
+    block_size: Size,
     image_buffer_canvas: ImageBufferCanvas,
 }
 
 impl ThreadedCanvas {
-    pub fn new(size: (u32, u32), block_size: u32) -> Self {
+    pub fn new(size: Size, block_size: u32) -> Self {
         Self {
-            block_size: (block_size, block_size),
+            block_size: Size::new(block_size, block_size),
             image_buffer_canvas: ImageBufferCanvas::new(size),
         }
     }
@@ -34,14 +34,9 @@ impl DerefMut for ThreadedCanvas {
     }
 }
 
-//TODO needed?
 impl ViewPort for ThreadedCanvas {
-    fn width(&self) -> u32 {
-        self.image_buffer_canvas.width()
-    }
-
-    fn height(&self) -> u32 {
-        self.image_buffer_canvas.height()
+    fn size(&self) -> Size {
+        self.image_buffer_canvas.size()
     }
 }
 

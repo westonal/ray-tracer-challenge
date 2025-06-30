@@ -1,3 +1,4 @@
+use crate::canvas::Size;
 use crate::ray;
 use crate::rays::{Ray, RayGeneration};
 use crate::world::World;
@@ -6,7 +7,7 @@ use math::tuple::color::Color;
 use math::{Angle, point};
 
 pub struct Camera {
-    view_port: (u32, u32),
+    view_port: Size,
     aspect_ratio: f32,
     fov_y: Angle,
     transform: Matrix4x4,
@@ -15,8 +16,8 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(view_port: (u32, u32), fov_y: Angle) -> Self {
-        let aspect_ratio = view_port.0 as f32 / view_port.1 as f32;
+    pub fn new(view_port: Size, fov_y: Angle) -> Self {
+        let aspect_ratio = view_port.aspect_ratio();
         let canvas_height = (fov_y.to_radians() / 2.).tan() * 2.;
         let canvas_width = canvas_height * aspect_ratio;
         Self {
@@ -33,8 +34,8 @@ impl Camera {
         let (x, y) = x_y;
         let (width, height) = self.canvas_size;
 
-        let x_normalized = (x as f32 + 0.5) / self.width() - 0.5;
-        let y_normalized = (y as f32 + 0.5) / self.height() - 0.5;
+        let x_normalized = (x as f32 + 0.5) / self.view_port.width() as f32 - 0.5;
+        let y_normalized = (y as f32 + 0.5) / self.view_port.height() as f32 - 0.5;
 
         let y1 = (-y_normalized) * height;
         let x1 = (-x_normalized) * width;
@@ -44,18 +45,6 @@ impl Camera {
         let direction = (point - origin).normalize();
 
         ray!(origin, direction.to_vector())
-    }
-
-    fn aspect(&self) -> f32 {
-        self.width() / self.height()
-    }
-
-    fn width(&self) -> f32 {
-        self.view_port.0 as f32
-    }
-
-    fn height(&self) -> f32 {
-        self.view_port.1 as f32
     }
 
     pub fn set_transform(&mut self, transform: Matrix4x4) {
@@ -79,15 +68,15 @@ mod camera_tests {
 
     #[test]
     fn new_camera() {
-        let camera = Camera::new((160, 120), degrees!(45));
-        assert_eq!(160, camera.view_port.0);
-        assert_eq!(120, camera.view_port.1);
+        let camera = Camera::new(Size::new(160, 120), degrees!(45));
+        assert_eq!(160, camera.view_port.width());
+        assert_eq!(120, camera.view_port.height());
         assert_eq!(45., camera.fov_y.to_degrees());
     }
 
     #[test]
     fn ray_for_center_of_view() {
-        let camera = Camera::new((201, 101), degrees!(90));
+        let camera = Camera::new(Size::new(201, 101), degrees!(90));
         let ray = camera.ray_for_pixel((100, 50));
         assert_eq!(ray.origin, point!(0, 0, 0));
         assert_eq!(ray.direction, vector!(0, 0, -1));
@@ -95,7 +84,7 @@ mod camera_tests {
 
     #[test]
     fn ray_for_top_left_of_view() {
-        let camera = Camera::new((101, 201), degrees!(90));
+        let camera = Camera::new(Size::new(101, 201), degrees!(90));
         let ray = camera.ray_for_pixel((0, 0));
         assert_eq!(ray.origin, point!(0, 0, 0));
         assert_eq!(ray.direction, vector!(0.3325932, 0.6651864, -0.66851234));
@@ -103,7 +92,7 @@ mod camera_tests {
 
     #[test]
     fn ray_for_transformed_view() {
-        let mut camera = Camera::new((101, 201), degrees!(90));
+        let mut camera = Camera::new(Size::new(101, 201), degrees!(90));
         camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).pre_translation(0., -2., 5.));
         let ray = camera.ray_for_pixel((50, 100));
         assert_eq!(ray.origin, point!(0, 2, -5.0000005));
@@ -113,7 +102,7 @@ mod camera_tests {
     #[test]
     fn render_world_with_camera() {
         let world = crate::world::shading::default_world();
-        let mut camera = Camera::new((11, 11), degrees!(90));
+        let mut camera = Camera::new(Size::new(11, 11), degrees!(90));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
