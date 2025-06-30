@@ -934,6 +934,7 @@ dependencies = [
  "image",
  "math",
  "ray_tracer",
+ "rayon",
 ]
 
 [[package]]

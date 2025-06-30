@@ -1,33 +1,37 @@
 use crate::chapter7_scene::ray_trace_end_chapter_7_scene;
-use crate::image_buffer_canvas::ImageBufferCanvas;
 use crate::png_write::PngWrite;
-use math::matrix::matrix_4x4::Matrix4x4;
+use crate::threaded_canvas::ThreadedCanvas;
 use math::tuple::color::Color;
-use math::{color, degrees, point};
-use ray_tracer::camera::Camera;
-use ray_tracer::canvas::Canvas;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::canvas::{Canvas, ViewPort};
 use ray_tracer::material::Material;
-use ray_tracer::material::pattern::Pattern;
-use ray_tracer::primatives::Shape;
-use ray_tracer::world::World;
-use ray_tracer::world::render_world::RenderWorld;
+use std::ops::DerefMut;
 use std::time::Instant;
 
 mod chapter7_scene;
 mod image_buffer_canvas;
 mod png_write;
+mod threaded_canvas;
 
 fn main() {
-    let mut canvas = ImageBufferCanvas::new(1200, 800);
-    fill_all_with_gradient(&mut canvas);
+    render(32);
+}
+
+fn render(block_size: u32) {
+    let size_multiplier = 2;
+    let mut canvas =
+        ThreadedCanvas::new((600 * size_multiplier, 400 * size_multiplier), block_size);
+    fill_all_with_gradient(canvas.deref_mut());
     let now = Instant::now();
+    // Multithread
     ray_trace_end_chapter_7_scene(&mut canvas);
+    // Single thread
+    //ray_trace_end_chapter_7_scene(canvas.deref_mut());
     // ray_trace_with_lighting(&mut canvas);
     let duration = now.elapsed();
     let pixels = canvas.width() * canvas.height();
     println!(
-        "Ray trace took: {} ms {} px/sec",
+        "Ray trace, block size {} took: {} ms {} px/sec",
+        block_size,
         duration.as_millis(),
         pixels as f32 / duration.as_secs_f32()
     );
@@ -48,18 +52,4 @@ fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
             canvas.write_color(x, y, color);
         }
     }
-}
-
-fn ray_trace_with_lighting<C: Canvas<Color>>(canvas: &mut C) {
-    let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(1., 0.5, 1.));
-    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., -2.0_f32.sqrt()));
-    sphere.material = material;
-    let mut world = World::default();
-    world.add(sphere);
-    world.set_light(PointLight::new(point!(10, 10, 7), color!(0., 0.9, 1.)));
-    let world = world;
-
-    let camera = Camera::new((canvas.width(), canvas.height()), degrees!(90));
-    canvas.render(&world, &camera);
 }

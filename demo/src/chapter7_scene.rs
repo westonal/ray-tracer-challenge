@@ -1,9 +1,9 @@
 use crate::Material;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{BLUE, Color, GREEN, RED, WHITE};
+use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::canvas::Canvas;
+use ray_tracer::canvas::ViewPort;
 use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
@@ -13,7 +13,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::world::render_world::RenderWorld;
 
-pub fn ray_trace_end_chapter_7_scene<C: Canvas<Color>>(canvas: &mut C) {
+pub fn ray_trace_end_chapter_7_scene<C: ViewPort + RenderWorld>(canvas: &mut C) {
     let mut world = World::default();
     world.add(floor());
     world.add(wall(degrees!(-45))); // left wall

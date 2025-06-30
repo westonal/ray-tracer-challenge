@@ -1,7 +1,7 @@
 use crate::png_write::PngWrite;
-use image::{ImageBuffer, ImageFormat, Rgba};
+use image::{GenericImage, GenericImageView, ImageBuffer, ImageFormat, Rgba};
 use math::tuple::color::Color;
-use ray_tracer::canvas::Canvas;
+use ray_tracer::canvas::{Canvas, ViewPort};
 use std::path::Path;
 
 pub struct ImageBufferCanvas {
@@ -10,7 +10,14 @@ pub struct ImageBufferCanvas {
     image_buffer: ImageBuffer<Rgba<u8>, Vec<u8>>,
 }
 
-impl Canvas<Color> for ImageBufferCanvas {
+impl ImageBufferCanvas {
+    pub(crate) fn draw(&mut self, other: &ImageBufferCanvas, offset: (u32, u32)) {
+        self.image_buffer
+            .copy_from(&other.image_buffer, offset.0, offset.1)
+            .unwrap();
+    }
+}
+impl ViewPort for ImageBufferCanvas {
     fn width(&self) -> u32 {
         self.width
     }
@@ -18,11 +25,9 @@ impl Canvas<Color> for ImageBufferCanvas {
     fn height(&self) -> u32 {
         self.height
     }
+}
 
-    fn ratio(&self) -> f32 {
-        self.width as f32 / self.height as f32
-    }
-
+impl Canvas<Color> for ImageBufferCanvas {
     fn write_color(&mut self, x_offset: u32, y_offset: u32, color: Color) {
         let img = &mut self.image_buffer;
         let c = Rgba::<u8>([
@@ -47,7 +52,8 @@ impl PngWrite for ImageBufferCanvas {
 }
 
 impl ImageBufferCanvas {
-    pub fn new(width: u32, height: u32) -> Self {
+    pub fn new(size: (u32, u32)) -> Self {
+        let (width, height) = size;
         Self {
             width,
             height,
