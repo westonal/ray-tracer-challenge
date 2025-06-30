@@ -19,7 +19,7 @@ mod image_buffer_canvas;
 mod png_write;
 
 fn main() {
-    let mut canvas = ImageBufferCanvas::new(600, 400);
+    let mut canvas = ImageBufferCanvas::new(1200, 800);
     fill_all_with_gradient(&mut canvas);
     let now = Instant::now();
     ray_trace_end_chapter_7_scene(&mut canvas);

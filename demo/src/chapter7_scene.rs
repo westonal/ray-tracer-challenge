@@ -62,13 +62,10 @@ fn wall(y: Angle) -> Shape {
 fn green_sphere() -> Shape {
     let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
     let mut material = Material::default();
-    material.pattern = Pattern::Stripe(
-        color!(0.1, 1, 0.5),
-        *RED,
-        Transform::new(Matrix4x4::scale(0.1, 0.1, 0.1).pre_rotation_z(degrees!(45))),
-    );
-    material.diffuse = 0.7;
-    material.specular = 0.3;
+    material.reflectivity = 0.9;
+    material.diffuse = 0.0;
+    material.specular = 0.9;
+    material.shininess = 100.;
     sphere.material = material;
     sphere
 }
