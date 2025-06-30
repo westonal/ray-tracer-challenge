@@ -1,5 +1,5 @@
 use crate::intersection::Intersection;
-use crate::rays::Ray;
+use crate::rays::{Ray, RayGeneration};
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
@@ -16,7 +16,7 @@ pub struct PreCalculations<'s> {
 }
 
 impl<'s> Intersection<'s> {
-    pub fn to_pre_calculation(&'s self, ray: Ray) -> PreCalculations<'s> {
+    pub fn to_pre_calculation(&'s self, ray: RayGeneration) -> PreCalculations<'s> {
         let point = ray.position(self.t);
         let normal = self.shape.normal_at(point);
         let inside = normal.dot(&ray.direction) >= 0.;
@@ -46,12 +46,13 @@ impl<'s> Deref for PreCalculations<'s> {
 mod precalculation_tests {
     use crate::intersection::Intersection;
     use crate::primatives::Shape;
-    use crate::ray;
+    use crate::{ray, ray_first_gen};
     use math::{point, vector};
+    use crate::rays::RayGeneration;
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
-        let ray = ray!((0., 0., -5.), (0., 0., 1.));
+        let ray = ray_first_gen!((0., 0., -5.), (0., 0., 1.));
         let sphere = Shape::new_sphere();
         let intersection = Intersection::new(4., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
@@ -65,7 +66,7 @@ mod precalculation_tests {
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_inside() {
-        let ray = ray!((0., 0., 0.), (0., 0., 1.));
+        let ray = ray_first_gen!((0., 0., 0.), (0., 0., 1.));
         let sphere = Shape::new_sphere();
         let intersection = Intersection::new(1., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
@@ -82,13 +83,13 @@ mod precalculation_tests {
 mod reflection_pre_calc_tests {
     use super::*;
     use crate::primatives::Shape;
-    use crate::ray;
+    use crate::{ray, ray_first_gen};
     use math::vector;
 
     #[test]
     fn precompute_the_reflection_vector() {
         let plane = Shape::new_plane();
-        let ray = ray!(
+        let ray = ray_first_gen!(
             (0., 1., -1.),
             (0., -(2.0_f32.sqrt() / 2.), 2.0_f32.sqrt() / 2.)
         );

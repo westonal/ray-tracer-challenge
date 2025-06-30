@@ -3,6 +3,29 @@ mod transform;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use std::fmt::{Debug, Display, Formatter};
+use std::ops::Deref;
+
+#[derive(PartialEq, Clone, Copy)]
+pub struct RayGeneration {
+    ray: Ray,
+
+    /// Each reflection counts this value up
+    pub generation: u32,
+}
+
+impl RayGeneration {
+    pub(crate) fn new(ray: Ray) -> RayGeneration {
+        Self { ray, generation: 0 }
+    }
+}
+
+impl Deref for RayGeneration {
+    type Target = Ray;
+
+    fn deref(&self) -> &Self::Target {
+        &self.ray
+    }
+}
 
 #[derive(PartialEq, Clone, Copy)]
 pub struct Ray {
@@ -24,6 +47,13 @@ impl Ray {
 macro_rules! ray {
     ($point: expr, $direction: expr) => {
         $crate::rays::Ray::new($point.into(), $direction.into())
+    };
+}
+
+#[macro_export]
+macro_rules! ray_first_gen {
+    ($point: expr, $direction: expr) => {
+        $crate::rays::RayGeneration::new($crate::ray!($point, $direction))
     };
 }
 

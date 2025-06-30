@@ -110,14 +110,14 @@ mod sorting_tests {
 #[cfg(test)]
 mod intersection_over_point_tests {
     use super::*;
-    use crate::ray;
+    use crate::{ray, ray_first_gen};
     use math::matrix::matrix_4x4::Matrix4x4;
 
     #[test]
     fn the_hit_should_offset_the_point() {
         let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
-        let calcs = i.to_pre_calculation(ray!((0., 0., -5.), (0., 0., 1.)));
+        let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
         assert!(calcs.over_point.z < -Intersection::EPSILON / 2.);
         assert!(calcs.point.z > calcs.over_point.z);
     }

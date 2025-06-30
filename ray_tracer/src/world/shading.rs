@@ -5,7 +5,7 @@ use crate::material::Material;
 use crate::material::pattern::Pattern;
 use crate::primatives::Shape;
 use crate::ray;
-use crate::rays::Ray;
+use crate::rays::{Ray, RayGeneration};
 use crate::world::World;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
@@ -36,17 +36,18 @@ impl World {
     fn reflection_color(&self, pre_calculations: PreCalculations) -> Color {
         let r = pre_calculations.shape.material.reflectivity;
         if r > 0. {
-            self.color_at(ray!(
+            // TODO Needs update
+            self.color_at(RayGeneration::new(ray!(
                 pre_calculations.over_point,
                 pre_calculations.reflection
-            )) * r
+            ))) * r
         } else {
             color!(0, 0, 0, 0)
         }
     }
 
-    pub fn color_at(&self, ray: Ray) -> Color {
-        let intersections = self.intersect(ray);
+    pub fn color_at(&self, ray: RayGeneration) -> Color {
+        let intersections = self.intersect(*ray);
         if let Some(hit) = intersections.hit() {
             let pre_calculations = hit.to_pre_calculation(ray);
             self.shade(pre_calculations)
@@ -82,15 +83,16 @@ mod world_shading_tests {
     use crate::intersection::Intersection;
     use crate::lighting::PointLight;
 
-    use crate::rays::Ray;
+    use crate::rays::{Ray, RayGeneration};
 
     use crate::world::shading::default_world;
     use math::{color, point, vector};
+    use crate::ray_first_gen;
 
     #[test]
     fn shade_an_intersection() {
         let world = default_world();
-        let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
+        let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let first = world.shapes.get(0).unwrap();
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
@@ -102,7 +104,7 @@ mod world_shading_tests {
     fn shade_an_intersection_from_inside() {
         let mut world = default_world();
         world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
-        let ray = Ray::new(point!(0, 0, 0), vector!(0, 0, 1));
+        let ray = ray_first_gen!(point!(0, 0, 0), vector!(0, 0, 1));
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
@@ -113,7 +115,7 @@ mod world_shading_tests {
     #[test]
     fn color_when_ray_misses() {
         let world = default_world();
-        let ray = Ray::new(point!(0, 0, -5), vector!(0, 1, 0));
+        let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.color_at(ray);
         assert_eq!(color!(0., 0., 0., 0.), c);
     }
@@ -122,7 +124,7 @@ mod world_shading_tests {
     fn color_when_ray_misses_alt_background_color() {
         let mut world = default_world();
         world.background = color!(0., 1., 0.);
-        let ray = Ray::new(point!(0, 0, -5), vector!(0, 1, 0));
+        let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.color_at(ray);
         assert_eq!(color!(0., 1., 0., 1.), c);
     }
@@ -130,7 +132,7 @@ mod world_shading_tests {
     #[test]
     fn shade_an_intersection_with_color_at() {
         let world = default_world();
-        let ray = Ray::new(point!(0, 0, -5), vector!(0, 0, 1));
+        let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let c = world.color_at(ray);
         assert_eq!(color!(0.3804233, 0.4755291, 0.28531748), c);
     }
@@ -141,6 +143,8 @@ mod world_shadow_shading_tests {
     use super::*;
     use crate::intersection::Intersection;
     use math::vector;
+    use crate::ray_first_gen;
+
     #[test]
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::new();
@@ -151,7 +155,7 @@ mod world_shadow_shading_tests {
         )));
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
-        let ray = Ray::new(point!(0, 0, 5), vector!(0, 0, 1));
+        let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);
         let color = world.shade(pre_calculations);
         assert_eq!(color!(0.1, 0.1, 0.1), color);
@@ -175,7 +179,7 @@ mod world_pattern_shading_tests {
         fn color_ray(&self, ray: Ray) -> Color {
             let first = self.world.shapes.get(0).unwrap();
             let intersection = Intersection::new(4., &first);
-            let pre_calculations = intersection.to_pre_calculation(ray);
+            let pre_calculations = intersection.to_pre_calculation(RayGeneration::new(ray));
             self.world.shade(pre_calculations)
         }
     }

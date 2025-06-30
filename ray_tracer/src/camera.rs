@@ -1,5 +1,5 @@
 use crate::ray;
-use crate::rays::Ray;
+use crate::rays::{Ray, RayGeneration};
 use crate::world::World;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
@@ -64,7 +64,7 @@ impl Camera {
     }
 
     pub fn color_at(&self, x_y: (u32, u32), world: &World) -> Color {
-        let ray = self.ray_for_pixel(x_y);
+        let ray = RayGeneration::new(self.ray_for_pixel(x_y));
         world.color_at(ray)
     }
 }
