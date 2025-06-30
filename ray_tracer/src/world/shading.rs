@@ -5,7 +5,7 @@ use crate::material::Material;
 use crate::material::pattern::Pattern;
 use crate::primatives::Shape;
 use crate::ray;
-use crate::rays::{Ray, RayGeneration};
+use crate::rays::RayGeneration;
 use crate::world::World;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
@@ -28,19 +28,20 @@ impl World {
                     shadow_factor,
                 )
         }
-        result = result + self.reflection_color(pre_calculations);
+        if pre_calculations.ray_generation < self.max_ray_generation {
+            result = result + self.reflection_color(pre_calculations);
+        }
         result.clamp_alpha();
         result
     }
 
-    fn reflection_color(&self, pre_calculations: PreCalculations) -> Color {
+    pub(crate) fn reflection_color(&self, pre_calculations: PreCalculations) -> Color {
         let r = pre_calculations.shape.material.reflectivity;
         if r > 0. {
-            // TODO Needs update
-            self.color_at(RayGeneration::new(ray!(
-                pre_calculations.over_point,
-                pre_calculations.reflection
-            ))) * r
+            self.color_at(RayGeneration::new_ray_with_generation(
+                ray!(pre_calculations.over_point, pre_calculations.reflection),
+                pre_calculations.ray_generation + 1,
+            )) * r
         } else {
             color!(0, 0, 0, 0)
         }
@@ -59,7 +60,7 @@ impl World {
 
 /// A test world
 pub fn default_world() -> World {
-    let mut world = World::new();
+    let mut world = World::default();
     world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
     let mut sphere = Shape::new_sphere();
     let mut material = Material::default();
@@ -83,11 +84,9 @@ mod world_shading_tests {
     use crate::intersection::Intersection;
     use crate::lighting::PointLight;
 
-    use crate::rays::{Ray, RayGeneration};
-
+    use crate::ray_first_gen;
     use crate::world::shading::default_world;
     use math::{color, point, vector};
-    use crate::ray_first_gen;
 
     #[test]
     fn shade_an_intersection() {
@@ -142,12 +141,12 @@ mod world_shading_tests {
 mod world_shadow_shading_tests {
     use super::*;
     use crate::intersection::Intersection;
-    use math::vector;
     use crate::ray_first_gen;
+    use math::vector;
 
     #[test]
     fn shade_when_given_intersection_in_shadow() {
-        let mut world = World::new();
+        let mut world = World::default();
         world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
@@ -165,9 +164,10 @@ mod world_shadow_shading_tests {
 #[cfg(test)]
 mod world_pattern_shading_tests {
     use super::*;
-    use crate::Transform::Transform;
     use crate::intersection::Intersection;
     use crate::ray;
+    use crate::rays::Ray;
+    use crate::transform::Transform;
     use math::tuple::color::{BLUE, GREEN, RED};
     use math::{degrees, vector};
 
@@ -179,14 +179,15 @@ mod world_pattern_shading_tests {
         fn color_ray(&self, ray: Ray) -> Color {
             let first = self.world.shapes.get(0).unwrap();
             let intersection = Intersection::new(4., &first);
-            let pre_calculations = intersection.to_pre_calculation(RayGeneration::new(ray));
+            let pre_calculations =
+                intersection.to_pre_calculation(RayGeneration::new_first_generation_ray(ray));
             self.world.shade(pre_calculations)
         }
     }
 
     impl TestScene {
         fn given(stripe_transform: Matrix4x4, plane_transformation: Matrix4x4) -> TestScene {
-            let mut world = World::new();
+            let mut world = World::default();
             world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
             let mut plane = Shape::new_plane_transformed(plane_transformation);
             let mut material = Material::solid(*BLUE);

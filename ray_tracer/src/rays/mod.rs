@@ -14,8 +14,12 @@ pub struct RayGeneration {
 }
 
 impl RayGeneration {
-    pub(crate) fn new(ray: Ray) -> RayGeneration {
-        Self { ray, generation: 0 }
+    pub(crate) fn new_ray_with_generation(ray: Ray, generation: u32) -> RayGeneration {
+        Self { ray, generation }
+    }
+
+    pub(crate) fn new_first_generation_ray(ray: Ray) -> RayGeneration {
+        Self::new_ray_with_generation(ray, 1)
     }
 }
 
@@ -53,7 +57,7 @@ macro_rules! ray {
 #[macro_export]
 macro_rules! ray_first_gen {
     ($point: expr, $direction: expr) => {
-        $crate::rays::RayGeneration::new($crate::ray!($point, $direction))
+        $crate::rays::RayGeneration::new_first_generation_ray($crate::ray!($point, $direction))
     };
 }
 

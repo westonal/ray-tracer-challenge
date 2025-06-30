@@ -1,7 +1,7 @@
 pub mod pre_calculations;
 
-use crate::Transform::Transform;
 use crate::material::Material;
+use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
@@ -151,8 +151,8 @@ mod lighting_tests {
 #[cfg(test)]
 mod non_solid_pattern_tests {
     use super::*;
-    use crate::Transform::Transform;
     use crate::material::pattern::Pattern;
+    use crate::transform::Transform;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{RED, WHITE};
     use math::{color, degrees, point, vector};
@@ -246,8 +246,9 @@ mod non_solid_pattern_tests {
 mod reflection_lighting_tests {
     use super::*;
     use crate::primatives::Shape;
-    use crate::{ray, ray_first_gen};
+    use crate::rays::RayGeneration;
     use crate::world::World;
+    use crate::{ray, ray_first_gen};
     use math::color;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{GREEN, RED, WHITE};
@@ -260,12 +261,15 @@ mod reflection_lighting_tests {
         material.reflectivity = 0.25;
         let mut plane = Shape::new_plane();
         plane.material = material;
-        let mut world = World::new();
+        let mut world = World::default();
         world.set_light(PointLight::new(Point::origin(), *WHITE));
         world.add(sphere);
         world.add(plane);
         // Shoot straight at sphere
-        assert_eq!(*RED, world.color_at(ray_first_gen!((0., 5., 5.), (0., 10., 10.))));
+        assert_eq!(
+            *RED,
+            world.color_at(ray_first_gen!((0., 5., 5.), (0., 10., 10.)))
+        );
         // Bounce off
         assert_eq!(
             color!(0.25, 1, 0, 1),
@@ -274,23 +278,41 @@ mod reflection_lighting_tests {
     }
 
     #[test]
-    fn infinite_recursion_ends() {
-        let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 10., 10.));
-        sphere.material = Material::solid(*RED);
-        let mut material = Material::solid(*GREEN);
-        material.reflectivity = 0.25;
+    fn just_before_infinite_recursion_ends() {
+        // two parallel reflective planes
+        let plane1 = solid_reflective_plane(*GREEN, 0.25);
+        let mut plane2 = solid_reflective_plane(*RED, 0.25);
+        plane2.transform = Transform::new(Matrix4x4::translation(0., 10., 0.));
+        let mut world = World::default();
+        world.max_ray_generation = 4;
+        world.set_light(PointLight::new(Point::origin(), *WHITE));
+        world.add(plane1);
+        world.add(plane2);
+        // Shoot straight at plane 1
+
+        // first case should have no color from the reflection
+        let ray = RayGeneration::new_ray_with_generation(
+            ray!((0., 5., 0.), (0., -1., 0.)),
+            world.max_ray_generation,
+        );
+        assert_eq!(color!(0, 1, 0), world.color_at(ray));
+
+        // second case should have one color from the reflection
+        let ray = RayGeneration::new_ray_with_generation(
+            ray!((0., 5., 0.), (0., -1., 0.)),
+            world.max_ray_generation - 1,
+        );
+        assert_eq!(color!(0.25, 1, 0), world.color_at(ray));
+
+        let ray = ray_first_gen!((0., 5., 0.), (0., -1., 0.));
+        assert_eq!(color!(0.265625, 1.0625, 0), world.color_at(ray));
+    }
+
+    fn solid_reflective_plane(color: Color, reflectivity: f32) -> Shape {
+        let mut material = Material::solid(color);
+        material.reflectivity = reflectivity;
         let mut plane = Shape::new_plane();
         plane.material = material;
-        let mut world = World::new();
-        world.set_light(PointLight::new(Point::origin(), *WHITE));
-        world.add(sphere);
-        world.add(plane);
-        // Shoot straight at plane
-        assert_eq!(*RED, world.color_at(ray_first_gen!((0., 5., 5.), (0., 10., 10.))));
-        // Bounce off
-        assert_eq!(
-            color!(0.25, 1, 0, 1),
-            world.color_at(ray_first_gen!((0., 10., -10.), (0., -10., 10.)))
-        );
+        plane
     }
 }

@@ -1,4 +1,3 @@
-pub mod Transform;
 pub mod camera;
 pub mod canvas;
 pub mod intersection;
@@ -6,6 +5,7 @@ pub mod lighting;
 pub mod material;
 pub mod primatives;
 pub mod rays;
+pub mod transform;
 pub mod view_matrix;
 pub mod world;
 

@@ -64,7 +64,7 @@ impl Camera {
     }
 
     pub fn color_at(&self, x_y: (u32, u32), world: &World) -> Color {
-        let ray = RayGeneration::new(self.ray_for_pixel(x_y));
+        let ray = RayGeneration::new_first_generation_ray(self.ray_for_pixel(x_y));
         world.color_at(ray)
     }
 }

@@ -1,5 +1,5 @@
-use crate::Transform::Transform;
 use crate::material::pattern::Pattern;
+use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 

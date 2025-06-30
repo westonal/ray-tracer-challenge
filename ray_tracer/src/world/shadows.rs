@@ -32,7 +32,7 @@ mod shadow_tests {
 
     #[test]
     fn there_is_no_shadow_when_nothing_is_collinear_with_point_and_light() {
-        let mut world = World::new();
+        let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
         world.add(Shape::new_sphere());
@@ -43,7 +43,7 @@ mod shadow_tests {
 
     #[test]
     fn the_shadow_when_an_object_is_between_the_light_and_the_object() {
-        let mut world = World::new();
+        let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
         world.add(Shape::new_sphere());
@@ -54,7 +54,7 @@ mod shadow_tests {
 
     #[test]
     fn no_shadow_when_point_is_colinear_but_beyond_the_light() {
-        let mut world = World::new();
+        let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         world.set_light(light);
         world.add(Shape::new_sphere());

@@ -8,11 +8,11 @@ use crate::primatives::Shape;
 use crate::rays::Ray;
 use math::tuple::color::Color;
 
-#[derive(Default)]
 pub struct World {
     shapes: Vec<Shape>,
     pub lights: Vec<PointLight>,
     pub background: Color,
+    pub max_ray_generation: u32,
 }
 
 impl World {
@@ -39,9 +39,14 @@ impl World {
     }
 }
 
-impl World {
-    pub fn new() -> Self {
-        Default::default()
+impl Default for World {
+    fn default() -> Self {
+        Self {
+            shapes: vec![],
+            lights: vec![],
+            background: Default::default(),
+            max_ray_generation: 10,
+        }
     }
 }
 
@@ -66,8 +71,13 @@ mod world_tests {
     use math::{color, point};
 
     #[test]
+    fn default_world_values() {
+        assert_eq!(10, World::default().max_ray_generation);
+    }
+
+    #[test]
     fn setup_world() {
-        let mut world = World::new();
+        let mut world = World::default();
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere());
         assert_eq!(2, world.object_count());
@@ -78,7 +88,7 @@ mod world_tests {
 
     #[test]
     fn intersecting_world() {
-        let mut world = World::new();
+        let mut world = World::default();
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere_transformed(Matrix4x4::scale(
             0.5, 0.5, 0.5,

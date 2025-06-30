@@ -110,7 +110,7 @@ mod sorting_tests {
 #[cfg(test)]
 mod intersection_over_point_tests {
     use super::*;
-    use crate::{ray, ray_first_gen};
+    use crate::ray_first_gen;
     use math::matrix::matrix_4x4::Matrix4x4;
 
     #[test]

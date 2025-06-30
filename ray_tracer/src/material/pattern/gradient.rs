@@ -1,5 +1,5 @@
-use crate::Transform::Transform;
 use crate::material::pattern::Pattern;
+use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 
@@ -94,8 +94,8 @@ mod gradient_stop_tests {
 #[cfg(test)]
 mod gradient_pattern_tests {
 
-    use crate::Transform::Transform;
     use crate::material::pattern::Pattern::Gradient;
+    use crate::transform::Transform;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLACK, BLUE, GREEN, WHITE};
     use math::{color, degrees, point};

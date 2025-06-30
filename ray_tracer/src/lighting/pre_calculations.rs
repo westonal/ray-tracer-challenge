@@ -1,5 +1,5 @@
 use crate::intersection::Intersection;
-use crate::rays::{Ray, RayGeneration};
+use crate::rays::RayGeneration;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
@@ -12,6 +12,7 @@ pub struct PreCalculations<'s> {
     pub eye: Normal,
     pub normal: Normal,
     pub reflection: Vector,
+    pub ray_generation: u32,
     inside: bool,
 }
 
@@ -29,6 +30,7 @@ impl<'s> Intersection<'s> {
             eye: (-ray.direction).normalize(),
             normal,
             reflection: ray.direction.reflect(normal_as_vector),
+            ray_generation: ray.generation,
             inside,
         }
     }
@@ -46,9 +48,8 @@ impl<'s> Deref for PreCalculations<'s> {
 mod precalculation_tests {
     use crate::intersection::Intersection;
     use crate::primatives::Shape;
-    use crate::{ray, ray_first_gen};
+    use crate::ray_first_gen;
     use math::{point, vector};
-    use crate::rays::RayGeneration;
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
@@ -61,6 +62,7 @@ mod precalculation_tests {
         assert_eq!(point!(0, 0, -1), pre_calculations.point);
         assert_eq!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_eq!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
+        assert_eq!(1, pre_calculations.ray_generation);
         assert!(!pre_calculations.inside);
     }
 
@@ -83,7 +85,7 @@ mod precalculation_tests {
 mod reflection_pre_calc_tests {
     use super::*;
     use crate::primatives::Shape;
-    use crate::{ray, ray_first_gen};
+    use crate::ray_first_gen;
     use math::vector;
 
     #[test]

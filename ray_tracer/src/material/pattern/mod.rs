@@ -2,8 +2,8 @@ pub mod checker;
 pub mod gradient;
 mod stripes;
 
-use crate::Transform::Transform;
 use crate::material::pattern::gradient::GradientStops;
+use crate::transform::Transform;
 use math::tuple::color::{Color, WHITE};
 use math::tuple::point::Point;
 

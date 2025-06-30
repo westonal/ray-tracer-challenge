@@ -1,8 +1,8 @@
-use crate::Transform::Transform;
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::material::Material;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
+use crate::transform::Transform;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
