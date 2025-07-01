@@ -9,6 +9,7 @@ pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,
     pub point: Point,
     pub over_point: Point,
+    pub under_point: Point,
     pub eye: Normal,
     pub normal: Normal,
     pub reflection: Vector,
@@ -23,10 +24,12 @@ impl<'s> Intersection<'s> {
         let inside = normal.dot(&ray.direction) >= 0.;
         let normal = if inside { -normal } else { normal };
         let normal_as_vector = normal.clone_vector();
+        let small_adjustment_for_under_over_points = normal_as_vector * Intersection::EPSILON;
         PreCalculations {
             intersection: self,
             point,
-            over_point: point + normal_as_vector * Intersection::EPSILON,
+            over_point: point + small_adjustment_for_under_over_points,
+            under_point: point - small_adjustment_for_under_over_points,
             eye: (-ray.direction).normalize(),
             normal,
             reflection: ray.direction.reflect(normal_as_vector),
