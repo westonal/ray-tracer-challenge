@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 #[derive(Debug, PartialEq)]
 pub struct Shape {
-    id: String,
+    pub id: String,
     pub material: Material,
     pub(crate) transform: Transform,
     surface: Surface,

@@ -112,7 +112,7 @@ mod sphere_multi_intersection_tests {
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),
         ]);
-        assert_eq!(&sphere1, intersections.hit().expect("Expected hit").shape);
+        assert_eq!(&sphere1, intersections.hit().expect("Expected hit").0.shape);
     }
 
     #[test]
@@ -123,7 +123,7 @@ mod sphere_multi_intersection_tests {
             Intersection::new(-1., &sphere1),
             Intersection::new(1., &sphere2),
         ]);
-        assert_eq!(&sphere2, intersections.hit().expect("Expected hit").shape);
+        assert_eq!(&sphere2, intersections.hit().expect("Expected hit").0.shape);
     }
 
     #[test]
@@ -149,7 +149,7 @@ mod sphere_multi_intersection_tests {
             Intersection::new(-3., &sphere3),
             Intersection::new(2., &sphere4),
         ]);
-        assert_eq!(&sphere4, intersections.hit().expect("Expected hit").shape);
+        assert_eq!(&sphere4, intersections.hit().expect("Expected hit").0.shape);
     }
 }
 

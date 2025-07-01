@@ -1,3 +1,4 @@
+use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::Shape;
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
@@ -41,12 +42,14 @@ impl Intersections<'_> {
 }
 
 impl<'s> Intersections<'s> {
-    pub fn hit(&self) -> Option<&Intersection> {
+    pub fn hit(&self) -> Option<(&Intersection, RefractionMediumIndexes)> {
+        let mut stack = RefractionStack::new();
         for i in self.iter() {
+            let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);
             if i.t < 0. {
                 continue;
             }
-            return Some(i);
+            return Some((i, refraction_indexes));
         }
         None
     }
@@ -127,7 +130,7 @@ mod intersection_over_point_tests {
         let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
         let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
-        assert!(calcs.under_point.z > -Intersection::EPSILON / 2.);
+        assert!(calcs.under_point.z > Intersection::EPSILON / 2.);
         assert!(calcs.point.z < calcs.under_point.z);
     }
 }

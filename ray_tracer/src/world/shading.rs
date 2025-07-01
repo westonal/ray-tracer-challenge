@@ -49,7 +49,7 @@ impl World {
 
     pub fn color_at(&self, ray: RayGeneration) -> Color {
         let intersections = self.intersect(*ray);
-        if let Some(hit) = intersections.hit() {
+        if let Some((hit, refractions)) = intersections.hit() {
             let pre_calculations = hit.to_pre_calculation(ray);
             self.shade(pre_calculations)
         } else {
