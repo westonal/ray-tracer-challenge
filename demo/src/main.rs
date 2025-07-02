@@ -20,6 +20,7 @@ fn main() {
     let size_multiplier = 2;
     let size = Size::new(600 * size_multiplier, 400 * size_multiplier);
     render(size, 32);
+    let size = Size::HD_720P;
     GlassSphereWithAir::render_scene(size);
     CubeOfSpheres::render_scene(size);
 }

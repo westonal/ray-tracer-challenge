@@ -24,6 +24,23 @@ impl Size {
     }
 }
 
+impl Size {
+    pub const HD_720P: Size = Self {
+        width: 1280,
+        height: 720,
+    };
+
+    pub const HD_1080P: Size = Self {
+        width: 1920,
+        height: 1080,
+    };
+
+    pub const UHD_4K: Size = Self {
+        width: 3840,
+        height: 2160,
+    };
+}
+
 impl From<Size> for (u32, u32) {
     fn from(value: Size) -> Self {
         (value.width, value.height)
@@ -32,6 +49,6 @@ impl From<Size> for (u32, u32) {
 
 impl Display for Size {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}x{}", self.width, self.height)
+        write!(f, "{}×{}", self.width, self.height)
     }
 }
