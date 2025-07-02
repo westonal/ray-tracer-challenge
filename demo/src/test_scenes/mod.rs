@@ -1,4 +1,5 @@
 pub mod glass_sphere_with_air;
+mod cube_of_spheres;
 
 use crate::chapter7_scene::ray_trace_end_chapter_7_scene;
 use crate::fill_all_with_gradient;
