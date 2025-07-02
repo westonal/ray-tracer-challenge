@@ -1,11 +1,32 @@
+use math::color;
 use crate::material::Material;
+use crate::material::pattern::Pattern;
 
 impl Material {
     pub fn glass() -> Self {
         let mut glass = Self::default();
+        glass.pattern = Pattern::Solid(color!(0.1,0.1,0.1));
         glass.transparency = 1.;
-        glass.refractive_index = 1.52;
+        glass.refractive_index = 1.5;
+        glass.ambient = 0.05;
+        glass.diffuse = 0.1;
+        glass.reflectivity = 0.5;
+        glass.specular = 1.;
+        glass.shininess = 300.;
         glass
+    }
+
+    pub fn air() -> Self {
+        let mut air = Self::default();
+        air.pattern = Pattern::Solid(color!(0.1,0.1,0.1));
+        air.transparency = 1.;
+        air.refractive_index = 1.;
+        air.ambient = 0.;
+        air.diffuse = 0.;
+        air.reflectivity = 0.;
+        air.specular = 0.;
+        air.shininess = 0.;
+        air
     }
 }
 
@@ -17,7 +38,7 @@ mod glass_tests {
     fn glass_properties() {
         let glass = Material::glass();
         assert_eq!(1., glass.transparency);
-        assert_eq!(1.52, glass.refractive_index);
+        assert_eq!(1.5, glass.refractive_index);
     }
 }
 

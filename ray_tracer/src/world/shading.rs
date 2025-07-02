@@ -1,6 +1,7 @@
 use crate::intersection::Intersect;
 use crate::lighting::PointLight;
 use crate::lighting::pre_calculations::PreCalculations;
+use crate::lighting::refraction_lighting::schlick;
 use crate::material::Material;
 use crate::material::pattern::Pattern;
 use crate::material::refraction::RefractionMediumIndexes;
@@ -24,11 +25,12 @@ impl World {
     ) -> Color {
         let mut result = color!(0, 0, 0, 0);
         let direct_lights = self.direct_lights(pre_calculations.over_point);
+        let material = &pre_calculations.shape.material;
         for light in &self.lights {
             // TODO, multilight support would light each in turn if they were direct.
             let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
             result = result
-                + pre_calculations.shape.material.light(
+                + material.light(
                     light,
                     &pre_calculations.shape.transform,
                     pre_calculations.over_point,
@@ -38,8 +40,16 @@ impl World {
                 )
         }
         if pre_calculations.ray_generation < self.max_ray_generation {
-            result = result + self.refracted_color(&pre_calculations, refraction_medium_indexes);
-            result = result + self.reflection_color(pre_calculations);
+            let (reflect, refract) = if material.reflectivity > 0. && material.transparency > 0. {
+                let reflectance = schlick(&pre_calculations, &refraction_medium_indexes);
+                (reflectance, 1. - reflectance)
+            } else {
+                (1., 1.)
+            };
+
+            result = result
+                + self.refracted_color(&pre_calculations, refraction_medium_indexes) * refract;
+            result = result + self.reflection_color(pre_calculations) * reflect;
         }
         result.clamp_alpha();
         result

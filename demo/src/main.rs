@@ -6,15 +6,21 @@ use ray_tracer::canvas::{Canvas, Size, ViewPort};
 use ray_tracer::material::Material;
 use std::ops::DerefMut;
 use std::time::Instant;
+use crate::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
+use crate::test_scenes::RenderTestScene;
 
 mod chapter7_scene;
 mod image_buffer_canvas;
 mod png_write;
 mod threaded_canvas;
+mod test_scenes;
 
 fn main() {
-    let size_multiplier = 2;
-    render(Size::new(600 * size_multiplier, 400 * size_multiplier), 32);
+    let size_multiplier = 1;
+    let size = Size::new(600 * size_multiplier, 400 * size_multiplier);
+    //render(Size::new(600 * size_multiplier, 400 * size_multiplier), 32);
+    GlassSphereWithAir::render_scene(size, "glass_sphere_with_air.png");
+
 }
 
 fn render(size: Size, block_size: u32) {

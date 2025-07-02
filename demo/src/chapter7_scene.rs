@@ -60,7 +60,7 @@ fn wall(y: Angle) -> Shape {
 }
 
 fn green_sphere() -> Shape {
-    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-1.5, 1., -1.5));
+    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-1., 1., -2.5));
     // let mut material = Material::default();
     // material.reflectivity = 0.9;
     // material.diffuse = 0.0;
