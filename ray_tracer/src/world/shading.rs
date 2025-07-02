@@ -3,6 +3,7 @@ use crate::lighting::PointLight;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::Material;
 use crate::material::pattern::Pattern;
+use crate::material::refraction::RefractionMediumIndexes;
 use crate::primatives::Shape;
 use crate::ray;
 use crate::rays::RayGeneration;
@@ -13,6 +14,14 @@ use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
+        self.shade_with_refraction(pre_calculations, RefractionMediumIndexes::new(1.0, 1.0))
+    }
+
+    pub fn shade_with_refraction(
+        &self,
+        pre_calculations: PreCalculations,
+        refraction_medium_indexes: RefractionMediumIndexes,
+    ) -> Color {
         let mut result = color!(0, 0, 0, 0);
         let direct_lights = self.direct_lights(pre_calculations.over_point);
         for light in &self.lights {
@@ -29,6 +38,7 @@ impl World {
                 )
         }
         if pre_calculations.ray_generation < self.max_ray_generation {
+            result = result + self.refracted_color(&pre_calculations, refraction_medium_indexes);
             result = result + self.reflection_color(pre_calculations);
         }
         result.clamp_alpha();
@@ -51,7 +61,7 @@ impl World {
         let intersections = self.intersect(*ray);
         if let Some((hit, refractions)) = intersections.hit() {
             let pre_calculations = hit.to_pre_calculation(ray);
-            self.shade(pre_calculations)
+            self.shade_with_refraction(pre_calculations, refractions)
         } else {
             self.background
         }

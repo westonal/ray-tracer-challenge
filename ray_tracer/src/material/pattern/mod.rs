@@ -4,6 +4,7 @@ mod stripes;
 
 use crate::material::pattern::gradient::GradientStops;
 use crate::transform::Transform;
+use math::color;
 use math::tuple::color::{Color, WHITE};
 use math::tuple::point::Point;
 
@@ -13,6 +14,7 @@ pub enum Pattern {
     Stripe(Color, Color, Transform),
     Gradient(GradientStops, Transform),
     Checker(Color, Color, Transform),
+    Test,
 }
 
 impl Default for Pattern {
@@ -42,6 +44,10 @@ impl Pattern {
                 pattern_transform,
                 transform.world_point_to_object_point(point),
             ),
+            Pattern::Test => {
+                let t = transform.world_point_to_object_point(point);
+                color!(t.x, t.y, t.z)
+            }
         }
     }
 }

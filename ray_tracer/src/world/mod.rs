@@ -9,7 +9,7 @@ use crate::rays::Ray;
 use math::tuple::color::Color;
 
 pub struct World {
-    shapes: Vec<Shape>,
+    pub(crate) shapes: Vec<Shape>,
     pub lights: Vec<PointLight>,
     pub background: Color,
     pub max_ray_generation: u32,
