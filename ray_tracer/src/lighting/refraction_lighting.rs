@@ -220,11 +220,9 @@ mod schlick_tests {
     fn the_schlick_approximation_with_small_angle_and_n1_gt_n1() {
         let mut sphere = Shape::new_sphere();
         sphere.material = Material::glass();
-        let intersections = Intersections::new(vec![
-            Intersection::new(1.8589, &sphere),
-        ]);
+        let intersections = Intersections::new(vec![Intersection::new(1.8589, &sphere)]);
         let (hit, refractions) = intersections.hit().unwrap();
-        let ray = ray_first_gen!((0.,0.99,-2.), (0., 0., 1.));
+        let ray = ray_first_gen!((0., 0.99, -2.), (0., 0., 1.));
         let reflectance = schlick(&hit.to_pre_calculation(ray), &refractions);
         assert_eq!(0.4887307, reflectance);
     }

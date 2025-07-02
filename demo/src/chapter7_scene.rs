@@ -60,13 +60,13 @@ fn wall(y: Angle) -> Shape {
 }
 
 fn green_sphere() -> Shape {
-    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-1., 1., -2.5));
-    // let mut material = Material::default();
-    // material.reflectivity = 0.9;
-    // material.diffuse = 0.0;
-    // material.specular = 0.9;
-    // material.shininess = 100.;
-    sphere.material = Material::glass();
+    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
+    let mut material = Material::default();
+    material.reflectivity = 0.9;
+    material.diffuse = 0.0;
+    material.specular = 0.9;
+    material.shininess = 100.;
+    sphere.material = material;
     sphere
 }
 

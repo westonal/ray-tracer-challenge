@@ -1,26 +1,27 @@
 use crate::chapter7_scene::ray_trace_end_chapter_7_scene;
 use crate::png_write::PngWrite;
+use crate::test_scenes::RenderTestScene;
+use crate::test_scenes::cube_of_spheres::CubeOfSpheres;
+use crate::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use crate::threaded_canvas::ThreadedCanvas;
 use math::tuple::color::Color;
 use ray_tracer::canvas::{Canvas, Size, ViewPort};
 use ray_tracer::material::Material;
 use std::ops::DerefMut;
 use std::time::Instant;
-use crate::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
-use crate::test_scenes::RenderTestScene;
 
 mod chapter7_scene;
 mod image_buffer_canvas;
 mod png_write;
-mod threaded_canvas;
 mod test_scenes;
+mod threaded_canvas;
 
 fn main() {
-    let size_multiplier = 1;
+    let size_multiplier = 2;
     let size = Size::new(600 * size_multiplier, 400 * size_multiplier);
-    //render(Size::new(600 * size_multiplier, 400 * size_multiplier), 32);
-    GlassSphereWithAir::render_scene(size, "glass_sphere_with_air.png");
-
+    render(size, 32);
+    GlassSphereWithAir::render_scene(size);
+    CubeOfSpheres::render_scene(size);
 }
 
 fn render(size: Size, block_size: u32) {

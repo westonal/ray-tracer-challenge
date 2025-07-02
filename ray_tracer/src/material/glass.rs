@@ -1,11 +1,11 @@
-use math::color;
 use crate::material::Material;
 use crate::material::pattern::Pattern;
+use math::color;
 
 impl Material {
     pub fn glass() -> Self {
         let mut glass = Self::default();
-        glass.pattern = Pattern::Solid(color!(0.1,0.1,0.1));
+        glass.pattern = Pattern::Solid(color!(0.1, 0.1, 0.1));
         glass.transparency = 1.;
         glass.refractive_index = 1.5;
         glass.ambient = 0.05;
@@ -18,7 +18,7 @@ impl Material {
 
     pub fn air() -> Self {
         let mut air = Self::default();
-        air.pattern = Pattern::Solid(color!(0.1,0.1,0.1));
+        air.pattern = Pattern::Solid(color!(0.1, 0.1, 0.1));
         air.transparency = 1.;
         air.refractive_index = 1.;
         air.ambient = 0.;
