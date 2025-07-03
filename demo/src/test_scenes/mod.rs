@@ -1,5 +1,6 @@
 pub mod cube_of_spheres;
 pub mod glass_sphere_with_air;
+pub mod grid;
 
 use crate::fill_all_with_gradient;
 use crate::png_write::PngWrite;
