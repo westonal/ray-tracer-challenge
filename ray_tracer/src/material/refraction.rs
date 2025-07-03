@@ -37,7 +37,7 @@ impl<'s, T: Eq + Hash> RefractionStack<'s, T> {
                 .entered
                 .iter()
                 .enumerate()
-                .find(|(_, (k, _))| k == &key)
+                .find(|(_, (k, _))| *k == key)
                 .unwrap();
             self.entered.remove(i);
         } else {

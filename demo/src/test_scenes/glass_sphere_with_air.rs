@@ -22,8 +22,8 @@ impl TestScene for GlassSphereWithAir {
 
     fn build_world() -> World {
         let mut world = World::default();
-        world.add_light(PointLight::new(point!(-30, 50, 10), *WHITE));
-        let mut plane = Shape::new_plane();
+        world.add_light(PointLight::new(point!(-300, 200, 10), *WHITE));
+        let mut plane = Shape::new_plane_transformed(Matrix4x4::translation(0., -8., 0.));
         plane.material.pattern = Pattern::Checker(*BLACK, *WHITE, Transform::identity());
         world.add(plane);
 
@@ -33,7 +33,7 @@ impl TestScene for GlassSphereWithAir {
         world.add(sphere);
 
         let mut bubble =
-            Shape::new_sphere_transformed(Matrix4x4::scale_all(2.).pre_translation(0., 1., 0.));
+            Shape::new_sphere_transformed(Matrix4x4::scale_all(1.5).pre_translation(0., 1., 0.));
         bubble.material = Material::air();
         world.add(bubble);
 

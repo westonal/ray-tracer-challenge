@@ -232,15 +232,34 @@ mod schlick_tests {
     }
 }
 
+impl RefractionMediumIndexes {
+    pub(crate) fn sin2_t(&self, pre_calculations: &PreCalculations) -> f32 {
+        let n_ratio = self.n1 / self.n2;
+
+        let cos_i = pre_calculations.eye.dot(&pre_calculations.normal);
+
+        let sin2_t = n_ratio * n_ratio * (1. - cos_i * cos_i);
+
+        sin2_t
+    }
+}
+
 pub fn schlick(
     pre_calculations: &PreCalculations,
     refraction_medium_indexes: &RefractionMediumIndexes,
 ) -> f32 {
+    let sin2_t = refraction_medium_indexes.sin2_t(pre_calculations);
+
+    if sin2_t > 1. {
+        return 1.;
+    }
+
     let mut cos = pre_calculations.eye.dot(&pre_calculations.normal);
     if refraction_medium_indexes.n1 > refraction_medium_indexes.n2 {
         let n = refraction_medium_indexes.n1 / refraction_medium_indexes.n2;
         let sin2_t = n * n * (1.0 - cos * cos);
         if sin2_t > 1. {
+            // Total internal reflection
             return 1.;
         }
 
