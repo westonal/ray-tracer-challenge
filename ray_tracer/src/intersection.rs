@@ -14,7 +14,7 @@ pub struct Intersection<'s> {
 
 impl<'s> Intersection<'s> {
     // TODO, this is quite large
-    pub(crate) const EPSILON: f32 = 0.01;
+    pub(crate) const EPSILON: f32 = 0.0001;
 }
 
 #[derive(Default)]

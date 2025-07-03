@@ -30,13 +30,12 @@ impl TestScene for GlassSphereWithAir {
         let mut sphere =
             Shape::new_sphere_transformed(Matrix4x4::scale_all(5.).pre_translation(0., 1., 0.));
         sphere.material = Material::glass();
-        sphere.material.shadow_boost = 0.;
         world.add(sphere);
 
         let mut bubble =
             Shape::new_sphere_transformed(Matrix4x4::scale_all(2.).pre_translation(0., 1., 0.));
         bubble.material = Material::air();
-        // world.add(bubble);
+        world.add(bubble);
 
         world
     }

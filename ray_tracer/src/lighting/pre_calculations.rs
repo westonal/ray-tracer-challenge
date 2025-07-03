@@ -21,16 +21,17 @@ impl<'s> Intersection<'s> {
     pub fn to_pre_calculation(&'s self, ray: RayGeneration) -> PreCalculations<'s> {
         let point = ray.position(self.t);
         let normal = self.shape.normal_at(point);
-        let inside = normal.dot(&ray.direction) >= 0.;
+        let eye = (-ray.direction).normalize();
+        let inside = normal.dot(&eye) < 0.;
         let normal = if inside { -normal } else { normal };
+        let small_adjustment_for_under_over_points = normal.clone_vector() * Intersection::EPSILON;
         let normal_as_vector = normal.clone_vector();
-        let small_adjustment_for_under_over_points = normal_as_vector * Intersection::EPSILON;
         PreCalculations {
             intersection: self,
             point,
             over_point: point + small_adjustment_for_under_over_points,
             under_point: point - small_adjustment_for_under_over_points,
-            eye: (-ray.direction).normalize(),
+            eye,
             normal,
             reflection: ray.direction.reflect(normal_as_vector),
             ray_generation: ray.generation,

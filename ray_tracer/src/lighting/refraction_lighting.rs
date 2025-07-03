@@ -3,7 +3,7 @@ use crate::material::refraction::RefractionMediumIndexes;
 use crate::ray;
 use crate::rays::RayGeneration;
 use crate::world::World;
-use math::tuple::color::{BLACK, Color};
+use math::tuple::color::{Color, TRANSPARENT};
 
 impl World {
     pub fn refracted_color(
@@ -13,19 +13,20 @@ impl World {
     ) -> Color {
         let transparency = pre_calculations.shape.material.transparency;
         if transparency <= 0. {
-            return *BLACK;
+            return *TRANSPARENT;
         }
+
         let n_ratio = refraction_medium_indexes.n1 / refraction_medium_indexes.n2;
 
         let cos_i = pre_calculations.eye.dot(&pre_calculations.normal);
 
-        let sin_t = n_ratio * n_ratio * (1. - cos_i * cos_i);
+        let sin2_t = n_ratio * n_ratio * (1. - cos_i * cos_i);
 
-        if sin_t > 1. {
-            return *BLACK;
+        if sin2_t > 1. {
+            return *TRANSPARENT;
         }
 
-        let cos_t = (1. - sin_t).sqrt();
+        let cos_t = (1. - sin2_t).sqrt();
 
         let direction = pre_calculations.normal.clone_vector() * (n_ratio * cos_i - cos_t)
             - pre_calculations.eye.clone_vector() * n_ratio;
@@ -73,7 +74,7 @@ mod refraction_lighting_tests {
         let pre_calculations =
             hit.to_pre_calculation(RayGeneration::new_ray_with_generation(ray, 1));
         assert_eq!(
-            color!(0, 0, 0),
+            color!(0, 0, 0, 0),
             world.refracted_color(&pre_calculations, refraction)
         );
     }
@@ -98,7 +99,7 @@ mod refraction_lighting_tests {
         let pre_calculations =
             hit.to_pre_calculation(RayGeneration::new_ray_with_generation(ray, 1));
         assert_eq!(
-            color!(0, 0, 0),
+            color!(0, 0, 0, 0),
             world.refracted_color(&pre_calculations, refraction)
         );
     }
@@ -123,11 +124,14 @@ mod refraction_lighting_tests {
         ]);
         let (hit, refraction) = intersections.hit().unwrap();
 
+        assert_eq!(hit.shape, b);
+        assert_eq!(hit.t, 0.4899);
+
         let pre_calculations =
             hit.to_pre_calculation(RayGeneration::new_ray_with_generation(ray, 1));
         assert_eq!(
-            // TODO, not quite what book has (0, 0.99888, 0.04725)
-            color!(0, 0.9887494, 0.04974536),
+            // Not quite what book has (0, 0.99888, 0.04725) but it is due to a smaller EPSILON
+            color!(0, 0.99878335, 0.04724201),
             world.refracted_color(&pre_calculations, refraction)
         );
     }
@@ -151,7 +155,7 @@ mod refraction_lighting_tests {
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
         ));
-        assert_eq!(color!(0.9361184, 0.6861184, 0.6861184), c);
+        assert_eq!(color!(0.9364223, 0.6864223, 0.6864223), c);
     }
 
     #[test]
@@ -174,8 +178,8 @@ mod refraction_lighting_tests {
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
         ));
-        // TODO, not quite what book has (0.93642, 0.68642, 0.68642)
-        assert_eq!(color!(0.9256011, 0.6861184, 0.6861184), c);
+        // TODO Not quite what book has (0.93642, 0.68642, 0.68642)
+        assert_eq!(color!(0.925905, 0.6864223, 0.6864223), c);
     }
 }
 

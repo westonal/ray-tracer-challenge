@@ -131,6 +131,7 @@ macro_rules! pub_static_color {
 
 pub_static_color! {WHITE = color!(1,1,1)}
 pub_static_color! {BLACK = color!(0,0,0)}
+pub_static_color! {TRANSPARENT = color!(0,0,0,0)}
 pub_static_color! {RED = color!(1,0,0)}
 pub_static_color! {GREEN = color!(0,1,0)}
 pub_static_color! {BLUE = color!(0,0,1)}
