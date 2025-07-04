@@ -2,6 +2,7 @@ use crate::chapter7_scene::ray_trace_end_chapter_7_scene;
 use crate::png_write::PngWrite;
 use crate::test_scenes::RenderTestScene;
 use crate::test_scenes::cube_of_spheres::CubeOfSpheres;
+use crate::test_scenes::cubes::Cubes;
 use crate::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use crate::test_scenes::grid::Grid;
 use crate::threaded_canvas::ThreadedCanvas;
@@ -23,6 +24,7 @@ fn main() {
     render(size, 32);
     let size = Size::HD_720P;
     GlassSphereWithAir::render_scene(size);
+    Cubes::render_scene(size);
     CubeOfSpheres::render_scene(size);
     Grid::render_scene(size);
 }

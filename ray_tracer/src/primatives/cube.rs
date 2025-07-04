@@ -6,7 +6,6 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::{max, min, vector};
-use std::cmp::max;
 
 impl Shape {
     pub fn new_cube_transformed(transform: Matrix4x4) -> Self {
@@ -45,7 +44,7 @@ impl Surface {
                 tmax_numerator * f32::INFINITY,
             )
         };
-        if (tmin > tmax) {
+        if tmin > tmax {
             (tmax, tmin)
         } else {
             (tmin, tmax)
@@ -140,10 +139,8 @@ mod cube_intersection_missing_tests {
 #[cfg(test)]
 mod cube_normal_tests {
     use crate::primatives::Shape;
-    use math::matrix::matrix_4x4::Matrix4x4;
-    use math::tuple::point::Point;
-    use math::{point, radians, vector};
-    use std::f32::consts::PI;
+
+    use math::{point, vector};
 
     macro_rules! cube_normal_tests {
     ($($name:ident: $point:expr => $normal:expr)*) => {

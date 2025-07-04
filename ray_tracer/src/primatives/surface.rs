@@ -4,7 +4,6 @@ use math::tuple::vector::Vector;
 
 #[derive(PartialEq, Debug)]
 pub(crate) enum Surface {
-
     /// A sphere with center at origin and radius 1
     UnitSphere,
 

@@ -1,4 +1,5 @@
 pub mod cube_of_spheres;
+pub mod cubes;
 pub mod glass_sphere_with_air;
 pub mod grid;
 

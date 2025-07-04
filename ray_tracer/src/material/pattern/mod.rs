@@ -12,7 +12,10 @@ use math::tuple::point::Point;
 pub enum Pattern {
     Solid(Color),
     Stripe(Color, Color, Transform),
+
+    /// The gradient runs from 0..1 in the x-axis
     Gradient(GradientStops, Transform),
+
     Checker(Color, Color, Transform),
     Test,
 }

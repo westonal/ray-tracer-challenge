@@ -22,7 +22,6 @@ macro_rules! max {
 
 #[cfg(test)]
 mod min_tests {
-    use super::*;
 
     #[test]
     fn base() {
@@ -45,7 +44,6 @@ mod min_tests {
 
 #[cfg(test)]
 mod max_tests {
-    use super::*;
 
     #[test]
     fn base() {
