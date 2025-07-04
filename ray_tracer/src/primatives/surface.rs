@@ -4,7 +4,14 @@ use math::tuple::vector::Vector;
 
 #[derive(PartialEq, Debug)]
 pub(crate) enum Surface {
+
+    /// A sphere with center at origin and radius 1
     UnitSphere,
+
+    /// AABB Axis-Aligned Bounding Box
+    UnitCube,
+
+    /// The Plane Y=0
     PlaneXZ,
 }
 
@@ -13,6 +20,7 @@ impl Surface {
         match self {
             Surface::UnitSphere => self.sphere_intersect(ray),
             Surface::PlaneXZ => self.plane_intersect(ray),
+            Surface::UnitCube => self.cube_intersect(ray),
         }
     }
 
@@ -20,6 +28,7 @@ impl Surface {
         match self {
             Surface::UnitSphere => self.sphere_normal_at(object_point),
             Surface::PlaneXZ => self.plane_normal_at(object_point),
+            Surface::UnitCube => todo!(),
         }
     }
 }
