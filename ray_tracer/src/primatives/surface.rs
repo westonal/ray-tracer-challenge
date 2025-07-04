@@ -28,7 +28,7 @@ impl Surface {
         match self {
             Surface::UnitSphere => self.sphere_normal_at(object_point),
             Surface::PlaneXZ => self.plane_normal_at(object_point),
-            Surface::UnitCube => todo!(),
+            Surface::UnitCube => self.cube_normal_at(object_point),
         }
     }
 }

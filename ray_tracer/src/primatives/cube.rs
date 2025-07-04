@@ -5,7 +5,7 @@ use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
-use math::vector;
+use math::{max, min, vector};
 use std::cmp::max;
 
 impl Shape {
@@ -17,17 +17,18 @@ impl Shape {
         Self::new_cube_transformed(Matrix4x4::identity())
     }
 }
+
 impl Surface {
     pub(crate) fn cube_intersect(&self, ray: Ray) -> Vec<f32> {
         let (x_tmin, x_tmax) = self.check_axis(ray.origin.x, ray.direction.x);
         let (y_tmin, y_tmax) = self.check_axis(ray.origin.y, ray.direction.y);
         let (z_tmin, z_tmax) = self.check_axis(ray.origin.z, ray.direction.z);
 
-        let tmin = x_tmin.max(y_tmin.max(z_tmin));
-        let tmax = x_tmax.min(y_tmax.min(z_tmax));
+        let tmin = max!(x_tmin, y_tmin, z_tmin);
+        let tmax = min!(x_tmax, y_tmax, z_tmax);
 
         if tmin > tmax {
-            return vec![]
+            return vec![];
         }
 
         vec![tmin, tmax]
@@ -44,44 +45,25 @@ impl Surface {
                 tmax_numerator * f32::INFINITY,
             )
         };
-        if (tmin > tmax){
+        if (tmin > tmax) {
             (tmax, tmin)
-        }else{
+        } else {
             (tmin, tmax)
         }
     }
 
-    pub(crate) fn cube_normal_at(&self, _object_point: Point) -> Vector {
-        vector!(0, 1, 0)
-    }
-}
-
-#[cfg(test)]
-mod cube_normal_tests {
-    use crate::primatives::Shape;
-    use math::matrix::matrix_4x4::Matrix4x4;
-    use math::tuple::point::Point;
-    use math::{point, radians, vector};
-    use std::f32::consts::PI;
-
-    #[test]
-    fn cube_normal() {
-        let cube = Shape::new_cube();
-        assert_eq!(vector!(0, 1, 0), *cube.normal_at(Point::origin()));
-        assert_eq!(vector!(0, 1, 0), *cube.normal_at(point!(1, 2, 3)));
-    }
-
-    #[test]
-    fn cube_normal_transformed() {
-        let cube = Shape::new_cube_transformed(Matrix4x4::rotation_z(radians!(PI / 2.)));
-        assert_eq!(
-            vector!(-1, -4.371139e-8, 0),
-            *cube.normal_at(Point::origin())
-        );
-        assert_eq!(
-            vector!(-1, -4.371139e-8, 0),
-            *cube.normal_at(point!(1, 2, 3))
-        );
+    pub(crate) fn cube_normal_at(&self, object_point: Point) -> Vector {
+        let abs_x = object_point.x.abs();
+        let abs_y = object_point.y.abs();
+        let abs_z = object_point.z.abs();
+        let max_c = max!(abs_x, abs_y, abs_z);
+        if max_c == abs_x {
+            vector!(object_point.x, 0, 0)
+        } else if max_c == abs_y {
+            vector!(0, object_point.y, 0)
+        } else {
+            vector!(0, 0, object_point.z)
+        }
     }
 }
 
@@ -152,5 +134,37 @@ mod cube_intersection_missing_tests {
         from_x_z: ray!((2.,0.,2.), (0.,0.,-1.))
         from_y_z: ray!((0.,2.,2.), (0.,-1.,0.))
         from_x_y: ray!((2.,2.,0.), (-1.,0.,0.))
+    }
+}
+
+#[cfg(test)]
+mod cube_normal_tests {
+    use crate::primatives::Shape;
+    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::tuple::point::Point;
+    use math::{point, radians, vector};
+    use std::f32::consts::PI;
+
+    macro_rules! cube_normal_tests {
+    ($($name:ident: $point:expr => $normal:expr)*) => {
+    $(
+        #[test]
+        fn $name(){
+            let cube = Shape::new_cube();
+            assert_eq!($normal, *cube.normal_at($point));
+        }
+    )*
+    }
+        }
+
+    cube_normal_tests! {
+        a: point!(1,0.5,-0.8) => vector!(1,0,0)
+        b: point!(-1,0.2,0.9) => vector!(-1,0,0)
+        c: point!(-0.4,1,-0.1) => vector!(0,1,0)
+        d: point!(0.3,-1,-0.7) => vector!(0,-1,0)
+        e: point!(-0.6,0.3,1) => vector!(0,0,1)
+        f: point!(0.4,0.4,-1) => vector!(0,0,-1)
+        g: point!(1,1,1) => vector!(1,0,0)
+        h: point!(-1,-1,-1) => vector!(-1,0,0)
     }
 }
