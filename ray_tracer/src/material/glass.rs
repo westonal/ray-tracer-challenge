@@ -15,19 +15,6 @@ impl Material {
         glass.shininess = 300.;
         glass
     }
-
-    pub fn air() -> Self {
-        let mut air = Self::default();
-        air.pattern = Pattern::Solid(color!(0.1, 0.1, 0.1));
-        air.transparency = 1.;
-        air.refractive_index = 1.;
-        air.ambient = 0.;
-        air.diffuse = 0.;
-        air.reflectivity = 0.;
-        air.specular = 0.;
-        air.shininess = 0.;
-        air
-    }
 }
 
 #[cfg(test)]
