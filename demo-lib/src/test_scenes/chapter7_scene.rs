@@ -1,9 +1,10 @@
 use crate::Material;
+use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::canvas::ViewPort;
+use ray_tracer::canvas::Size;
 use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
@@ -11,25 +12,33 @@ use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
-use ray_tracer::world::render_world::RenderWorld;
 
-pub fn ray_trace_end_chapter_7_scene<C: ViewPort + RenderWorld>(canvas: &mut C) {
-    let mut world = World::default();
-    world.add(floor());
-    world.add(wall(degrees!(-45))); // left wall
-    world.add(wall(degrees!(45))); // right wall
-    world.add(green_sphere());
-    world.add(small_green_sphere());
-    world.add(smallest_yellow_sphere());
-    world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
-    let world = world;
+pub struct Chapter7Scene {}
 
-    let mut camera = Camera::new(canvas.size(), degrees!(60));
-    camera.set_transform(
-        ViewMatrix::new_look_at(point!(0, 1.5, -5), point!(0, 1, 0), vector!(0, 1, 0)).into(),
-    );
+impl TestScene for Chapter7Scene {
+    fn name() -> &'static str {
+        "Chapter 7 Scene"
+    }
 
-    canvas.render(&world, &camera);
+    fn build_world() -> World {
+        let mut world = World::default();
+        world.add(floor());
+        world.add(wall(degrees!(-45))); // left wall
+        world.add(wall(degrees!(45))); // right wall
+        world.add(green_sphere());
+        world.add(small_green_sphere());
+        world.add(smallest_yellow_sphere());
+        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
+        world
+    }
+
+    fn build_camera(size: Size) -> Camera {
+        let mut camera = Camera::new(size, degrees!(60));
+        camera.set_transform(
+            ViewMatrix::new_look_at(point!(0, 1.5, -5), point!(0, 1, 0), vector!(0, 1, 0)).into(),
+        );
+        camera
+    }
 }
 
 fn floor() -> Shape {

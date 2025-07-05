@@ -1,5 +1,5 @@
 
-![Demo](demo.png)
+![Demo](test_scenes/Chapter%207%20Scene.png)
 
 # Chapter 1
 

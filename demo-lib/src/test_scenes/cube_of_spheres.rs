@@ -21,7 +21,7 @@ impl TestScene for CubeOfSpheres {
 
     fn build_world() -> World {
         let mut world = World::default();
-        world.max_ray_generation = 3;
+        world.max_ray_generation = 2;
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
         let mut shape = Shape::new_plane();
         shape.material.pattern = Pattern::Checker(
