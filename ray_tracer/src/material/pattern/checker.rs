@@ -11,10 +11,16 @@ impl Pattern {
         object_point: Point,
     ) -> Color {
         let point = pattern_transform.world_point_to_object_point(object_point);
-        let x = point.x.floor() as i32;
-        let y = point.y.floor() as i32;
-        let z = point.z.floor() as i32;
+        let x = Self::convert(point.x);
+        let y = Self::convert(point.y);
+        let z = Self::convert(point.z);
         if (x + y + z) % 2 == 0 { a } else { b }.clone()
+    }
+
+    /// This complex conversion is to avoid some rash effect when the values are
+    /// Bouncing near to a boundary. E.g. commonly seen on a plane with y=0
+    fn convert(f: f32) -> i32 {
+        ((f * 100000.).round() / 100000.).floor() as i32
     }
 }
 
