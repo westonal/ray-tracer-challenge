@@ -1,16 +1,16 @@
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::material::Material;
+use crate::primatives::ShapeId;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
 use crate::transform::Transform;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
-use uuid::Uuid;
 
 #[derive(Debug, PartialEq)]
 pub struct Shape {
-    pub id: String,
+    pub id: ShapeId,
     pub material: Material,
     pub(crate) transform: Transform,
     surface: Surface,
@@ -19,8 +19,8 @@ pub struct Shape {
 impl Shape {
     pub(crate) fn new(object_to_world_matrix: Matrix4x4, surface: Surface) -> Self {
         Self {
-            id: format!("{}", Uuid::new_v4()),
-            material: Material::default(),
+            id: Default::default(),
+            material: Default::default(),
             transform: Transform::new(object_to_world_matrix),
             surface,
         }
