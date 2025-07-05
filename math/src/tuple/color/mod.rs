@@ -1,3 +1,5 @@
+mod assertions;
+
 use crate::tuple::Tuple;
 use std::fmt::Formatter;
 use std::ops::{Add, Mul, Sub};
@@ -46,6 +48,12 @@ impl Color {
         Self {
             tuple: Tuple::new(r, g, b, a),
         }
+    }
+}
+
+impl From<Color> for Tuple {
+    fn from(value: Color) -> Self {
+        value.tuple
     }
 }
 
@@ -205,7 +213,7 @@ mod color_math_tests {
         let a = Color::rgba(0.9, 0.6, 0.75, 1.);
         let b = Color::rgba(1.7, 0.2, 0.25, 1.);
 
-        assert_eq!(Color::rgba(2.6, 0.8, 1., 2.), a + b)
+        assert_eq!(Color::rgba(2.6, 0.8, 1., 2.), a + b);
     }
 
     #[test]

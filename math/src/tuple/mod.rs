@@ -1,7 +1,11 @@
+mod assertions;
+
 pub mod color;
+
 pub mod point;
 pub mod vector;
 
+use crate::max;
 use crate::tuple::point::Point;
 use crate::tuple::vector::Vector;
 use std::fmt::Formatter;
@@ -187,5 +191,72 @@ mod tuple_math_tests {
         let b = Tuple::new(2., 0.1, 0.35, 0.5);
 
         assert_eq!(Tuple::new(3.6, 0.05, 0.2625, 0.6), a.hadamard_product(b))
+    }
+}
+
+impl Tuple {
+    /// Component wise abs
+    pub fn abs(&self) -> Self {
+        Tuple::new(self.x.abs(), self.y.abs(), self.z.abs(), self.w.abs())
+    }
+}
+
+#[cfg(test)]
+mod tuple_abs_tests {
+    use super::*;
+
+    #[test]
+    fn positive() {
+        assert_eq!(
+            Tuple::new(1., 2., 3., 4.5),
+            Tuple::new(1., 2., 3., 4.5).abs()
+        )
+    }
+
+    #[test]
+    fn negative() {
+        assert_eq!(
+            Tuple::new(1., 2., 3., 4.5),
+            Tuple::new(-1., -2., -3., -4.5).abs()
+        )
+    }
+}
+
+impl Tuple {
+    /// Component wise maximum
+    pub fn max(&self) -> f32 {
+        max!(self.x, self.y, self.z, self.w)
+    }
+}
+
+#[cfg(test)]
+mod tuple_max_tests {
+    use super::*;
+
+    #[test]
+    fn x() {
+        assert_eq!(10., Tuple::new(10., 2., 3., 4.5).max())
+    }
+
+    #[test]
+    fn y() {
+        assert_eq!(20., Tuple::new(1., 20., 3., 4.5).max())
+    }
+
+    #[test]
+    fn z() {
+        assert_eq!(3., Tuple::new(-1., -2., 3., -4.5).max())
+    }
+    #[test]
+    fn w() {
+        assert_eq!(4.5, Tuple::new(1., 2., 3., 4.5).max())
+    }
+
+    #[test]
+    fn negative() {
+        assert_eq!(
+            Tuple::new(1., 2., 3., 4.5),
+            Tuple::new(-1., -2., -3., -4.5).abs()
+        )
     }
 }

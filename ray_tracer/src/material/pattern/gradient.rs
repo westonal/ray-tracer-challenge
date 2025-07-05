@@ -53,25 +53,25 @@ macro_rules! gradient_stops {
 #[cfg(test)]
 mod gradient_stop_tests {
 
-    use math::color;
+    use math::{assert_color, color};
 
     #[test]
     fn single_stop() {
         let gradient = gradient_stops!(0.1 => color!(1,0,0));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.1));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(1.));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.5));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.1));
+        assert_color!(color!(1, 0, 0), gradient.color_at(1.));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.5));
     }
 
     #[test]
     fn two_stops() {
         let gradient = gradient_stops!(0.1 => color!(1,0,0),0.9 => color!(1,1,0),);
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.1));
-        assert_eq!(color!(1, 1, 0), gradient.color_at(0.9));
-        assert_eq!(color!(1, 1, 0), gradient.color_at(1.));
-        assert_eq!(color!(1, 0.50000006, 0), gradient.color_at(0.5));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.1));
+        assert_color!(color!(1, 1, 0), gradient.color_at(0.9));
+        assert_color!(color!(1, 1, 0), gradient.color_at(1.));
+        assert_color!(color!(1, 0.50000006, 0), gradient.color_at(0.5));
     }
 
     #[test]
@@ -81,13 +81,13 @@ mod gradient_stop_tests {
             0.5 => color!(1,0,1),
             0.9 => color!(1,1,0),
         );
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.));
-        assert_eq!(color!(1, 0, 0), gradient.color_at(0.1));
-        assert_eq!(color!(1, 0, 1), gradient.color_at(0.5));
-        assert_eq!(color!(1, 1, 0), gradient.color_at(0.9));
-        assert_eq!(color!(1, 1, 0), gradient.color_at(1.));
-        assert_eq!(color!(1, 0, 0.50000006), gradient.color_at(0.3));
-        assert_eq!(color!(1, 0.62500006, 0.37499994), gradient.color_at(0.75));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.));
+        assert_color!(color!(1, 0, 0), gradient.color_at(0.1));
+        assert_color!(color!(1, 0, 1), gradient.color_at(0.5));
+        assert_color!(color!(1, 1, 0), gradient.color_at(0.9));
+        assert_color!(color!(1, 1, 0), gradient.color_at(1.));
+        assert_color!(color!(1, 0, 0.50000006), gradient.color_at(0.3));
+        assert_color!(color!(1, 0.62500006, 0.37499994), gradient.color_at(0.75));
     }
 }
 
@@ -98,7 +98,7 @@ mod gradient_pattern_tests {
     use crate::transform::Transform;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLACK, BLUE, GREEN, WHITE};
-    use math::{color, degrees, point};
+    use math::{assert_color, color, degrees, point};
 
     #[test]
     fn a_gradient_pattern_is_constant_in_y_and_z() {
@@ -106,19 +106,19 @@ mod gradient_pattern_tests {
             gradient_stops!(0. => *WHITE, 1.=>*BLACK),
             Transform::identity(),
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 0, 0), &Transform::identity()),
             *WHITE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 1, 0), &Transform::identity()),
             *WHITE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 0, 1), &Transform::identity()),
             *WHITE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 1, 1), &Transform::identity()),
             *WHITE
         );
@@ -130,23 +130,23 @@ mod gradient_pattern_tests {
             gradient_stops!(0. => *WHITE, 1.=>*BLACK),
             Transform::identity(),
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(-1, 0, 0), &Transform::identity()),
             *WHITE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 0, 0), &Transform::identity()),
             *WHITE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(1, 0, 0), &Transform::identity()),
             *BLACK
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(2, 0, 1), &Transform::identity()),
             *BLACK
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0.5, 0, 1), &Transform::identity()),
             color!(0.5, 0.5, 0.5)
         );
@@ -158,23 +158,23 @@ mod gradient_pattern_tests {
             gradient_stops!(0. => *GREEN, 1.=>*BLUE),
             Transform::new(Matrix4x4::rotation_z(degrees!(90))),
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, -1, 0), &Transform::identity()),
             *GREEN
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 0, 0), &Transform::identity()),
             *GREEN
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 1, 0), &Transform::identity()),
             *BLUE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 2, 1), &Transform::identity()),
             *BLUE
         );
-        assert_eq!(
+        assert_color!(
             pattern.color_at(point!(0, 0.75, 1), &Transform::identity()),
             color!(0., 0.25, 0.75)
         );
@@ -187,11 +187,11 @@ mod gradient_pattern_tests {
             Transform::identity(),
         );
         let transform = Transform::new(Matrix4x4::rotation_z(degrees!(90)));
-        assert_eq!(pattern.color_at(point!(0, -1, 0), &transform), *GREEN);
-        assert_eq!(pattern.color_at(point!(0, 0, 0), &transform), *GREEN);
-        assert_eq!(pattern.color_at(point!(0, 1, 0), &transform), *BLUE);
-        assert_eq!(pattern.color_at(point!(0, 2, 1), &transform), *BLUE);
-        assert_eq!(
+        assert_color!(pattern.color_at(point!(0, -1, 0), &transform), *GREEN);
+        assert_color!(pattern.color_at(point!(0, 0, 0), &transform), *GREEN);
+        assert_color!(pattern.color_at(point!(0, 1, 0), &transform), *BLUE);
+        assert_color!(pattern.color_at(point!(0, 2, 1), &transform), *BLUE);
+        assert_color!(
             pattern.color_at(point!(0, 0.75, 1), &transform),
             color!(0., 0.25, 0.75)
         );
