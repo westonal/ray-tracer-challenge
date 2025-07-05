@@ -14,7 +14,7 @@ impl Pattern {
         let x = Self::convert(point.x);
         let y = Self::convert(point.y);
         let z = Self::convert(point.z);
-        if (x+y+z) % 2 == 0 { a } else { b }.clone()
+        if (x + y + z) % 2 == 0 { a } else { b }.clone()
     }
 
     /// This complex conversion is to avoid some rash effect when the values are

@@ -114,11 +114,7 @@ fn smallest_yellow_sphere() -> Shape {
             .pre_rotation_x(degrees!(-30)),
     );
     let mut material = Material::default();
-    material.pattern = Pattern::Checker(
-        color!(1, 0.8, 0.1),
-        *WHITE,
-        Transform::identity(),
-    );
+    material.pattern = Pattern::Checker(color!(1, 0.8, 0.1), *WHITE, Transform::identity());
     material.diffuse = 0.7;
     material.specular = 0.3;
     sphere.material = material;

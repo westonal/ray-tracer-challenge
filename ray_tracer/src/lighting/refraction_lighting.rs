@@ -129,8 +129,7 @@ mod refraction_lighting_tests {
         let pre_calculations =
             hit.to_pre_calculation(RayGeneration::new_ray_with_generation(ray, 1));
         assert_color!(
-            // Not quite what book has (0, 0.99888, 0.04725) but it is due to a smaller EPSILON
-            color!(0, 0.9988, 0.04725),
+            color!(0, 0.99888, 0.04725),
             world.refracted_color(&pre_calculations, refraction)
         );
     }

@@ -10,7 +10,7 @@ fn main() {
     let size = Size::HD_720P;
     Chapter7Scene::render_scene(size);
     GlassSphereWithAir::render_scene(size);
-    // Cubes::render_scene(size);
-    // CubeOfSpheres::render_scene(size);
-    // Grid::render_scene(size);
+    Cubes::render_scene(size);
+    CubeOfSpheres::render_scene(size);
+    Grid::render_scene(size);
 }

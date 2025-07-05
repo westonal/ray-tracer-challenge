@@ -64,7 +64,7 @@ mod camera_tests {
 
     use crate::view_matrix::ViewMatrix;
 
-    use math::{color, degrees, point, vector};
+    use math::{assert_color, assert_point, assert_vector, color, degrees, point, vector};
 
     #[test]
     fn new_camera() {
@@ -87,7 +87,7 @@ mod camera_tests {
         let camera = Camera::new(Size::new(101, 201), degrees!(90));
         let ray = camera.ray_for_pixel((0, 0));
         assert_eq!(ray.origin, point!(0, 0, 0));
-        assert_eq!(ray.direction, vector!(0.3325932, 0.6651864, -0.66851234));
+        assert_vector!(ray.direction, vector!(0.3326, 0.6652, -0.6685));
     }
 
     #[test]
@@ -95,8 +95,8 @@ mod camera_tests {
         let mut camera = Camera::new(Size::new(101, 201), degrees!(90));
         camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).pre_translation(0., -2., 5.));
         let ray = camera.ray_for_pixel((50, 100));
-        assert_eq!(ray.origin, point!(0, 2, -5.0000005));
-        assert_eq!(ray.direction, vector!(0.70710665, 0, -0.7071069));
+        assert_point!(ray.origin, point!(0, 2, -5));
+        assert_vector!(ray.direction, vector!(0.7071, 0, -0.7071));
     }
 
     #[test]
@@ -107,6 +107,6 @@ mod camera_tests {
             ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
         let color = camera.color_at((5, 5), &world);
-        assert_eq!(color!(0.38065884, 0.47582352, 0.28549412), color);
+        assert_color!(color!(0.3807, 0.4758, 0.2855), color);
     }
 }
