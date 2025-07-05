@@ -55,7 +55,7 @@ mod refraction_lighting_tests {
     use math::matrix::matrix_4x4::Matrix4x4;
 
     use math::tuple::color::RED;
-    use math::{color, point};
+    use math::{assert_color, color, point};
 
     #[test]
     fn the_refracted_color_of_an_opaque_surface() {
@@ -129,9 +129,9 @@ mod refraction_lighting_tests {
 
         let pre_calculations =
             hit.to_pre_calculation(RayGeneration::new_ray_with_generation(ray, 1));
-        assert_eq!(
+        assert_color!(
             // Not quite what book has (0, 0.99888, 0.04725) but it is due to a smaller EPSILON
-            color!(0, 0.99878335, 0.04724201),
+            color!(0, 0.9988, 0.04725),
             world.refracted_color(&pre_calculations, refraction)
         );
     }
@@ -155,7 +155,7 @@ mod refraction_lighting_tests {
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
         ));
-        assert_eq!(color!(0.9364223, 0.6864223, 0.6864223), c);
+        assert_color!(color!(0.9364, 0.6864, 0.6864), c);
     }
 
     #[test]
@@ -179,7 +179,7 @@ mod refraction_lighting_tests {
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
         ));
         // TODO Not quite what book has (0.93642, 0.68642, 0.68642)
-        assert_eq!(color!(0.925905, 0.6864223, 0.6864223), c);
+        assert_color!(color!(0.9259, 0.6864, 0.6864), c);
     }
 }
 

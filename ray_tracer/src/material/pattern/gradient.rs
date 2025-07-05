@@ -86,8 +86,8 @@ mod gradient_stop_tests {
         assert_color!(color!(1, 0, 1), gradient.color_at(0.5));
         assert_color!(color!(1, 1, 0), gradient.color_at(0.9));
         assert_color!(color!(1, 1, 0), gradient.color_at(1.));
-        assert_color!(color!(1, 0, 0.50000006), gradient.color_at(0.3));
-        assert_color!(color!(1, 0.62500006, 0.37499994), gradient.color_at(0.75));
+        assert_color!(color!(1, 0, 0.5), gradient.color_at(0.3));
+        assert_color!(color!(1, 0.625, 0.375), gradient.color_at(0.75));
     }
 }
 

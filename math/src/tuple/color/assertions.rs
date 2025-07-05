@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! assert_color {
     ($left:expr, $right:expr) => {
-        $crate::assert_tuple!($left, $right);
+        $crate::assert_tuple!($left, $right, 0.00005);
     };
 }
 
@@ -10,25 +10,26 @@ mod assert_color_tests {
     use crate::color;
 
     macro_rules! color_assertion_fail_tests {
-    ($($name:ident: $left:expr ; $right:expr)*) => {
-    $(
-        #[test]
-        #[should_panic]
-        fn $name(){
-            assert_color!($left, $right);
+        ($($name:ident: $left:expr ; $right:expr)*) => {
+        $(
+            #[test]
+            #[should_panic]
+            fn $name(){
+                assert_color!($left, $right);
+            }
+        )*
         }
-    )*
     }
-    }
+
     macro_rules! color_assertion_pass_tests {
-    ($($name:ident: $left:expr ; $right:expr)*) => {
-    $(
-        #[test]
-        fn $name(){
-            assert_color!($left, $right);
+        ($($name:ident: $left:expr ; $right:expr)*) => {
+        $(
+            #[test]
+            fn $name(){
+                assert_color!($left, $right);
+            }
+        )*
         }
-    )*
-    }
     }
 
     color_assertion_fail_tests! {

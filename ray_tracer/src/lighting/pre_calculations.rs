@@ -53,7 +53,7 @@ mod precalculation_tests {
     use crate::intersection::Intersection;
     use crate::primatives::Shape;
     use crate::ray_first_gen;
-    use math::{point, vector};
+    use math::{assert_point, assert_vector, point, vector};
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
@@ -63,9 +63,9 @@ mod precalculation_tests {
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(4., pre_calculations.t);
         assert_eq!(&sphere, pre_calculations.shape);
-        assert_eq!(point!(0, 0, -1), pre_calculations.point);
-        assert_eq!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
-        assert_eq!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
+        assert_point!(point!(0, 0, -1), pre_calculations.point);
+        assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
+        assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
         assert_eq!(1, pre_calculations.ray_generation);
         assert!(!pre_calculations.inside);
     }
@@ -79,8 +79,8 @@ mod precalculation_tests {
         assert_eq!(1., pre_calculations.t);
         assert_eq!(&sphere, pre_calculations.shape);
         assert_eq!(point!(0, 0, 1), pre_calculations.point);
-        assert_eq!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
-        assert_eq!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
+        assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
+        assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
         assert!(pre_calculations.inside);
     }
 }

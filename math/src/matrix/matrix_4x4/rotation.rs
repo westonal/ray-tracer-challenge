@@ -56,7 +56,7 @@ mod rotation_x_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
 
-    use crate::{point, radians};
+    use crate::{assert_tuple, point, radians};
     use std::f32::consts::PI;
 
     #[test]
@@ -108,7 +108,7 @@ mod rotation_x_tests {
     fn rotate_point_one_quarter() {
         let quarter = Matrix4x4::rotation_x(radians!(PI / 2.0));
         let p = point!(0., 1., 0.);
-        assert_eq!(quarter * p, point!(0., -4.371139e-8, 1.).into());
+        assert_tuple!(quarter * p, *point!(0, 0, 1));
     }
 
     #[test]
@@ -117,11 +117,8 @@ mod rotation_x_tests {
         let eighth_reversed = Matrix4x4::rotation_x(radians!(-(PI / 4.0)));
         let eighth_inverted = eighth.invert().unwrap();
         let p = point!(1., 2., 3.);
-        assert_eq!(Tuple::new(1., 3.535534, 0.7071067, 1.), eighth_reversed * p);
-        assert_eq!(
-            Tuple::new(1., 3.5355341, 0.7071068, 1.),
-            eighth_inverted * p
-        );
+        assert_tuple!(Tuple::new(1., 3.5355, 0.7071, 1.), eighth_reversed * p);
+        assert_tuple!(Tuple::new(1., 3.5355, 0.7071, 1.), eighth_inverted * p);
     }
 }
 
@@ -207,7 +204,7 @@ mod rotation_z_tests {
     use crate::matrix::matrix_4x4::Matrix4x4;
     use crate::tuple::Tuple;
 
-    use crate::{point, radians};
+    use crate::{assert_tuple, point, radians};
     use std::f32::consts::PI;
 
     #[test]
@@ -244,14 +241,14 @@ mod rotation_z_tests {
     fn rotate_point_one_eighth_2() {
         let eighth = Matrix4x4::rotation_z(radians!(PI / 4.0));
         let p = point!(2., 3., 2.);
-        assert_eq!(eighth * p, point!(-0.7071067, 3.535534, 2.).into());
+        assert_tuple!(eighth * p, *point!(-0.7071, 3.5355, 2.));
     }
 
     #[test]
     fn rotate_point_one_quarter() {
         let quarter = Matrix4x4::rotation_z(radians!(PI / 2.0));
         let p = point!(0., 1., 0.);
-        assert_eq!(quarter * p, point!(-1., -4.371139e-8, 0.).into());
+        assert_tuple!(quarter * p, *point!(-1, 0, 0));
     }
 
     #[test]
@@ -260,13 +257,7 @@ mod rotation_z_tests {
         let eighth_reversed = Matrix4x4::rotation_z(radians!(-(PI / 4.0)));
         let eighth_inverted = eighth.invert().unwrap();
         let p = point!(1., 2., 3.);
-        assert_eq!(
-            Tuple::new(2.1213202, 0.70710677, 3., 1.),
-            eighth_reversed * p
-        );
-        assert_eq!(
-            Tuple::new(2.1213205, 0.7071068, 3., 1.),
-            eighth_inverted * p
-        );
+        assert_tuple!(Tuple::new(2.1213, 0.7071, 3., 1.), eighth_reversed * p);
+        assert_tuple!(Tuple::new(2.1213, 0.7071, 3., 1.), eighth_inverted * p);
     }
 }

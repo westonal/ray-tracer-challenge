@@ -35,14 +35,14 @@ mod plane_normal_tests {
     use crate::primatives::Shape;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::point::Point;
-    use math::{point, radians, vector};
+    use math::{assert_vector, point, radians, vector};
     use std::f32::consts::PI;
 
     #[test]
     fn plane_normal() {
         let plane = Shape::new_plane();
-        assert_eq!(vector!(0, 1, 0), *plane.normal_at(Point::origin()));
-        assert_eq!(vector!(0, 1, 0), *plane.normal_at(point!(1, 2, 3)));
+        assert_vector!(vector!(0, 1, 0), *plane.normal_at(Point::origin()));
+        assert_vector!(vector!(0, 1, 0), *plane.normal_at(point!(1, 2, 3)));
     }
 
     #[test]

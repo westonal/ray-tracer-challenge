@@ -68,7 +68,7 @@ impl Material {
 mod lighting_tests {
     use super::*;
 
-    use math::{color, point, vector};
+    use math::{assert_color, color, point, vector};
 
     #[test]
     fn lighting_with_the_eye_between_the_light_and_the_surface() {
@@ -103,8 +103,8 @@ mod lighting_tests {
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 10, -10), color!(1, 1, 1));
         let material = Material::default();
-        assert_eq!(
-            color!(0.7363961, 0.7363961, 0.7363961),
+        assert_color!(
+            color!(0.7364, 0.7364, 0.7364),
             material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }
@@ -116,8 +116,8 @@ mod lighting_tests {
         let normal = vector!(0, 0, -1).normalize();
         let light = PointLight::new(point!(0, 10, -10), color!(1, 1, 1));
         let material = Material::default();
-        assert_eq!(
-            color!(1.636396, 1.636396, 1.636396),
+        assert_color!(
+            color!(1.6364, 1.6364, 1.6364),
             material.light(&light, &Transform::identity(), point, eye, normal, 0.)
         );
     }

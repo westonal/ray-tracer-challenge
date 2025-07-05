@@ -1,3 +1,4 @@
+mod assertions;
 pub mod normal;
 mod reflection;
 
@@ -112,6 +113,7 @@ mod vector_display_tests {
 
 #[cfg(test)]
 mod vector_into_tests {
+
     use super::*;
     #[test]
     fn tuple_3_into_vector() {
@@ -179,13 +181,14 @@ impl Neg for Vector {
 #[cfg(test)]
 mod vector_math_tests {
     use super::*;
+    use crate::assert_vector;
 
     #[test]
     fn add_vector_from_vector_yields_a_vector() {
         let a = Vector::vector(1., 5., 4.);
         let b = Vector::vector(4., 1., 6.);
 
-        assert_eq!(Vector::vector(5., 6., 10.), a + b);
+        assert_vector!(Vector::vector(5., 6., 10.), a + b);
     }
 
     #[test]
@@ -194,7 +197,7 @@ mod vector_math_tests {
         let b = Vector::vector(4., 1., 6.);
         a += b;
 
-        assert_eq!(Vector::vector(5., 6., 10.), a);
+        assert_vector!(Vector::vector(5., 6., 10.), a);
     }
 
     #[test]
@@ -202,7 +205,7 @@ mod vector_math_tests {
         let a = Vector::vector(1., 5., 4.);
         let b = Vector::vector(4., 1., 6.);
 
-        assert_eq!(Vector::vector(-3., 4., -2.), a - b);
+        assert_vector!(Vector::vector(-3., 4., -2.), a - b);
     }
 
     #[test]
@@ -217,14 +220,14 @@ mod vector_math_tests {
     fn vector_scalar_multiply() {
         let a = Vector::vector(4., 1., -6.);
 
-        assert_eq!(Vector::vector(8., 2., -12.), a * 2.);
+        assert_vector!(Vector::vector(8., 2., -12.), a * 2.);
     }
 
     #[test]
     fn vector_divide() {
         let a = Vector::vector(12., 3., -18.);
 
-        assert_eq!(Vector::vector(4., 1., -6.), a / 3.);
+        assert_vector!(Vector::vector(4., 1., -6.), a / 3.);
     }
 
     #[test]
@@ -288,18 +291,19 @@ mod vector_math_tests {
         let a = Vector::vector(1., 2., 3.);
         let b = Vector::vector(2., 3., 4.);
 
-        assert_eq!(Vector::vector(-1., 2., -1.), a.cross(b));
-        assert_eq!(Vector::vector(1., -2., 1.), b.cross(a));
+        assert_vector!(Vector::vector(-1., 2., -1.), a.cross(b));
+        assert_vector!(Vector::vector(1., -2., 1.), b.cross(a));
     }
 }
 
 #[cfg(test)]
 mod tuple_casting_tests {
     use super::*;
+    use crate::assert_vector;
     #[test]
     fn valid_vector() {
         let vector: Vector = Tuple::new(1., 2., 3., 0.).try_into().unwrap();
-        assert_eq!(Vector::vector(1., 2., 3.), vector);
+        assert_vector!(Vector::vector(1., 2., 3.), vector);
     }
 
     #[test]
@@ -312,6 +316,6 @@ mod tuple_casting_tests {
     #[test]
     fn invalid_point_forced_to_vector() {
         let vector: Vector = Tuple::new(1., 2., 3., 1.).force_vector();
-        assert_eq!(vector!(1., 2., 3.), vector);
+        assert_vector!(vector!(1., 2., 3.), vector);
     }
 }

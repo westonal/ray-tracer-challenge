@@ -1,3 +1,5 @@
+mod assertions;
+
 use crate::tuple::Tuple;
 use crate::tuple::vector::Vector;
 use std::fmt::Formatter;

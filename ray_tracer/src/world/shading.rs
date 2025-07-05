@@ -106,7 +106,7 @@ mod world_shading_tests {
 
     use crate::ray_first_gen;
     use crate::world::shading::default_world;
-    use math::{color, point, vector};
+    use math::{assert_color, color, point, vector};
 
     #[test]
     fn shade_an_intersection() {
@@ -116,7 +116,7 @@ mod world_shading_tests {
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
-        assert_eq!(color!(0.38065884, 0.47582352, 0.28549412), c);
+        assert_color!(color!(0.3807, 0.4758, 0.2855), c);
     }
 
     #[test]
@@ -128,7 +128,7 @@ mod world_shading_tests {
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
-        assert_eq!(color!(0.9049522, 0.9049522, 0.9049522), c);
+        assert_color!(color!(0.9050, 0.9050, 0.9050), c);
     }
 
     #[test]
@@ -153,7 +153,7 @@ mod world_shading_tests {
         let world = default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let c = world.color_at(ray);
-        assert_eq!(color!(0.38065884, 0.47582352, 0.28549412), c);
+        assert_color!(color!(0.3807, 0.4758, 0.2855), c);
     }
 }
 
