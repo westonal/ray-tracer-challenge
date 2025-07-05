@@ -50,7 +50,6 @@ mod refraction_lighting_tests {
     use crate::primatives::Shape;
     use crate::rays::RayGeneration;
     use crate::world::World;
-    use crate::world::shading::default_world;
     use crate::{ray, ray_first_gen};
     use math::matrix::matrix_4x4::Matrix4x4;
 
@@ -106,7 +105,7 @@ mod refraction_lighting_tests {
 
     #[test]
     fn the_refracted_color_with_a_refracted_ray() {
-        let mut world = default_world();
+        let mut world = World::default_world();
         let a = world.shapes.get_mut(0).unwrap();
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;

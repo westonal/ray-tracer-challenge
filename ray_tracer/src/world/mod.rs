@@ -1,6 +1,10 @@
+mod default;
 pub mod render_world;
 pub mod shading;
 mod shadows;
+
+#[cfg(test)]
+pub use crate::world::default::test_world;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;

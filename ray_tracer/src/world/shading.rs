@@ -1,17 +1,12 @@
 use crate::intersection::Intersect;
-use crate::lighting::PointLight;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
-use crate::material::Material;
-use crate::material::pattern::Pattern;
 use crate::material::refraction::RefractionMediumIndexes;
-use crate::primatives::Shape;
 use crate::ray;
 use crate::rays::RayGeneration;
 use crate::world::World;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::color;
 use math::tuple::color::Color;
-use math::{color, point};
 
 impl World {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
@@ -78,39 +73,18 @@ impl World {
     }
 }
 
-/// A test world
-pub fn default_world() -> World {
-    let mut world = World::default();
-    world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
-    let mut sphere = Shape::new_sphere();
-    let mut material = Material::default();
-    material.pattern = Pattern::Solid(color!(0.8, 1., 0.6));
-    material.diffuse = 0.7;
-    material.specular = 0.2;
-    // turn off shadows
-    material.shadow_boost = 1.;
-    sphere.material = material;
-    world.add(sphere);
-    let mut material = Material::default();
-    material.shadow_boost = 1.;
-    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::scale(0.5, 0.5, 0.5));
-    sphere.material = material;
-    world.add(sphere);
-    world
-}
-
 #[cfg(test)]
 mod world_shading_tests {
     use crate::intersection::Intersection;
     use crate::lighting::PointLight;
 
     use crate::ray_first_gen;
-    use crate::world::shading::default_world;
+    use crate::world::World;
     use math::{assert_color, color, point, vector};
 
     #[test]
     fn shade_an_intersection() {
-        let world = default_world();
+        let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let first = world.shapes.get(0).unwrap();
         let intersection = Intersection::new(4., first);
@@ -121,7 +95,7 @@ mod world_shading_tests {
 
     #[test]
     fn shade_an_intersection_from_inside() {
-        let mut world = default_world();
+        let mut world = World::default_world();
         world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = ray_first_gen!(point!(0, 0, 0), vector!(0, 0, 1));
         let second = world.shapes.get(1).unwrap();
@@ -133,7 +107,7 @@ mod world_shading_tests {
 
     #[test]
     fn color_when_ray_misses() {
-        let world = default_world();
+        let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.color_at(ray);
         assert_eq!(color!(0., 0., 0., 0.), c);
@@ -141,7 +115,7 @@ mod world_shading_tests {
 
     #[test]
     fn color_when_ray_misses_alt_background_color() {
-        let mut world = default_world();
+        let mut world = World::default_world();
         world.background = color!(0., 1., 0.);
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.color_at(ray);
@@ -150,7 +124,7 @@ mod world_shading_tests {
 
     #[test]
     fn shade_an_intersection_with_color_at() {
-        let world = default_world();
+        let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let c = world.color_at(ray);
         assert_color!(color!(0.3807, 0.4758, 0.2855), c);
@@ -161,8 +135,11 @@ mod world_shading_tests {
 mod world_shadow_shading_tests {
     use super::*;
     use crate::intersection::Intersection;
+    use crate::lighting::PointLight;
+    use crate::primatives::Shape;
     use crate::ray_first_gen;
-    use math::vector;
+    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::{point, vector};
 
     #[test]
     fn shade_when_given_intersection_in_shadow() {
@@ -185,11 +162,16 @@ mod world_shadow_shading_tests {
 mod world_pattern_shading_tests {
     use super::*;
     use crate::intersection::Intersection;
+    use crate::lighting::PointLight;
+    use crate::material::Material;
+    use crate::material::pattern::Pattern;
+    use crate::primatives::Shape;
     use crate::ray;
     use crate::rays::Ray;
     use crate::transform::Transform;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLUE, GREEN, RED};
-    use math::{degrees, vector};
+    use math::{degrees, point, vector};
 
     struct TestScene {
         world: World,

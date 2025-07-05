@@ -101,7 +101,7 @@ mod camera_tests {
 
     #[test]
     fn render_world_with_camera() {
-        let world = crate::world::shading::default_world();
+        let world = World::default_world();
         let mut camera = Camera::new(Size::new(11, 11), degrees!(90));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
