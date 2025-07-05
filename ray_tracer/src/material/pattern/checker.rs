@@ -14,18 +14,13 @@ impl Pattern {
         let x = Self::convert(point.x);
         let y = Self::convert(point.y);
         let z = Self::convert(point.z);
-        if (x + y + z) % 2 == 0 { a } else { b }.clone()
+        if (x+y+z) % 2 == 0 { a } else { b }.clone()
     }
 
-    /// Not quite sure why, but without this, a checkered scene contains rash marks
-    const RASH_FIX:f32 = f32::EPSILON * 128.;
-
+    /// This complex conversion is to avoid some rash effect when the values are
+    /// Bouncing near to a boundary. E.g. commonly seen on a plane with y=0
     fn convert(f: f32) -> i32 {
-        let mut i = (f + 0.5).round().floor() as i32;
-        if i < 0 {
-         // i = i.abs() + 1;
-        }
-        i
+        ((f * 100000.).round() / 100000.).floor() as i32
     }
 }
 
