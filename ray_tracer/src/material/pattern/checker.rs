@@ -11,10 +11,21 @@ impl Pattern {
         object_point: Point,
     ) -> Color {
         let point = pattern_transform.world_point_to_object_point(object_point);
-        let x = point.x.floor() as i32;
-        let y = point.y.floor() as i32;
-        let z = point.z.floor() as i32;
+        let x = Self::convert(point.x);
+        let y = Self::convert(point.y);
+        let z = Self::convert(point.z);
         if (x + y + z) % 2 == 0 { a } else { b }.clone()
+    }
+
+    /// Not quite sure why, but without this, a checkered scene contains rash marks
+    const RASH_FIX:f32 = f32::EPSILON * 128.;
+
+    fn convert(f: f32) -> i32 {
+        let mut i = (f + 0.5).round().floor() as i32;
+        if i < 0 {
+         // i = i.abs() + 1;
+        }
+        i
     }
 }
 

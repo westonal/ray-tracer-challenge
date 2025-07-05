@@ -117,9 +117,7 @@ fn smallest_yellow_sphere() -> Shape {
     material.pattern = Pattern::Checker(
         color!(1, 0.8, 0.1),
         *WHITE,
-        // TODO: BUG, without some scale, the pattern does not align exactly
-        //  Even though it's a unit sphere and unit repeating pattern.
-        Transform::new(Matrix4x4::scale_all(1.2)),
+        Transform::identity(),
     );
     material.diffuse = 0.7;
     material.specular = 0.3;

@@ -28,7 +28,7 @@ impl World {
                 + material.light(
                     light,
                     &pre_calculations.shape.transform,
-                    pre_calculations.over_point,
+                    pre_calculations.point,
                     pre_calculations.eye,
                     pre_calculations.normal,
                     shadow_factor,
