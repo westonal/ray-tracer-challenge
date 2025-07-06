@@ -1,5 +1,5 @@
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
-use crate::primatives::Shape;
+use crate::primatives::{Shape, ShapeId};
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
 
@@ -47,6 +47,18 @@ impl<'s> Intersections<'s> {
         for i in self.iter() {
             let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);
             if i.t < 0. {
+                continue;
+            }
+            return Some((i, refraction_indexes));
+        }
+        None
+    }
+
+    pub fn hit_excluding(&self, id:&ShapeId) -> Option<(&Intersection, RefractionMediumIndexes)> {
+        let mut stack = RefractionStack::new();
+        for i in self.iter() {
+            let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);
+            if i.t < 0. || &i.shape.id == id {
                 continue;
             }
             return Some((i, refraction_indexes));

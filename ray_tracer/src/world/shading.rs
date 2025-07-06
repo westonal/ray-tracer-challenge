@@ -19,7 +19,7 @@ impl World {
         refraction_medium_indexes: RefractionMediumIndexes,
     ) -> Color {
         let mut result = color!(0, 0, 0, 0);
-        let direct_lights = self.direct_lights(pre_calculations.surface_hit.over_point);
+        let direct_lights = self.direct_lights_2(&pre_calculations.surface_hit);
         let material = &pre_calculations.shape.material;
         for light in &self.lights {
             // TODO, multilight support would light each in turn if they were direct.

@@ -3,6 +3,7 @@ use crate::lighting::PointLight;
 use crate::ray;
 use crate::world::World;
 use math::tuple::point::Point;
+use crate::lighting::surface_hit::SurfaceHit;
 
 impl World {
     /// Which lights are not occluded by objects in the scene
@@ -12,6 +13,20 @@ impl World {
             .filter_map(|l| {
                 let intersections = self.intersect(ray!(point, l.position - point));
                 if let Some((hit, refractions)) = intersections.hit() {
+                    if hit.t < 1. { None } else { Some(l) }
+                } else {
+                    Some(l)
+                }
+            })
+            .collect::<Vec<&PointLight>>()
+    }
+
+    pub(crate) fn direct_lights_2(&self, point: &SurfaceHit) -> Vec<&PointLight> {
+        self.lights
+            .iter()
+            .filter_map(|l| {
+                let intersections = self.intersect(ray!(point.point, l.position - point.point));
+                if let Some((hit, _)) = intersections.hit_excluding(point.shape_id) {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {
                     Some(l)
