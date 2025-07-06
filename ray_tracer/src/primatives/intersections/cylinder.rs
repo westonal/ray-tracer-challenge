@@ -5,12 +5,38 @@ use math::vector;
 
 pub struct Cylinder {}
 
+#[derive(Debug, PartialEq)]
+pub enum CylinderCapStyle {
+    Open,
+    Closed,
+}
+
 impl Cylinder {
-    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
+    pub(crate) fn intersect(ray: Ray, cylinder_cap_style: &CylinderCapStyle) -> Vec<f32> {
         let direction = vector!(ray.direction.x, 0., ray.direction.z);
+
+        let mut result = Vec::with_capacity(2);
+        match cylinder_cap_style {
+            CylinderCapStyle::Open => {}
+            CylinderCapStyle::Closed => {
+                // println!("{}", ray);
+                let t = (-1. - ray.origin.y) / ray.direction.y;
+                // println!("t{} {}", t, ray.position(t));
+                if Self::check_cap(&ray.position(t)) {
+                    // println!("CAP! -1 ");
+                    result.push(t);
+                }
+                let t = (1. - ray.origin.y) / ray.direction.y;
+                if Self::check_cap(&ray.position(t)) {
+                    // println!("CAP! 1");
+                    result.push(t);
+                }
+            }
+        }
+
         let a = direction.dot(&direction);
         if a == 0. {
-            return Default::default();
+            return result;
         }
 
         let cylinder_to_ray = vector!(ray.origin.x, 0., ray.origin.z);
@@ -19,18 +45,32 @@ impl Cylinder {
         let discriminant = b * b - 4. * a * c;
 
         if discriminant < 0. {
-            return Default::default();
+            return result;
         }
-        let mut result = Vec::with_capacity(2);
         let a2 = 2. * a;
         if discriminant == 0. {
+            // println!("wall! 1");
             result.push(-b / a2);
         } else {
             let discriminant_sqrt = discriminant.sqrt();
-            result.push((-b - discriminant_sqrt) / a2);
-            result.push((-b + discriminant_sqrt) / a2);
+            let t = (-b - discriminant_sqrt) / a2;
+            let position = ray.position(t);
+            if position.y.abs() < 1.{
+                // println!("wall! 2");
+                result.push(t);
+            }
+            let t = (-b + discriminant_sqrt) / a2;
+            let position = ray.position(t);
+            if position.y.abs() < 1.{
+                // println!("wall! 3");
+                result.push(t);
+            }
         }
         result
+    }
+
+    fn check_cap(point: &Point) -> bool {
+        point.x * point.x + point.z * point.z <= 1.
     }
 
     pub(crate) fn normal_at(object_point: Point) -> Vector {
@@ -49,7 +89,7 @@ mod cylinder_intersection_miss_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_cylinder();
+                let cylinder = Shape::new_open_cylinder();
                 let intersections = cylinder.intersect($ray);
                 assert_eq!(intersections.len(), 0);
             }
@@ -66,6 +106,7 @@ mod cylinder_intersection_miss_tests {
 
 #[cfg(test)]
 mod cylinder_intersection_hit_tests {
+    use math::matrix::matrix_4x4::Matrix4x4;
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use crate::ray;
@@ -75,8 +116,10 @@ mod cylinder_intersection_hit_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_cylinder();
-                let intersections = cylinder.intersect($ray);
+                let cylinder = Shape::new_open_cylinder_transformed(
+                    Matrix4x4::scale(1., 8., 1.)
+                );
+                let intersections = cylinder.intersect($ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
             }
             )*
@@ -86,19 +129,17 @@ mod cylinder_intersection_hit_tests {
     hit!(
         tangential; ray!((1., 0., -5.),  (0., 0., 1.))  => vec!(5.)
         horizontal; ray!((0., 0., -5.),  (0., 0., 1.))  => vec!(4., 6.)
+        angled;     ray!((0.5, 0., -5.), (0.1, 1., 1.)) => vec!(6.808006, 7.0886984)
         inside;     ray!((0., 0., 0.5),  (0., 0., 1.))  => vec!(-1.5, 0.5)
         behind;     ray!((0., 0., 2.),   (0., 0., 1.))  => vec!(-3., -1.)
-        // we normalize the ray to match the book results
-        angled;     ray!((0.5, 0., -5.), (0.1, 1., 1.)).normalize() => vec!(6.808006, 7.0886984)
     );
 }
 
 #[cfg(test)]
 mod cylinder_normal_tests {
     use crate::primatives::Shape;
-    use math::matrix::matrix_4x4::Matrix4x4;
-    use math::{assert_vector, point, radians, vector};
-    use std::f32::consts::PI;
+
+    use math::{point, vector};
 
     macro_rules! normal {
         ($($name:ident; $point:expr => $expect:expr)*) => {
@@ -117,5 +158,75 @@ mod cylinder_normal_tests {
         b; point!(0, 5, -1) => vector!(0, 0, -1)
         c; point!(0, -2, 1) => vector!(0, 0, 1)
         d; point!(-1, 1, 0) => vector!(-1, 0, 0)
+    );
+}
+
+#[cfg(test)]
+mod cylinder_truncate_tests {
+    use super::*;
+    use crate::intersection::Intersect;
+    use crate::primatives::Shape;
+    use crate::ray;
+    use math::matrix::matrix_4x4::Matrix4x4;
+
+    macro_rules! truncate_hits {
+        ($($name:ident; $ray:expr => $expect:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    let cylinder = Shape::new_open_cylinder_transformed(
+                        Matrix4x4::translation(0., 1., 0.)
+                        .pre_scale(1., 0.5, 1.)
+                        .pre_translation(0., 1., 0.)
+                    );
+                    let intersections = cylinder.intersect($ray.normalize());
+                    assert_eq!($expect, intersections.len());
+                }
+            )*
+        };
+    }
+
+    truncate_hits!(
+        test_1; ray!((0., 1.5, 0.),  (0.1, 1., 0.))  => 0
+        test_2; ray!((0., 3., -5.),  (0., 0., 1.))  => 0
+        test_3; ray!((0., 0., -5.),  (0., 0., 1.))  => 0
+        test_4; ray!((0., 2., -5.),  (0., 0., 1.))  => 0
+        test_5; ray!((0., 1., -5.),  (0., 0., 1.))  => 0
+        test_6; ray!((0., 1.5, 0.),  (0., 0., 1.))  => 2
+    );
+}
+
+#[cfg(test)]
+mod cylinder_cap_intersection_tests {
+    use super::*;
+    use crate::intersection::Intersect;
+    use crate::primatives::Shape;
+    use crate::ray;
+    use math::matrix::matrix_4x4::Matrix4x4;
+
+    macro_rules! intersect_cap {
+        ($($name:ident; $ray:expr => $expect:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    // cylinder 1..2
+                    let cylinder = Shape::new_cylinder_transformed(
+                        Matrix4x4::translation(0., 1., 0.)
+                        .pre_scale(1., 0.5, 1.)
+                        .pre_translation(0., 1., 0.)
+                    );
+                    let intersections = cylinder.intersect($ray.normalize());
+                    assert_eq!($expect, intersections.len());
+                }
+            )*
+        };
+    }
+
+    intersect_cap!(
+        test_1; ray!((0., 3., 0.),  (0., -1., 0.)) => 2
+        test_2; ray!((0., 3., -2.),  (0., -1., 2.)) => 2
+        test_3; ray!((0., 4., -2.),  (0., -1., 1.)) => 2
+        test_4; ray!((0., 0., -2.),  (0., -1., 2.)) => 2
+        test_5; ray!((0., -1., -2.),  (0., 1., 1.)) => 2
     );
 }

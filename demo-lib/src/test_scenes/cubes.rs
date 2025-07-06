@@ -48,7 +48,7 @@ impl TestScene for Cubes {
 
         world.add(cube);
 
-        let mut cube = Shape::new_cube_transformed(
+        let mut cube = Shape::new_cylinder_transformed(
             Matrix4x4::identity()
                 .pre_translation(-8., 4., -3.)
                 .pre_scale_all(4.)

@@ -1,4 +1,4 @@
-use crate::primatives::intersections::Plane;
+use crate::primatives::intersections::{CylinderCapStyle, Plane};
 use crate::primatives::intersections::Sphere;
 use crate::primatives::intersections::{Cube, Cylinder};
 use crate::rays::Ray;
@@ -17,7 +17,7 @@ pub(crate) enum Surface {
     PlaneXZ,
 
     /// A cylinder with center at origin and radius 1, infinite length
-    UnitCylinder,
+    UnitCylinder(CylinderCapStyle),
 }
 
 impl Surface {
@@ -26,7 +26,7 @@ impl Surface {
             Surface::UnitSphere => Sphere::intersect(ray),
             Surface::PlaneXZ => Plane::intersect(ray),
             Surface::UnitCube => Cube::intersect(ray),
-            Surface::UnitCylinder => Cylinder::intersect(ray),
+            Surface::UnitCylinder(style) => Cylinder::intersect(ray, style),
         }
     }
 
@@ -35,7 +35,7 @@ impl Surface {
             Surface::UnitSphere => Sphere::normal_at(object_point),
             Surface::PlaneXZ => Plane::normal_at(object_point),
             Surface::UnitCube => Cube::normal_at(object_point),
-            Surface::UnitCylinder => Cylinder::normal_at(object_point),
+            Surface::UnitCylinder(_) => Cylinder::normal_at(object_point),
         }
     }
 }
