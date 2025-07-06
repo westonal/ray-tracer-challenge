@@ -28,7 +28,7 @@ impl Cylinder {
                     result.push(t);
                 }
                 // Small EPSILON to ensure no rays escape caps
-                1.000001
+                1. + Self::CAP_EPSILON
             }
         };
 
@@ -63,7 +63,7 @@ impl Cylinder {
     }
 
     fn check_cap(point: &Point) -> bool {
-        point.x * point.x + point.z * point.z <= 1.
+        Self::d_squared_xz(point) <= 1.
     }
 
     fn near(ray: &Ray, t: f32, limit: f32) -> bool {
@@ -71,9 +71,24 @@ impl Cylinder {
         position.y.abs() < limit
     }
 
-    pub(crate) fn normal_at(object_point: Point) -> Vector {
+    fn d_squared_xz(point: &Point) -> f32 {
+        point.x * point.x + point.z * point.z
+    }
+
+    pub(crate) fn normal_at(object_point: Point, cylinder_cap_style: &CylinderCapStyle) -> Vector {
+        if cylinder_cap_style == &CylinderCapStyle::Closed && Self::d_squared_xz(&object_point) < 1.
+        {
+            if object_point.y >= 1. {
+                return vector!(0, 1., 0);
+            }
+            if object_point.y <= -1. {
+                return vector!(0, -1., 0);
+            }
+        }
         vector!(object_point.x, 0., object_point.z)
     }
+
+    const CAP_EPSILON: f32 = 0.000001;
 }
 
 #[cfg(test)]
@@ -144,7 +159,7 @@ mod cylinder_normal_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cylinder = Shape::new_cylinder();
+                    let cylinder = Shape::new_open_cylinder();
                     math::assert_vector!(cylinder.normal_at($point).to_vector(), $expect);
                 }
             )*
@@ -196,7 +211,6 @@ mod cylinder_truncate_tests {
 
 #[cfg(test)]
 mod cylinder_cap_intersection_tests {
-
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use crate::ray;
@@ -227,5 +241,43 @@ mod cylinder_cap_intersection_tests {
         test_3; ray!((0., 4., -2.),  (0., -1., 1.)) => vec!(2.828427, 4.242641)
         test_4; ray!((0., 0., -2.),  (0., 1., 2.)) => vec!(2.236068, 3.354102)
         test_5; ray!((0., -1., -2.),  (0., 1., 1.)) => vec!(2.828427, 4.242641)
+    );
+}
+
+#[cfg(test)]
+mod cylinder_cap_normal_tests {
+
+    use crate::primatives::Shape;
+
+    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::{assert_vector, point, vector};
+
+    macro_rules! normal_cap {
+        ($($name:ident; $point:expr => $expected:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    // cylinder 1..2
+                    let cylinder = Shape::new_cylinder_transformed(
+                        Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
+                    );
+                    assert_vector!(cylinder.normal_at($point).to_vector(), $expected);
+                }
+            )*
+        };
+    }
+
+    normal_cap!(
+        test_1; point!(0, 1, 0)   => vector!(0, -1, 0)
+        test_2; point!(0.5, 1, 0) => vector!(0, -1, 0)
+        test_3; point!(0, 1, 0.5) => vector!(0, -1, 0)
+        test_4; point!(0, 2, 0)   => vector!(0, 1, 0)
+        test_5; point!(0.5, 2, 0) => vector!(0, 1, 0)
+        test_6; point!(0, 2, 0.5) => vector!(0, 1, 0)
+
+        a; point!(1, 0, 0) => vector!(1, 0, 0)
+        b; point!(0, 5, -1) => vector!(0, 0, -1)
+        c; point!(0, -2, 1) => vector!(0, 0, 1)
+        d; point!(-1, 1, 0) => vector!(-1, 0, 0)
     );
 }

@@ -13,11 +13,11 @@ use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 
-pub struct Cubes {}
+pub struct Cylinders {}
 
-impl TestScene for Cubes {
+impl TestScene for Cylinders {
     fn name() -> &'static str {
-        "cubes"
+        "cylinders"
     }
 
     fn build_world() -> World {
@@ -32,29 +32,29 @@ impl TestScene for Cubes {
         floor.material.reflectivity = 0.5;
         world.add(floor);
 
-        world.add(Shape::new_cube_transformed(
+        world.add(Shape::new_cylinder_transformed(
             Matrix4x4::identity().pre_translation(0., 1., 0.),
         ));
 
-        let mut cube = Shape::new_cube_transformed(
+        let mut cylinder = Shape::new_cylinder_transformed(
             Matrix4x4::identity()
                 .pre_scale_all(3.5)
                 .pre_translation(2., 1., -3.)
                 .pre_rotation_y(degrees!(55)),
         );
-        cube.material = Material::glass();
-        cube.material.pattern = Pattern::Solid(color!(0.5, 0., 0.));
-        cube.material.ambient = 0.3;
+        cylinder.material = Material::glass();
+        cylinder.material.pattern = Pattern::Solid(color!(0.5, 0., 0.));
+        cylinder.material.ambient = 0.3;
 
-        world.add(cube);
+        world.add(cylinder);
 
-        let mut cube = Shape::new_cube_transformed(
+        let mut cylinder = Shape::new_cylinder_transformed(
             Matrix4x4::identity()
                 .pre_translation(-8., 4., -3.)
                 .pre_scale_all(4.)
                 .pre_rotation_y(degrees!(0)),
         );
-        cube.material.pattern = Pattern::Gradient(
+        cylinder.material.pattern = Pattern::Gradient(
             gradient_stops!(
                 0. => *RED,
                 0.5 => *BLUE,
@@ -66,8 +66,8 @@ impl TestScene for Cubes {
                     .pre_scale_all(2.),
             ),
         );
-        cube.material.reflectivity = 0.1;
-        world.add(cube);
+        cylinder.material.reflectivity = 0.1;
+        world.add(cylinder);
         world
     }
 

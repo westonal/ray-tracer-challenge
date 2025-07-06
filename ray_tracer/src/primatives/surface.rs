@@ -35,7 +35,7 @@ impl Surface {
             Surface::UnitSphere => Sphere::normal_at(object_point),
             Surface::PlaneXZ => Plane::normal_at(object_point),
             Surface::UnitCube => Cube::normal_at(object_point),
-            Surface::UnitCylinder(_) => Cylinder::normal_at(object_point),
+            Surface::UnitCylinder(style) => Cylinder::normal_at(object_point, style),
         }
     }
 }
