@@ -78,17 +78,17 @@ impl Cylinder {
     pub(crate) fn normal_at(object_point: Point, cylinder_cap_style: &CylinderCapStyle) -> Vector {
         if cylinder_cap_style == &CylinderCapStyle::Closed && Self::d_squared_xz(&object_point) < 1.
         {
-            if object_point.y >= 1. {
+            if object_point.y >= 1. - Self::CAP_EPSILON {
                 return vector!(0, 1., 0);
             }
-            if object_point.y <= -1. {
+            if object_point.y <= -1. + Self::CAP_EPSILON {
                 return vector!(0, -1., 0);
             }
         }
         vector!(object_point.x, 0., object_point.z)
     }
 
-    const CAP_EPSILON: f32 = 0.000001;
+    const CAP_EPSILON: f32 = 0.00001;
 }
 
 #[cfg(test)]
