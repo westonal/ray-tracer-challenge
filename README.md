@@ -19,6 +19,14 @@ Patterns
 
 To Visit - couple of patterns left out, Ring and Perturbed. 
 
+# Chapter 12 - Cubes
+
+![Cubes](test_scenes/cubes.png)
+
+# Chapter 13 - Cylinders
+
+![Cylinders](test_scenes/cylinders.png)
+
 # Running
 
 ## Testing 

@@ -13,7 +13,7 @@ pub struct Shape {
     pub id: ShapeId,
     pub material: Material,
     pub(crate) transform: Transform,
-    surface: Surface,
+    pub(crate) surface: Surface,
 }
 
 impl Shape {
