@@ -1,6 +1,7 @@
 use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
+use crate::lighting::surface_hit::SurfaceHit;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::ray;
 use crate::rays::RayGeneration;
@@ -26,12 +27,12 @@ impl World {
             let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
             result = result
                 + material.light(
-                light,
-                &pre_calculations.shape.transform,
-                pre_calculations.surface_hit.point,
-                pre_calculations.eye,
-                pre_calculations.normal,
-                shadow_factor,
+                    light,
+                    &pre_calculations.shape.transform,
+                    pre_calculations.surface_hit.point,
+                    pre_calculations.eye,
+                    pre_calculations.normal,
+                    shadow_factor,
                 )
         }
         if pre_calculations.ray_generation < self.max_ray_generation {
@@ -54,7 +55,7 @@ impl World {
         let r = pre_calculations.shape.material.reflectivity;
         if r > 0. {
             self.color_at(RayGeneration::new_ray_with_generation(
-                ray!(pre_calculations.surface_hit.over_point, pre_calculations.reflection),
+                ray!(pre_calculations.surface_hit.point, pre_calculations.reflection, epsilon:SurfaceHit::EPSILON),
                 pre_calculations.ray_generation + 1,
             )) * r
         } else {

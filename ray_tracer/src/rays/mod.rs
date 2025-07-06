@@ -52,6 +52,13 @@ macro_rules! ray {
     ($point: expr, $direction: expr) => {
         $crate::rays::Ray::new($point.into(), $direction.into())
     };
+    ($point: expr, $direction: expr, epsilon:$offset: expr) => {
+       {
+            let d: math::tuple::vector::Vector = $direction.into();
+            let p: math::tuple::point::Point = $point.into();
+            $crate::rays::Ray::new(p + d * $offset.into(), d)
+        }
+    };
 }
 
 #[macro_export]
