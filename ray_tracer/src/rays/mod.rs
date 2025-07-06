@@ -131,3 +131,37 @@ mod ray_tracing_at_time_tests {
         assert_eq!(ray.position(2.5), Point::point(4.5, 8., 11.5));
     }
 }
+
+impl Ray {
+    pub fn normalize(mut self) -> Self {
+        self.direction = self.direction.normalize().to_vector();
+        self
+    }
+}
+
+#[cfg(test)]
+mod ray_normalize_tests {
+
+    macro_rules! normalize {
+        ($($name:ident; $ray:expr => $expect:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    let normalized = $ray.normalize();
+                    math::assert_point!($expect.origin, normalized.origin);
+                    math::assert_vector!($expect.direction, normalized.direction);
+                }
+            )*
+        };
+    }
+
+    normalize!(
+        already_normalized_x; ray!((1., 2., 3.), (1., 0., 0.)) => ray!((1., 2., 3.), (1., 0., 0.))
+        already_normalized_y; ray!((4., 5., 6.), (0., 1., 0.)) => ray!((4., 5., 6.), (0., 1., 0.))
+        already_normalized_z; ray!((1., 2., 3.), (0., 0., 1.)) => ray!((1., 2., 3.), (0., 0., 1.))
+        two_dimensions; ray!((1., 2., 3.), (2., 2., 0.)) => ray!((1., 2., 3.), (0.7071, 0.7071, 0.))
+        two_dimensions_negative; ray!((1., 2., 3.), (0., 2., -2.)) => ray!((1., 2., 3.), (0.,0.7071, -0.7071))
+        three_dimensions; ray!((1., 2., 3.), (1., 1., 1.)) => ray!((1., 2., 3.), (0.57735, 0.57735, 0.57735))
+        three_dimensions_negative; ray!((1., 2., 3.), (-3., 3., 3.)) => ray!((1., 2., 3.), (-0.57735, 0.57735, 0.57735))
+    );
+}
