@@ -1,20 +1,7 @@
-use crate::primatives::Shape;
-use crate::primatives::surface::Surface::UnitCube;
 use crate::rays::Ray;
-use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::{max, min, vector};
-
-impl Shape {
-    pub fn new_cube_transformed(transform: Matrix4x4) -> Self {
-        Self::new(transform, UnitCube)
-    }
-
-    pub fn new_cube() -> Self {
-        Self::new_cube_transformed(Matrix4x4::identity())
-    }
-}
 
 pub struct Cube {}
 
@@ -71,6 +58,7 @@ impl Cube {
 mod cube_intersection_tests {
     use super::*;
     use crate::intersection::Intersect;
+    use crate::primatives::Shape;
     use crate::ray;
 
     fn run_intersection_test(ray: Ray) -> (f32, f32) {
@@ -110,8 +98,8 @@ mod cube_intersection_tests {
 
 #[cfg(test)]
 mod cube_intersection_missing_tests {
-    use super::*;
     use crate::intersection::Intersect;
+    use crate::primatives::Shape;
     use crate::ray;
 
     macro_rules! intersection_miss_tests {

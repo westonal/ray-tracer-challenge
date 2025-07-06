@@ -1,19 +1,7 @@
-use crate::primatives::Shape;
-use crate::primatives::surface::Surface::UnitSphere;
 use crate::rays::Ray;
-use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 
-impl Shape {
-    pub fn new_sphere_transformed(transform: Matrix4x4) -> Self {
-        Self::new(transform, UnitSphere)
-    }
-
-    pub fn new_sphere() -> Self {
-        Self::new_sphere_transformed(Matrix4x4::identity())
-    }
-}
 pub struct Sphere {}
 
 impl Sphere {

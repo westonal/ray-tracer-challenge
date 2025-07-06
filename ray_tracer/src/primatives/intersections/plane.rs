@@ -1,20 +1,8 @@
-use crate::primatives::Shape;
-use crate::primatives::surface::Surface::PlaneXZ;
 use crate::rays::Ray;
-use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::vector;
 
-impl Shape {
-    pub fn new_plane_transformed(transform: Matrix4x4) -> Self {
-        Self::new(transform, PlaneXZ)
-    }
-
-    pub fn new_plane() -> Self {
-        Self::new_plane_transformed(Matrix4x4::identity())
-    }
-}
 pub struct Plane {}
 
 impl Plane {
@@ -62,8 +50,9 @@ mod plane_normal_tests {
 
 #[cfg(test)]
 mod plane_intersection_tests {
-    use super::*;
+
     use crate::intersection::Intersect;
+    use crate::primatives::Shape;
     use crate::ray;
 
     #[test]

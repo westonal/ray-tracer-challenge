@@ -1,3 +1,4 @@
+mod factories;
 mod intersections;
 mod shape;
 mod shape_id;
