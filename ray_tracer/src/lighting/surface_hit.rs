@@ -37,6 +37,8 @@ mod surface_hit_point_tests {
     use super::*;
     use crate::ray_first_gen;
     use math::matrix::matrix_4x4::Matrix4x4;
+    use crate::intersection::Intersection;
+    use crate::primatives::Shape;
 
     #[test]
     fn the_hit_should_offset_the_point_over() {
