@@ -16,23 +16,21 @@ impl Cylinder {
         let direction = vector!(ray.direction.x, 0., ray.direction.z);
 
         let mut result = Vec::with_capacity(2);
-        match cylinder_cap_style {
-            CylinderCapStyle::Open => {}
+        let limit = match cylinder_cap_style {
+            CylinderCapStyle::Open => { 1.}
             CylinderCapStyle::Closed => {
-                // println!("{}", ray);
                 let t = (-1. - ray.origin.y) / ray.direction.y;
-                // println!("t{} {}", t, ray.position(t));
                 if Self::check_cap(&ray.position(t)) {
-                    // println!("CAP! -1 ");
                     result.push(t);
                 }
                 let t = (1. - ray.origin.y) / ray.direction.y;
                 if Self::check_cap(&ray.position(t)) {
-                    // println!("CAP! 1");
                     result.push(t);
                 }
+                // Small EPSILON to ensure no rays escape caps
+                1.000001
             }
-        }
+        };
 
         let a = direction.dot(&direction);
         if a == 0. {
@@ -49,21 +47,16 @@ impl Cylinder {
         }
         let a2 = 2. * a;
         if discriminant == 0. {
-            // println!("wall! 1");
             result.push(-b / a2);
         } else {
             let discriminant_sqrt = discriminant.sqrt();
             let t = (-b - discriminant_sqrt) / a2;
-            let position = ray.position(t);
-            if position.y.abs() < 1.{
-                // println!("wall! 2");
-                result.push(t);
+            if Self::near(&ray, t, limit){
+                result.push(t)
             }
             let t = (-b + discriminant_sqrt) / a2;
-            let position = ray.position(t);
-            if position.y.abs() < 1.{
-                // println!("wall! 3");
-                result.push(t);
+            if Self::near(&ray, t, limit){
+                result.push(t)
             }
         }
         result
@@ -71,6 +64,11 @@ impl Cylinder {
 
     fn check_cap(point: &Point) -> bool {
         point.x * point.x + point.z * point.z <= 1.
+    }
+
+    fn near(ray: &Ray, t: f32, limit:f32) -> bool {
+        let position = ray.position(t);
+        position.y.abs() < limit
     }
 
     pub(crate) fn normal_at(object_point: Point) -> Vector {
@@ -106,10 +104,10 @@ mod cylinder_intersection_miss_tests {
 
 #[cfg(test)]
 mod cylinder_intersection_hit_tests {
-    use math::matrix::matrix_4x4::Matrix4x4;
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use crate::ray;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     macro_rules! hit {
         ($($name:ident; $ray:expr => $t:expr)*) => {
@@ -205,28 +203,29 @@ mod cylinder_cap_intersection_tests {
     use math::matrix::matrix_4x4::Matrix4x4;
 
     macro_rules! intersect_cap {
-        ($($name:ident; $ray:expr => $expect:expr)*) => {
+        ($($name:ident; $ray:expr => $t:expr)*) => {
             $(
                 #[test]
                 fn $name() {
                     // cylinder 1..2
                     let cylinder = Shape::new_cylinder_transformed(
-                        Matrix4x4::translation(0., 1., 0.)
-                        .pre_scale(1., 0.5, 1.)
-                        .pre_translation(0., 1., 0.)
+                        Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
+                        // Matrix4x4::translation(0., 1., 0.)
+                        // .pre_scale(1., 0.5, 1.)
+                        // .pre_translation(0., 1., 0.)
                     );
                     let intersections = cylinder.intersect($ray.normalize());
-                    assert_eq!($expect, intersections.len());
+                    assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
                 }
             )*
         };
     }
 
     intersect_cap!(
-        test_1; ray!((0., 3., 0.),  (0., -1., 0.)) => 2
-        test_2; ray!((0., 3., -2.),  (0., -1., 2.)) => 2
-        test_3; ray!((0., 4., -2.),  (0., -1., 1.)) => 2
-        test_4; ray!((0., 0., -2.),  (0., -1., 2.)) => 2
-        test_5; ray!((0., -1., -2.),  (0., 1., 1.)) => 2
+        test_1; ray!((0., 3., 0.),  (0., -1., 0.)) => vec!(1., 2.)
+        test_2; ray!((0., 3., -2.),  (0., -1., 2.)) => vec!(2.236068, 3.354102)
+        test_3; ray!((0., 4., -2.),  (0., -1., 1.)) => vec!(2.828427, 4.242641)
+        test_4; ray!((0., 0., -2.),  (0., 1., 2.)) => vec!(2.236068, 3.354102)
+        test_5; ray!((0., -1., -2.),  (0., 1., 1.)) => vec!(2.828427, 4.242641)
     );
 }
