@@ -121,8 +121,8 @@ mod intersection_over_point_tests {
         let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
         let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
-        assert!(calcs.over_point.z < -Intersection::EPSILON / 2.);
-        assert!(calcs.point.z > calcs.over_point.z);
+        assert!(calcs.surface_hit.over_point.z < -Intersection::EPSILON / 2.);
+        assert!(calcs.surface_hit.point.z > calcs.surface_hit.over_point.z);
     }
 
     #[test]
@@ -130,7 +130,7 @@ mod intersection_over_point_tests {
         let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
         let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
-        assert!(calcs.under_point.z > Intersection::EPSILON / 2.);
-        assert!(calcs.point.z < calcs.under_point.z);
+        assert!(calcs.surface_hit.under_point.z > Intersection::EPSILON / 2.);
+        assert!(calcs.surface_hit.point.z < calcs.surface_hit.under_point.z);
     }
 }

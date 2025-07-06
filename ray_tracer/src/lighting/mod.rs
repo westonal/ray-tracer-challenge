@@ -1,5 +1,6 @@
 pub mod pre_calculations;
 pub mod refraction_lighting;
+mod surface_hit;
 
 use crate::material::Material;
 use crate::transform::Transform;

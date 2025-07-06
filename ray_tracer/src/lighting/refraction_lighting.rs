@@ -31,7 +31,7 @@ impl World {
         let direction = pre_calculations.normal.clone_vector() * (n_ratio * cos_i - cos_t)
             - pre_calculations.eye.clone_vector() * n_ratio;
 
-        let refraction_ray = ray!(pre_calculations.under_point, direction);
+        let refraction_ray = ray!(pre_calculations.surface_hit.under_point, direction);
 
         self.color_at(RayGeneration::new_ray_with_generation(
             refraction_ray,

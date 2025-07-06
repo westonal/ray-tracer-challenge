@@ -1,15 +1,13 @@
 use crate::intersection::Intersection;
 use crate::rays::RayGeneration;
-use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
 use std::ops::Deref;
+use crate::lighting::surface_hit::SurfaceHit;
 
 pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,
-    pub point: Point,
-    pub over_point: Point,
-    pub under_point: Point,
+    pub surface_hit: SurfaceHit<'s>,
     pub eye: Normal,
     pub normal: Normal,
     pub reflection: Vector,
@@ -24,13 +22,11 @@ impl<'s> Intersection<'s> {
         let eye = (-ray.direction).normalize();
         let inside = normal.dot(&eye) < 0.;
         let normal = if inside { -normal } else { normal };
-        let small_adjustment_for_under_over_points = normal.clone_vector() * Intersection::EPSILON;
         let normal_as_vector = normal.clone_vector();
+        let under = SurfaceHit::new(&self.shape.id, point, &normal);
         PreCalculations {
             intersection: self,
-            point,
-            over_point: point + small_adjustment_for_under_over_points,
-            under_point: point - small_adjustment_for_under_over_points,
+            surface_hit: under,
             eye,
             normal,
             reflection: ray.direction.reflect(normal_as_vector),
@@ -63,7 +59,7 @@ mod precalculation_tests {
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(4., pre_calculations.t);
         assert_eq!(&sphere, pre_calculations.shape);
-        assert_point!(point!(0, 0, -1), pre_calculations.point);
+        assert_point!(point!(0, 0, -1), pre_calculations.surface_hit.point);
         assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
         assert_eq!(1, pre_calculations.ray_generation);
@@ -78,7 +74,7 @@ mod precalculation_tests {
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(1., pre_calculations.t);
         assert_eq!(&sphere, pre_calculations.shape);
-        assert_eq!(point!(0, 0, 1), pre_calculations.point);
+        assert_eq!(point!(0, 0, 1), pre_calculations.surface_hit.point);
         assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
         assert!(pre_calculations.inside);
