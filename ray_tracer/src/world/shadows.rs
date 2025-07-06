@@ -1,9 +1,9 @@
 use crate::intersection::Intersect;
 use crate::lighting::PointLight;
+use crate::lighting::surface_hit::SurfaceHit;
 use crate::ray;
 use crate::world::World;
 use math::tuple::point::Point;
-use crate::lighting::surface_hit::SurfaceHit;
 
 impl World {
     /// Which lights are not occluded by objects in the scene

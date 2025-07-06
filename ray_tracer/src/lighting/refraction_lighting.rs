@@ -1,10 +1,8 @@
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::refraction::RefractionMediumIndexes;
-use crate::ray;
 use crate::rays::RayGeneration;
 use crate::world::World;
 use math::tuple::color::{Color, TRANSPARENT};
-use crate::lighting::surface_hit::SurfaceHit;
 
 impl World {
     pub fn refracted_color(
@@ -32,7 +30,7 @@ impl World {
         let direction = pre_calculations.normal.clone_vector() * (n_ratio * cos_i - cos_t)
             - pre_calculations.eye.clone_vector() * n_ratio;
 
-        let refraction_ray = ray!(pre_calculations.surface_hit.point, direction, epsilon:SurfaceHit::EPSILON);
+        let refraction_ray = pre_calculations.surface_hit.new_ray(direction);
 
         self.color_at(RayGeneration::new_ray_with_generation(
             refraction_ray,

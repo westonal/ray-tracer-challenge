@@ -49,7 +49,7 @@ impl<'s> Intersections<'s> {
         None
     }
 
-    pub fn hit_excluding(&self, id:&ShapeId) -> Option<(&Intersection, RefractionMediumIndexes)> {
+    pub fn hit_excluding(&self, id: &ShapeId) -> Option<(&Intersection, RefractionMediumIndexes)> {
         let mut stack = RefractionStack::new();
         for i in self.iter() {
             let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);

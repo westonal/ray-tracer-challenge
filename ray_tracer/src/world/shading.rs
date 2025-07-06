@@ -1,9 +1,7 @@
 use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
-use crate::lighting::surface_hit::SurfaceHit;
 use crate::material::refraction::RefractionMediumIndexes;
-use crate::ray;
 use crate::rays::RayGeneration;
 use crate::world::World;
 use math::color;
@@ -55,7 +53,9 @@ impl World {
         let r = pre_calculations.shape.material.reflectivity;
         if r > 0. {
             self.color_at(RayGeneration::new_ray_with_generation(
-                ray!(pre_calculations.surface_hit.point, pre_calculations.reflection, epsilon:SurfaceHit::EPSILON),
+                pre_calculations
+                    .surface_hit
+                    .new_ray(pre_calculations.reflection),
                 pre_calculations.ray_generation + 1,
             )) * r
         } else {
