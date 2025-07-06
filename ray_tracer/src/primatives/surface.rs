@@ -1,6 +1,6 @@
-use crate::primatives::intersections::{CylinderCapStyle, Plane};
 use crate::primatives::intersections::Sphere;
 use crate::primatives::intersections::{Cube, Cylinder};
+use crate::primatives::intersections::{CylinderCapStyle, Plane};
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;

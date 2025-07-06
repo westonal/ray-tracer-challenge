@@ -17,7 +17,7 @@ impl Cylinder {
 
         let mut result = Vec::with_capacity(2);
         let limit = match cylinder_cap_style {
-            CylinderCapStyle::Open => { 1.}
+            CylinderCapStyle::Open => 1.,
             CylinderCapStyle::Closed => {
                 let t = (-1. - ray.origin.y) / ray.direction.y;
                 if Self::check_cap(&ray.position(t)) {
@@ -51,11 +51,11 @@ impl Cylinder {
         } else {
             let discriminant_sqrt = discriminant.sqrt();
             let t = (-b - discriminant_sqrt) / a2;
-            if Self::near(&ray, t, limit){
+            if Self::near(&ray, t, limit) {
                 result.push(t)
             }
             let t = (-b + discriminant_sqrt) / a2;
-            if Self::near(&ray, t, limit){
+            if Self::near(&ray, t, limit) {
                 result.push(t)
             }
         }
@@ -66,7 +66,7 @@ impl Cylinder {
         point.x * point.x + point.z * point.z <= 1.
     }
 
-    fn near(ray: &Ray, t: f32, limit:f32) -> bool {
+    fn near(ray: &Ray, t: f32, limit: f32) -> bool {
         let position = ray.position(t);
         position.y.abs() < limit
     }
@@ -161,7 +161,7 @@ mod cylinder_normal_tests {
 
 #[cfg(test)]
 mod cylinder_truncate_tests {
-    use super::*;
+
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use crate::ray;
@@ -196,7 +196,7 @@ mod cylinder_truncate_tests {
 
 #[cfg(test)]
 mod cylinder_cap_intersection_tests {
-    use super::*;
+
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use crate::ray;

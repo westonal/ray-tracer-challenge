@@ -11,8 +11,7 @@ impl World {
         self.lights
             .iter()
             .filter_map(|l| {
-                let intersections
-                    = self.intersect(ray!(point, l.position - point));
+                let intersections = self.intersect(ray!(point, l.position - point));
                 if let Some((hit, refractions)) = intersections.hit() {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {

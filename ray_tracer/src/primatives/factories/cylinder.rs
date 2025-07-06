@@ -1,7 +1,7 @@
 use crate::primatives::Shape;
+use crate::primatives::intersections::CylinderCapStyle;
 use crate::primatives::surface::Surface::UnitCylinder;
 use math::matrix::matrix_4x4::Matrix4x4;
-use crate::primatives::intersections::CylinderCapStyle;
 
 impl Shape {
     pub fn new_cylinder_transformed(transform: Matrix4x4) -> Self {
@@ -27,15 +27,25 @@ mod cylinder_factory_tests {
 
     #[test]
     fn cylinders_are_closed_by_default() {
-        assert_eq!(UnitCylinder(CylinderCapStyle::Closed), Shape::new_cylinder().surface);
-        assert_eq!(UnitCylinder(CylinderCapStyle::Closed), Shape::new_cylinder_transformed(Matrix4x4::identity()).surface);
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Closed),
+            Shape::new_cylinder().surface
+        );
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Closed),
+            Shape::new_cylinder_transformed(Matrix4x4::identity()).surface
+        );
     }
 
     #[test]
     fn open_cylinder() {
-        assert_eq!(UnitCylinder(CylinderCapStyle::Open), Shape::new_open_cylinder().surface);
-        assert_eq!(UnitCylinder(CylinderCapStyle::Open), Shape::new_open_cylinder_transformed(Matrix4x4::identity()).surface);
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Open),
+            Shape::new_open_cylinder().surface
+        );
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Open),
+            Shape::new_open_cylinder_transformed(Matrix4x4::identity()).surface
+        );
     }
-
-
 }
