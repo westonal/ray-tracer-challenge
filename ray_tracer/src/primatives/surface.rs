@@ -1,3 +1,6 @@
+use crate::primatives::intersections::Cube;
+use crate::primatives::intersections::Plane;
+use crate::primatives::intersections::Sphere;
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
@@ -17,17 +20,17 @@ pub(crate) enum Surface {
 impl Surface {
     pub(crate) fn intersect(&self, ray: Ray) -> Vec<f32> {
         match self {
-            Surface::UnitSphere => self.sphere_intersect(ray),
-            Surface::PlaneXZ => self.plane_intersect(ray),
-            Surface::UnitCube => self.cube_intersect(ray),
+            Surface::UnitSphere => Sphere::intersect(ray),
+            Surface::PlaneXZ => Plane::intersect(ray),
+            Surface::UnitCube => Cube::intersect(ray),
         }
     }
 
     pub(crate) fn normal_at(&self, object_point: Point) -> Vector {
         match self {
-            Surface::UnitSphere => self.sphere_normal_at(object_point),
-            Surface::PlaneXZ => self.plane_normal_at(object_point),
-            Surface::UnitCube => self.cube_normal_at(object_point),
+            Surface::UnitSphere => Sphere::normal_at(object_point),
+            Surface::PlaneXZ => Plane::normal_at(object_point),
+            Surface::UnitCube => Cube::normal_at(object_point),
         }
     }
 }

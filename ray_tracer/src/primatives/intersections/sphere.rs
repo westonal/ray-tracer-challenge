@@ -1,5 +1,4 @@
 use crate::primatives::Shape;
-use crate::primatives::surface::Surface;
 use crate::primatives::surface::Surface::UnitSphere;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -15,9 +14,10 @@ impl Shape {
         Self::new_sphere_transformed(Matrix4x4::identity())
     }
 }
+pub struct Sphere {}
 
-impl Surface {
-    pub(crate) fn sphere_intersect(&self, ray: Ray) -> Vec<f32> {
+impl Sphere {
+    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
         let sphere_to_ray = ray.origin - Point::origin();
         let a = ray.direction.dot(&ray.direction);
         let b = 2. * ray.direction.dot(&sphere_to_ray);
@@ -38,7 +38,7 @@ impl Surface {
         result
     }
 
-    pub(crate) fn sphere_normal_at(&self, object_point: Point) -> Vector {
+    pub(crate) fn normal_at(object_point: Point) -> Vector {
         object_point - Point::origin()
     }
 }

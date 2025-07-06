@@ -1,5 +1,4 @@
 use crate::primatives::Shape;
-use crate::primatives::surface::Surface;
 use crate::primatives::surface::Surface::PlaneXZ;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -16,8 +15,10 @@ impl Shape {
         Self::new_plane_transformed(Matrix4x4::identity())
     }
 }
-impl Surface {
-    pub(crate) fn plane_intersect(&self, ray: Ray) -> Vec<f32> {
+pub struct Plane {}
+
+impl Plane {
+    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
         if ray.direction.y.abs() < f32::EPSILON {
             vec![]
         } else {
@@ -25,7 +26,7 @@ impl Surface {
         }
     }
 
-    pub(crate) fn plane_normal_at(&self, _object_point: Point) -> Vector {
+    pub(crate) fn normal_at(_object_point: Point) -> Vector {
         vector!(0, 1, 0)
     }
 }

@@ -1,5 +1,4 @@
 use crate::primatives::Shape;
-use crate::primatives::surface::Surface;
 use crate::primatives::surface::Surface::UnitCube;
 use crate::rays::Ray;
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -17,11 +16,13 @@ impl Shape {
     }
 }
 
-impl Surface {
-    pub(crate) fn cube_intersect(&self, ray: Ray) -> Vec<f32> {
-        let (x_tmin, x_tmax) = self.check_axis(ray.origin.x, ray.direction.x);
-        let (y_tmin, y_tmax) = self.check_axis(ray.origin.y, ray.direction.y);
-        let (z_tmin, z_tmax) = self.check_axis(ray.origin.z, ray.direction.z);
+pub struct Cube {}
+
+impl Cube {
+    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
+        let (x_tmin, x_tmax) = Self::check_axis(ray.origin.x, ray.direction.x);
+        let (y_tmin, y_tmax) = Self::check_axis(ray.origin.y, ray.direction.y);
+        let (z_tmin, z_tmax) = Self::check_axis(ray.origin.z, ray.direction.z);
 
         let tmin = max!(x_tmin, y_tmin, z_tmin);
         let tmax = min!(x_tmax, y_tmax, z_tmax);
@@ -33,7 +34,7 @@ impl Surface {
         vec![tmin, tmax]
     }
 
-    fn check_axis(&self, origin: f32, direction: f32) -> (f32, f32) {
+    fn check_axis(origin: f32, direction: f32) -> (f32, f32) {
         let tmin_numerator = -1. - origin;
         let tmax_numerator = 1. - origin;
         let (tmin, tmax) = if direction.abs() >= f32::EPSILON {
@@ -51,7 +52,7 @@ impl Surface {
         }
     }
 
-    pub(crate) fn cube_normal_at(&self, object_point: Point) -> Vector {
+    pub(crate) fn normal_at(object_point: Point) -> Vector {
         let abs_x = object_point.x.abs();
         let abs_y = object_point.y.abs();
         let abs_z = object_point.z.abs();
@@ -114,17 +115,17 @@ mod cube_intersection_missing_tests {
     use crate::ray;
 
     macro_rules! intersection_miss_tests {
-    ($($name:ident: $ray:expr)*) => {
-    $(
-        #[test]
-        fn $name(){
-            let cube = Shape::new_cube();
-            let intersections = cube.intersect($ray);
-            assert_eq!(0, intersections.len());
+        ($($name:ident: $ray:expr)*) => {
+            $(
+                #[test]
+                fn $name(){
+                    let cube = Shape::new_cube();
+                    let intersections = cube.intersect($ray);
+                    assert_eq!(0, intersections.len());
+                }
+            )*
         }
-    )*
     }
-        }
 
     intersection_miss_tests! {
         from_x: ray!((-2.,0.,0.), (0.2673,0.5345,0.8018))
@@ -144,15 +145,15 @@ mod cube_normal_tests {
 
     macro_rules! cube_normal_tests {
     ($($name:ident: $point:expr => $normal:expr)*) => {
-    $(
-        #[test]
-        fn $name(){
-            let cube = Shape::new_cube();
-            assert_eq!($normal, *cube.normal_at($point));
+        $(
+            #[test]
+            fn $name(){
+                let cube = Shape::new_cube();
+                assert_eq!($normal, *cube.normal_at($point));
+            }
+        )*
         }
-    )*
     }
-        }
 
     cube_normal_tests! {
         a: point!(1,0.5,-0.8) => vector!(1,0,0)
