@@ -2,7 +2,6 @@ use crate::intersection::Intersect;
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
 use crate::material::refraction::RefractionMediumIndexes;
-use crate::ray;
 use crate::rays::RayGeneration;
 use crate::world::World;
 use math::color;
@@ -19,19 +18,19 @@ impl World {
         refraction_medium_indexes: RefractionMediumIndexes,
     ) -> Color {
         let mut result = color!(0, 0, 0, 0);
-        let direct_lights = self.direct_lights(pre_calculations.surface_hit.over_point);
+        let direct_lights = self.direct_lights_2(&pre_calculations.surface_hit);
         let material = &pre_calculations.shape.material;
         for light in &self.lights {
             // TODO, multilight support would light each in turn if they were direct.
             let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
             result = result
                 + material.light(
-                light,
-                &pre_calculations.shape.transform,
-                pre_calculations.surface_hit.point,
-                pre_calculations.eye,
-                pre_calculations.normal,
-                shadow_factor,
+                    light,
+                    &pre_calculations.shape.transform,
+                    pre_calculations.surface_hit.point,
+                    pre_calculations.eye,
+                    pre_calculations.normal,
+                    shadow_factor,
                 )
         }
         if pre_calculations.ray_generation < self.max_ray_generation {
@@ -54,7 +53,9 @@ impl World {
         let r = pre_calculations.shape.material.reflectivity;
         if r > 0. {
             self.color_at(RayGeneration::new_ray_with_generation(
-                ray!(pre_calculations.surface_hit.over_point, pre_calculations.reflection),
+                pre_calculations
+                    .surface_hit
+                    .new_ray(pre_calculations.reflection),
                 pre_calculations.ray_generation + 1,
             )) * r
         } else {

@@ -1,5 +1,5 @@
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
-use crate::primatives::Shape;
+use crate::primatives::{Shape, ShapeId};
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
 
@@ -10,11 +10,6 @@ pub trait Intersect {
 pub struct Intersection<'s> {
     pub t: f32,
     pub shape: &'s Shape,
-}
-
-impl<'s> Intersection<'s> {
-    // TODO, this is quite large
-    pub(crate) const EPSILON: f32 = 0.0001;
 }
 
 #[derive(Default)]
@@ -47,6 +42,18 @@ impl<'s> Intersections<'s> {
         for i in self.iter() {
             let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);
             if i.t < 0. {
+                continue;
+            }
+            return Some((i, refraction_indexes));
+        }
+        None
+    }
+
+    pub fn hit_excluding(&self, id: &ShapeId) -> Option<(&Intersection, RefractionMediumIndexes)> {
+        let mut stack = RefractionStack::new();
+        for i in self.iter() {
+            let refraction_indexes = stack.push(&i.shape.id, i.shape.material.refractive_index);
+            if i.t < 0. || &i.shape.id == id {
                 continue;
             }
             return Some((i, refraction_indexes));
@@ -107,30 +114,5 @@ mod sorting_tests {
         assert_eq!(1., intersections2[1].t);
         assert_eq!(2., intersections2[2].t);
         assert_eq!(3., intersections2[3].t);
-    }
-}
-
-#[cfg(test)]
-mod intersection_over_point_tests {
-    use super::*;
-    use crate::ray_first_gen;
-    use math::matrix::matrix_4x4::Matrix4x4;
-
-    #[test]
-    fn the_hit_should_offset_the_point_over() {
-        let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
-        let i = Intersection::new(5., &shape);
-        let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
-        assert!(calcs.surface_hit.over_point.z < -Intersection::EPSILON / 2.);
-        assert!(calcs.surface_hit.point.z > calcs.surface_hit.over_point.z);
-    }
-
-    #[test]
-    fn the_hit_should_offset_the_point_under() {
-        let shape = Shape::new_sphere_transformed(Matrix4x4::translation(0., 0., 1.));
-        let i = Intersection::new(5., &shape);
-        let calcs = i.to_pre_calculation(ray_first_gen!((0., 0., -5.), (0., 0., 1.)));
-        assert!(calcs.surface_hit.under_point.z > Intersection::EPSILON / 2.);
-        assert!(calcs.surface_hit.point.z < calcs.surface_hit.under_point.z);
     }
 }

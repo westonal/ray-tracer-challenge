@@ -1,9 +1,9 @@
 use crate::intersection::Intersection;
+use crate::lighting::surface_hit::SurfaceHit;
 use crate::rays::RayGeneration;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
 use std::ops::Deref;
-use crate::lighting::surface_hit::SurfaceHit;
 
 pub struct PreCalculations<'s> {
     intersection: &'s Intersection<'s>,
@@ -23,7 +23,7 @@ impl<'s> Intersection<'s> {
         let inside = normal.dot(&eye) < 0.;
         let normal = if inside { -normal } else { normal };
         let normal_as_vector = normal.clone_vector();
-        let under = SurfaceHit::new(&self.shape.id, point, &normal);
+        let under = SurfaceHit::new(&self.shape.id, point);
         PreCalculations {
             intersection: self,
             surface_hit: under,
