@@ -3,11 +3,11 @@ use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::rays::RayGeneration;
-use crate::world::World;
+use crate::world::{RenderableWorld, World};
 use math::color;
 use math::tuple::color::Color;
 
-impl World {
+impl RenderableWorld<'_> {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
         self.shade_with_refraction(pre_calculations, RefractionMediumIndexes::new(1.0, 1.0))
     }
@@ -20,7 +20,7 @@ impl World {
         let mut result = color!(0, 0, 0, 0);
         let direct_lights = self.direct_lights_2(&pre_calculations.surface_hit);
         let material = &pre_calculations.shape.material;
-        for light in &self.lights {
+        for light in self.lights {
             // TODO, multilight support would light each in turn if they were direct.
             let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
             result = result
@@ -90,7 +90,7 @@ mod world_shading_tests {
         let first = world.shapes.get(0).unwrap();
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let c = world.shade(pre_calculations);
+        let c = world.prepare_for_render().shade(pre_calculations);
         assert_color!(color!(0.3807, 0.4758, 0.2855), c);
     }
 
@@ -102,7 +102,7 @@ mod world_shading_tests {
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let c = world.shade(pre_calculations);
+        let c = world.prepare_for_render().shade(pre_calculations);
         assert_color!(color!(0.9050, 0.9050, 0.9050), c);
     }
 
@@ -110,7 +110,7 @@ mod world_shading_tests {
     fn color_when_ray_misses() {
         let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
-        let c = world.color_at(ray);
+        let c = world.prepare_for_render().color_at(ray);
         assert_eq!(color!(0., 0., 0., 0.), c);
     }
 
@@ -119,7 +119,7 @@ mod world_shading_tests {
         let mut world = World::default_world();
         world.background = color!(0., 1., 0.);
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
-        let c = world.color_at(ray);
+        let c = world.prepare_for_render().color_at(ray);
         assert_eq!(color!(0., 1., 0., 1.), c);
     }
 
@@ -127,7 +127,7 @@ mod world_shading_tests {
     fn shade_an_intersection_with_color_at() {
         let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
-        let c = world.color_at(ray);
+        let c = world.prepare_for_render().color_at(ray);
         assert_color!(color!(0.3807, 0.4758, 0.2855), c);
     }
 }
@@ -154,7 +154,7 @@ mod world_shadow_shading_tests {
         let intersection = Intersection::new(4., &second);
         let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let color = world.shade(pre_calculations);
+        let color = world.prepare_for_render().shade(pre_calculations);
         assert_eq!(color!(0.1, 0.1, 0.1), color);
     }
 }
@@ -184,7 +184,9 @@ mod world_pattern_shading_tests {
             let intersection = Intersection::new(4., &first);
             let pre_calculations =
                 intersection.to_pre_calculation(RayGeneration::new_first_generation_ray(ray));
-            self.world.shade(pre_calculations)
+
+            let world = &self.world.prepare_for_render();
+            world.shade(pre_calculations)
         }
     }
 

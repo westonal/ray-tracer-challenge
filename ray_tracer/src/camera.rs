@@ -1,7 +1,7 @@
 use crate::canvas::Size;
 use crate::ray;
 use crate::rays::{Ray, RayGeneration};
-use crate::world::World;
+use crate::world::{RenderableWorld, World};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
 use math::{Angle, point};
@@ -52,7 +52,7 @@ impl Camera {
         self.transform = transform;
     }
 
-    pub fn color_at(&self, x_y: (u32, u32), world: &World) -> Color {
+    pub fn color_at(&self, x_y: (u32, u32), world: &RenderableWorld) -> Color {
         let ray = RayGeneration::new_first_generation_ray(self.ray_for_pixel(x_y));
         world.color_at(ray)
     }
@@ -106,6 +106,8 @@ mod camera_tests {
         camera.set_transform(
             ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
+
+        let world = world.prepare_for_render();
         let color = camera.color_at((5, 5), &world);
         assert_color!(color!(0.3807, 0.4758, 0.2855), color);
     }

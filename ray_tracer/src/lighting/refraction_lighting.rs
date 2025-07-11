@@ -1,10 +1,10 @@
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::rays::RayGeneration;
-use crate::world::World;
+use crate::world::RenderableWorld;
 use math::tuple::color::{Color, TRANSPARENT};
 
-impl World {
+impl RenderableWorld<'_> {
     pub fn refracted_color(
         &self,
         pre_calculations: &PreCalculations,
@@ -60,6 +60,7 @@ mod refraction_lighting_tests {
         let sphere = Shape::new_sphere();
         let mut world = World::default();
         world.add(sphere);
+        let world = world.prepare_for_render();
         let sphere = world.shapes.get(0).unwrap();
 
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
@@ -83,6 +84,8 @@ mod refraction_lighting_tests {
         sphere.material = Material::glass();
         let mut world = World::default();
         world.add(sphere);
+
+        let world = world.prepare_for_render();
         let sphere = world.shapes.get(0).unwrap();
 
         println!("{}", sphere.id);
@@ -112,6 +115,8 @@ mod refraction_lighting_tests {
         b.material.transparency = 1.;
         b.material.refractive_index = 1.5;
         let ray = ray!((0., 0., 0.1), (0., 1., 0.));
+
+        let world = world.prepare_for_render();
         let a = world.shapes.get(0).unwrap();
         let b = world.shapes.get(1).unwrap();
         let intersections = Intersections::new(vec![
@@ -148,6 +153,7 @@ mod refraction_lighting_tests {
         ball.material.ambient = 0.5;
         world.add(ball);
 
+        let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
@@ -171,6 +177,7 @@ mod refraction_lighting_tests {
         ball.material.ambient = 0.5;
         world.add(ball);
 
+        let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)

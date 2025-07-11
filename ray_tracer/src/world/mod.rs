@@ -19,6 +19,24 @@ pub struct World {
     pub max_ray_generation: u32,
 }
 
+impl<'w> World {
+    pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
+        RenderableWorld {
+            shapes: &self.shapes,
+            lights: &self.lights,
+            background: self.background,
+            max_ray_generation: self.max_ray_generation,
+        }
+    }
+}
+
+pub struct RenderableWorld<'w> {
+    pub(crate) shapes: &'w Vec<Shape>,
+    pub lights: &'w Vec<PointLight>,
+    pub background: Color,
+    pub max_ray_generation: u32,
+}
+
 impl World {
     pub fn add_light(&mut self, light: PointLight) {
         self.lights.push(light);
@@ -54,10 +72,10 @@ impl Default for World {
     }
 }
 
-impl Intersect for World {
+impl Intersect for RenderableWorld<'_> {
     fn intersect(&self, ray: Ray) -> Intersections {
         let mut results = Intersections::default();
-        for object in &self.shapes {
+        for object in self.shapes {
             results += object.intersect(ray);
         }
         results
@@ -97,7 +115,7 @@ mod world_tests {
         world.add(Shape::new_sphere_transformed(Matrix4x4::scale(
             0.5, 0.5, 0.5,
         )));
-        let world = world;
+        let world = world.prepare_for_render();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = world.intersect(ray);
         assert_eq!(intersections.len(), 4);

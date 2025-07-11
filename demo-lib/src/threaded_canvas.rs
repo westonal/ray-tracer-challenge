@@ -1,7 +1,7 @@
 use crate::image_buffer_canvas::ImageBufferCanvas;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Block, BlockIterator, Canvas, PixelIterator, Size, ViewPort};
-use ray_tracer::world::World;
+use ray_tracer::world::RenderableWorld;
 use ray_tracer::world::render_world::{RenderPartialWorld, RenderWorld};
 use rayon::prelude::*;
 use std::ops::{Deref, DerefMut};
@@ -41,7 +41,7 @@ impl ViewPort for ThreadedCanvas {
 }
 
 impl RenderWorld for ImageBufferCanvas {
-    fn render(&mut self, world: &World, camera: &Camera) {
+    fn render(&mut self, world: &RenderableWorld, camera: &Camera) {
         for (x, y) in self.pixels() {
             let color = camera.color_at((x, y), &world);
             if color.alpha() > 0. {
@@ -52,7 +52,7 @@ impl RenderWorld for ImageBufferCanvas {
 }
 
 impl RenderPartialWorld for ImageBufferCanvas {
-    fn render_area(&mut self, world: &World, camera: &Camera, block: &Block) {
+    fn render_area(&mut self, world: &RenderableWorld, camera: &Camera, block: &Block) {
         for (x, y) in block.pixels() {
             let color = camera.color_at((block.offset.0 + x, block.offset.1 + y), &world);
             if color.alpha() > 0. {
@@ -63,7 +63,7 @@ impl RenderPartialWorld for ImageBufferCanvas {
 }
 
 impl RenderWorld for ThreadedCanvas {
-    fn render(&mut self, world: &World, camera: &Camera) {
+    fn render(&mut self, world: &RenderableWorld, camera: &Camera) {
         let vec: Vec<_> = self
             .blocks(self.block_size)
             .par_bridge()

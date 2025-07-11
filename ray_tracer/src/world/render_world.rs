@@ -1,11 +1,11 @@
 use crate::camera::Camera;
 use crate::canvas::Block;
-use crate::world::World;
+use crate::world::RenderableWorld;
 
 pub trait RenderWorld {
-    fn render(&mut self, world: &World, camera: &Camera);
+    fn render(&mut self, world: &RenderableWorld, camera: &Camera);
 }
 
 pub trait RenderPartialWorld {
-    fn render_area(&mut self, world: &World, camera: &Camera, range: &Block);
+    fn render_area(&mut self, world: &RenderableWorld, camera: &Camera, range: &Block);
 }

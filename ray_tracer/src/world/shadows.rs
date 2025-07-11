@@ -2,10 +2,10 @@ use crate::intersection::Intersect;
 use crate::lighting::PointLight;
 use crate::lighting::surface_hit::SurfaceHit;
 use crate::ray;
-use crate::world::World;
+use crate::world::RenderableWorld;
 use math::tuple::point::Point;
 
-impl World {
+impl RenderableWorld<'_> {
     /// Which lights are not occluded by objects in the scene
     pub(crate) fn direct_lights(&self, point: Point) -> Vec<&PointLight> {
         self.lights
@@ -52,6 +52,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(0, 10, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
     }
@@ -63,6 +64,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(5, -5, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 0);
     }
@@ -74,6 +76,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(-11, 11, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
     }

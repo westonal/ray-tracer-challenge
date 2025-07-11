@@ -44,6 +44,8 @@ impl<T: TestScene> RenderTestScene<T> for T {
         let camera = T::build_camera(size);
 
         let now = Instant::now();
+
+        let world = world.prepare_for_render();
         canvas.render(&world, &camera);
         let duration = now.elapsed();
         let pixels = canvas.size().width() * canvas.size().height();
