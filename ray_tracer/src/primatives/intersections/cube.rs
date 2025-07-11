@@ -62,7 +62,7 @@ mod cube_intersection_tests {
     use crate::ray;
 
     fn run_intersection_test(ray: Ray) -> (f32, f32) {
-        let cube = Shape::new_cube().to_shape2();
+        let cube = Shape::new_cube().to_intersectable();
         let intersections = cube.intersect(ray);
         assert_eq!(2, intersections.len());
         (
@@ -107,7 +107,7 @@ mod cube_intersection_missing_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cube = Shape::new_cube().to_shape2();
+                    let cube = Shape::new_cube().to_intersectable();
                     let intersections = cube.intersect($ray);
                     assert_eq!(0, intersections.len());
                 }
@@ -136,7 +136,7 @@ mod cube_normal_tests {
         $(
             #[test]
             fn $name(){
-                let cube = Shape::new_cube().to_shape2();
+                let cube = Shape::new_cube().to_intersectable();
                 assert_eq!($normal, *cube.normal_at($point));
             }
         )*

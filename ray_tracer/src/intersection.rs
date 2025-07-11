@@ -1,7 +1,8 @@
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
-use crate::primatives::{Shape, Shape2, ShapeId};
+use crate::primatives::{Shape, ShapeId};
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
+use crate::primatives::IntersectableShape;
 
 pub trait Intersect {
     fn intersect(&self, ray: Ray) -> Intersections;
@@ -9,7 +10,7 @@ pub trait Intersect {
 
 pub struct Intersection<'s> {
     pub t: f32,
-    pub shape: &'s Shape2,
+    pub shape: &'s IntersectableShape,
 }
 
 #[derive(Default)]
@@ -71,7 +72,7 @@ impl<'s> Deref for Intersections<'s> {
 }
 
 impl<'s> Intersection<'s> {
-    pub fn new(t: f32, shape: &'s Shape2) -> Self {
+    pub fn new(t: f32, shape: &'s IntersectableShape) -> Self {
         Self { t, shape }
     }
 }
@@ -82,8 +83,8 @@ mod sorting_tests {
 
     #[test]
     fn intersections_are_sorted_in_create() {
-        let sphere1 = Shape::new_sphere().to_shape2();
-        let sphere2 = Shape::new_sphere().to_shape2();
+        let sphere1 = Shape::new_sphere().to_intersectable();
+        let sphere2 = Shape::new_sphere().to_intersectable();
         let intersections = Intersections::new(vec![
             Intersection::new(2., &sphere1),
             Intersection::new(1., &sphere2),
@@ -98,8 +99,8 @@ mod sorting_tests {
 
     #[test]
     fn intersections_are_sorted_when_joined() {
-        let sphere1 = Shape::new_sphere().to_shape2();
-        let sphere2 = Shape::new_sphere().to_shape2();
+        let sphere1 = Shape::new_sphere().to_intersectable();
+        let sphere2 = Shape::new_sphere().to_intersectable();
         let intersections1 = Intersections::new(vec![
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),

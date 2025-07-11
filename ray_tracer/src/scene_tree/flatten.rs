@@ -1,19 +1,17 @@
-use math::matrix::matrix_4x4::Matrix4x4;
-use crate::primatives::{Shape, Shape2};
+use crate::primatives::Shape;
+use crate::primatives::IntersectableShape;
 use crate::scene_tree::SceneTree;
-use crate::transform::Transform;
-
 impl SceneTree {
-    pub fn flatten(&self) -> Vec<Shape2> {
+    pub fn flatten(&self) -> Vec<IntersectableShape> {
         let mut result = vec![];
         self.walk(&mut result);
         result
     }
 
-    fn walk(&self, into: &mut Vec<Shape2>) {
+    fn walk(&self, into: &mut Vec<IntersectableShape>) {
         match self {
             SceneTree::Leaf(shape) => {
-                let mut shape = (*shape).clone().to_shape2();
+                let mut shape = (*shape).clone().to_intersectable();
                 // shape.transform = Transform::identity();// * Matrix4x4::scale_all(2.);
                 into.push(shape)
             }
