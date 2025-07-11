@@ -1,3 +1,6 @@
+mod flatten;
+mod manipulation;
+
 use crate::primatives::Shape;
 use crate::transform::Transform;
 

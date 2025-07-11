@@ -107,7 +107,8 @@ mod refraction_lighting_tests {
 
     #[test]
     fn the_refracted_color_with_a_refracted_ray() {
-        let mut world = World::default_world();
+        let world = World::default_world();
+        let mut world = world.prepare_for_render();
         let a = world.shapes.get_mut(0).unwrap();
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;
@@ -116,7 +117,6 @@ mod refraction_lighting_tests {
         b.material.refractive_index = 1.5;
         let ray = ray!((0., 0., 0.1), (0., 1., 0.));
 
-        let world = world.prepare_for_render();
         let a = world.shapes.get(0).unwrap();
         let b = world.shapes.get(1).unwrap();
         let intersections = Intersections::new(vec![

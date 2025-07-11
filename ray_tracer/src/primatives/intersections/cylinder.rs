@@ -5,7 +5,7 @@ use math::vector;
 
 pub struct Cylinder {}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum CylinderCapStyle {
     Open,
     Closed,

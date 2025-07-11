@@ -87,10 +87,11 @@ mod world_shading_tests {
     fn shade_an_intersection() {
         let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
+        let world = world.prepare_for_render();
         let first = world.shapes.get(0).unwrap();
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let c = world.prepare_for_render().shade(pre_calculations);
+        let c = world.shade(pre_calculations);
         assert_color!(color!(0.3807, 0.4758, 0.2855), c);
     }
 
@@ -99,10 +100,11 @@ mod world_shading_tests {
         let mut world = World::default_world();
         world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = ray_first_gen!(point!(0, 0, 0), vector!(0, 0, 1));
+        let world = world.prepare_for_render();
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let c = world.prepare_for_render().shade(pre_calculations);
+        let c = world.shade(pre_calculations);
         assert_color!(color!(0.9050, 0.9050, 0.9050), c);
     }
 
@@ -150,11 +152,12 @@ mod world_shadow_shading_tests {
         world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
             0., 0., 10.,
         )));
+        let world = world.prepare_for_render();
         let second = world.shapes.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
         let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);
-        let color = world.prepare_for_render().shade(pre_calculations);
+        let color = world.shade(pre_calculations);
         assert_eq!(color!(0.1, 0.1, 0.1), color);
     }
 }
@@ -180,12 +183,12 @@ mod world_pattern_shading_tests {
 
     impl TestScene {
         fn color_ray(&self, ray: Ray) -> Color {
-            let first = self.world.shapes.get(0).unwrap();
+            let world = &self.world.prepare_for_render();
+            let first = world.shapes.get(0).unwrap();
             let intersection = Intersection::new(4., &first);
             let pre_calculations =
                 intersection.to_pre_calculation(RayGeneration::new_first_generation_ray(ray));
 
-            let world = &self.world.prepare_for_render();
             world.shade(pre_calculations)
         }
     }

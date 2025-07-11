@@ -3,7 +3,7 @@ use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct GradientStops(Vec<(f32, Color)>);
 
 impl Pattern {

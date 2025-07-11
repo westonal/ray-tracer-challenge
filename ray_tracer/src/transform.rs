@@ -4,7 +4,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Transform {
     object_to_world_transform: Matrix4x4,
     world_to_object_transform: Matrix4x4,

@@ -8,7 +8,7 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Shape {
     pub id: ShapeId,
     pub material: Material,

@@ -10,8 +10,8 @@ use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
 use crate::primatives::Shape;
 use crate::rays::Ray;
-use math::tuple::color::Color;
 use crate::scene_tree::SceneTree;
+use math::tuple::color::Color;
 
 pub struct World {
     pub scene_tree: SceneTree,
@@ -23,7 +23,7 @@ pub struct World {
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
         RenderableWorld {
-            shapes: &self.shapes,
+            shapes: self.scene_tree.flatten(),
             lights: &self.lights,
             background: self.background,
             max_ray_generation: self.max_ray_generation,
@@ -32,7 +32,7 @@ impl<'w> World {
 }
 
 pub struct RenderableWorld<'w> {
-    pub(crate) shapes: &'w Vec<Shape>,
+    pub(crate) shapes: Vec<Shape>,
     pub lights: &'w Vec<PointLight>,
     pub background: Color,
     pub max_ray_generation: u32,
@@ -58,14 +58,14 @@ impl World {
 
 impl World {
     pub fn add(&mut self, object: Shape) {
-        self.scene_tree. .push(object);
+        self.scene_tree.add(object);
     }
 }
 
 impl Default for World {
     fn default() -> Self {
         Self {
-            shapes: vec![],
+            scene_tree: Default::default(),
             lights: vec![],
             background: Default::default(),
             max_ray_generation: 10,
@@ -76,7 +76,7 @@ impl Default for World {
 impl Intersect for RenderableWorld<'_> {
     fn intersect(&self, ray: Ray) -> Intersections {
         let mut results = Intersections::default();
-        for object in self.shapes {
+        for object in &self.shapes {
             results += object.intersect(ray);
         }
         results
