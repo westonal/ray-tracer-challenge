@@ -2,10 +2,10 @@ use crate::primatives::Shape;
 use crate::scene_tree::SceneTree;
 
 impl SceneTree {
-    pub fn object_count(&self) -> usize {
+    pub fn shape_count(&self) -> usize {
         match self {
             SceneTree::Leaf(_) => 1,
-            SceneTree::Group { children, .. } => children.iter().map(|a| a.object_count()).sum(),
+            SceneTree::Group { children, .. } => children.iter().map(|a| a.shape_count()).sum(),
         }
     }
 
@@ -39,7 +39,7 @@ impl SceneTree {
             SceneTree::Group { children, .. } => {
                 let mut countdown = index;
                 for (i, item) in children.iter().enumerate() {
-                    let branch_size = item.object_count();
+                    let branch_size = item.shape_count();
                     if branch_size > countdown {
                         return item.get_shape(countdown);
                     } else {
@@ -63,7 +63,7 @@ impl SceneTree {
             SceneTree::Group { children, .. } => {
                 let mut countdown = index;
                 for (i, item) in children.iter_mut().enumerate() {
-                    let branch_size = item.object_count();
+                    let branch_size = item.shape_count();
                     if branch_size > countdown {
                         return item.get_mut_shape(countdown);
                     } else {
@@ -83,14 +83,14 @@ mod build_tree_tests {
     #[test]
     fn new_tree() {
         let tree = SceneTree::default();
-        assert_eq!(0, tree.object_count());
+        assert_eq!(0, tree.shape_count());
     }
 
     #[test]
     fn add_one_leaf() {
         let mut tree = SceneTree::default();
         tree.add(Shape::new_cylinder());
-        assert_eq!(1, tree.object_count());
+        assert_eq!(1, tree.shape_count());
     }
 
     #[test]
@@ -98,7 +98,7 @@ mod build_tree_tests {
         let mut tree = SceneTree::default();
         tree.add(Shape::new_cylinder());
         tree.add(Shape::new_sphere());
-        assert_eq!(2, tree.object_count());
+        assert_eq!(2, tree.shape_count());
     }
 
     #[test]
@@ -109,6 +109,6 @@ mod build_tree_tests {
         branch.add(Shape::new_cylinder());
         branch.add(Shape::new_sphere());
         tree.add_tree(branch);
-        assert_eq!(3, tree.object_count());
+        assert_eq!(3, tree.shape_count());
     }
 }

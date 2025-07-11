@@ -52,12 +52,10 @@ impl World {
 }
 
 impl World {
-    pub fn object_count(&self) -> usize {
-        self.scene_tree.count()
+    pub fn shape_count(&self) -> usize {
+        self.scene_tree.shape_count()
     }
-}
 
-impl World {
     pub fn add(&mut self, object: Shape) {
         self.scene_tree.add(object);
     }
@@ -104,7 +102,7 @@ mod world_tests {
         let mut world = World::default();
         world.add(Shape::new_sphere());
         world.add(Shape::new_sphere());
-        assert_eq!(2, world.object_count());
+        assert_eq!(2, world.shape_count());
         assert!(world.lights.is_empty());
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
         assert!(!world.lights.is_empty());
