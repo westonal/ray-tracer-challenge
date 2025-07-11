@@ -10,6 +10,15 @@ pub enum SceneTree {
     },
 }
 
+impl SceneTree {
+    pub fn count(&self) -> usize {
+        match self {
+            SceneTree::Leaf(_) => 1,
+            SceneTree::Group { children, .. } => children.iter().map(|f| f.count()).sum(),
+        }
+    }
+}
+
 impl Default for SceneTree {
     fn default() -> Self {
         Self::Group {

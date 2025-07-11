@@ -11,9 +11,10 @@ use crate::lighting::PointLight;
 use crate::primatives::Shape;
 use crate::rays::Ray;
 use math::tuple::color::Color;
+use crate::scene_tree::SceneTree;
 
 pub struct World {
-    pub(crate) shapes: Vec<Shape>,
+    pub scene_tree: SceneTree,
     pub lights: Vec<PointLight>,
     pub background: Color,
     pub max_ray_generation: u32,
@@ -51,13 +52,13 @@ impl World {
 
 impl World {
     pub fn object_count(&self) -> usize {
-        self.shapes.len()
+        self.scene_tree.count()
     }
 }
 
 impl World {
     pub fn add(&mut self, object: Shape) {
-        self.shapes.push(object);
+        self.scene_tree. .push(object);
     }
 }
 
