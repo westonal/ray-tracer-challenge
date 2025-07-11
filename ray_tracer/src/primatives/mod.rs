@@ -5,4 +5,5 @@ mod shape_id;
 mod surface;
 
 pub use shape::Shape;
+pub use shape::Shape2;
 pub use shape_id::ShapeId;

@@ -1,17 +1,20 @@
-use crate::primatives::Shape;
+use math::matrix::matrix_4x4::Matrix4x4;
+use crate::primatives::{Shape, Shape2};
 use crate::scene_tree::SceneTree;
+use crate::transform::Transform;
 
 impl SceneTree {
-    pub fn flatten(&self) -> Vec<Shape> {
+    pub fn flatten(&self) -> Vec<Shape2> {
         let mut result = vec![];
         self.walk(&mut result);
         result
     }
 
-    fn walk(&self, into: &mut Vec<Shape>) {
+    fn walk(&self, into: &mut Vec<Shape2>) {
         match self {
             SceneTree::Leaf(shape) => {
-                let shape = (*shape).clone();
+                let mut shape = (*shape).clone().to_shape2();
+                // shape.transform = Transform::identity();// * Matrix4x4::scale_all(2.);
                 into.push(shape)
             }
             SceneTree::Group { children, .. } => {
@@ -34,5 +37,6 @@ mod flatten_tests {
         tree.add(Shape::new_sphere());
 
         //tree.flatten()
+        todo!()
     }
 }

@@ -12,6 +12,14 @@ use math::tuple::vector::normal::Normal;
 pub struct Shape {
     pub id: ShapeId,
     pub material: Material,
+    pub(crate) matrix: Matrix4x4,
+    pub(crate) surface: Surface,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Shape2 {
+    pub id: ShapeId,
+    pub material: Material,
     pub(crate) transform: Transform,
     pub(crate) surface: Surface,
 }
@@ -21,13 +29,22 @@ impl Shape {
         Self {
             id: Default::default(),
             material: Default::default(),
-            transform: Transform::new(object_to_world_matrix),
+            matrix: object_to_world_matrix,
             surface,
+        }
+    }
+    
+    pub fn to_shape2(self) -> Shape2 {
+        Shape2{
+            id: self.id,
+            material: self.material,
+            transform: Transform::new(self.matrix),
+            surface:self.surface
         }
     }
 }
 
-impl Shape {
+impl Shape2 {
     pub fn normal_at(&self, point: Point) -> Normal {
         let object_point: Point = self.transform.world_point_to_object_point(point);
         let object_normal = self.surface.normal_at(object_point);
@@ -35,7 +52,7 @@ impl Shape {
     }
 }
 
-impl Intersect for Shape {
+impl Intersect for Shape2 {
     fn intersect(&self, ray: Ray) -> Intersections {
         // Convert world ray into object space
         let ray = self.transform.world_ray_to_object_ray(ray);

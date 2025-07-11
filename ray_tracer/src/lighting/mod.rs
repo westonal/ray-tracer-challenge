@@ -286,7 +286,7 @@ mod reflection_lighting_tests {
         // two parallel reflective planes
         let plane1 = solid_reflective_plane(*GREEN, 0.25);
         let mut plane2 = solid_reflective_plane(*RED, 0.25);
-        plane2.transform = Transform::new(Matrix4x4::translation(0., 10., 0.));
+        plane2.matrix = Matrix4x4::translation(0., 10., 0.);
         let mut world = World::default();
         world.max_ray_generation = 4;
         world.set_light(PointLight::new(Point::origin(), *WHITE));

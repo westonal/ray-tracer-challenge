@@ -102,7 +102,7 @@ mod cylinder_intersection_miss_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_open_cylinder();
+                let cylinder = Shape::new_open_cylinder().to_shape2();
                 let intersections = cylinder.intersect($ray);
                 assert_eq!(intersections.len(), 0);
             }
@@ -131,7 +131,7 @@ mod cylinder_intersection_hit_tests {
             fn $name() {
                 let cylinder = Shape::new_open_cylinder_transformed(
                     Matrix4x4::scale(1., 8., 1.)
-                );
+                ).to_shape2();
                 let intersections = cylinder.intersect($ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
             }
@@ -159,7 +159,7 @@ mod cylinder_normal_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cylinder = Shape::new_open_cylinder();
+                    let cylinder = Shape::new_open_cylinder().to_shape2();
                     math::assert_vector!(cylinder.normal_at($point).to_vector(), $expect);
                 }
             )*
@@ -191,7 +191,7 @@ mod cylinder_truncate_tests {
                         Matrix4x4::translation(0., 1., 0.)
                         .pre_scale(1., 0.5, 1.)
                         .pre_translation(0., 1., 0.)
-                    );
+                    ).to_shape2();
                     let intersections = cylinder.intersect($ray.normalize());
                     assert_eq!($expect, intersections.len());
                 }
@@ -227,7 +227,7 @@ mod cylinder_cap_intersection_tests {
                         // Matrix4x4::translation(0., 1., 0.)
                         // .pre_scale(1., 0.5, 1.)
                         // .pre_translation(0., 1., 0.)
-                    );
+                    ).to_shape2();
                     let intersections = cylinder.intersect($ray.normalize());
                     assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
                 }
@@ -260,7 +260,7 @@ mod cylinder_cap_normal_tests {
                     // cylinder 1..2
                     let cylinder = Shape::new_cylinder_transformed(
                         Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
-                    );
+                    ).to_shape2();
                     assert_vector!(cylinder.normal_at($point).to_vector(), $expected);
                 }
             )*

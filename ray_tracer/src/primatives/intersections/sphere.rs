@@ -41,7 +41,7 @@ mod sphere_intersection_tests {
 
     #[test]
     fn intersect() {
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let ray = Ray::new(Point::point(0., 0., -5.), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 2);
@@ -51,7 +51,7 @@ mod sphere_intersection_tests {
 
     #[test]
     fn tangential_intersection() {
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let ray = Ray::new(Point::point(0., 1., -5.), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 1);
@@ -60,7 +60,7 @@ mod sphere_intersection_tests {
 
     #[test]
     fn miss() {
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let ray = Ray::new(Point::point(0., 2., -5.), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 0);
@@ -68,7 +68,7 @@ mod sphere_intersection_tests {
 
     #[test]
     fn ray_from_inside_sphere() {
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let ray = Ray::new(Point::origin(), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 2);
@@ -78,7 +78,7 @@ mod sphere_intersection_tests {
 
     #[test]
     fn sphere_behind_ray() {
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let ray = Ray::new(Point::point(0., 0., 5.), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 2);
@@ -94,8 +94,8 @@ mod sphere_multi_intersection_tests {
 
     #[test]
     fn the_hit_when_all_intersections_are_positive() {
-        let sphere1 = Shape::new_sphere();
-        let sphere2 = Shape::new_sphere();
+        let sphere1 = Shape::new_sphere().to_shape2();
+        let sphere2 = Shape::new_sphere().to_shape2();
         let intersections = Intersections::new(vec![
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),
@@ -105,8 +105,8 @@ mod sphere_multi_intersection_tests {
 
     #[test]
     fn the_hit_when_some_intersections_are_negative() {
-        let sphere1 = Shape::new_sphere();
-        let sphere2 = Shape::new_sphere();
+        let sphere1 = Shape::new_sphere().to_shape2();
+        let sphere2 = Shape::new_sphere().to_shape2();
         let intersections = Intersections::new(vec![
             Intersection::new(-1., &sphere1),
             Intersection::new(1., &sphere2),
@@ -116,8 +116,8 @@ mod sphere_multi_intersection_tests {
 
     #[test]
     fn the_hit_when_all_intersections_are_negative() {
-        let sphere1 = Shape::new_sphere();
-        let sphere2 = Shape::new_sphere();
+        let sphere1 = Shape::new_sphere().to_shape2();
+        let sphere2 = Shape::new_sphere().to_shape2();
         let intersections = Intersections::new(vec![
             Intersection::new(-2., &sphere1),
             Intersection::new(-1., &sphere2),
@@ -127,10 +127,10 @@ mod sphere_multi_intersection_tests {
 
     #[test]
     fn the_hit_is_always_the_lowest_non_negative_intersection() {
-        let sphere1 = Shape::new_sphere();
-        let sphere2 = Shape::new_sphere();
-        let sphere3 = Shape::new_sphere();
-        let sphere4 = Shape::new_sphere();
+        let sphere1 = Shape::new_sphere().to_shape2();
+        let sphere2 = Shape::new_sphere().to_shape2();
+        let sphere3 = Shape::new_sphere().to_shape2();
+        let sphere4 = Shape::new_sphere().to_shape2();
         let intersections = Intersections::new(vec![
             Intersection::new(5., &sphere1),
             Intersection::new(7., &sphere2),
@@ -150,7 +150,7 @@ mod sphere_intersection_of_transformed_sphere_tests {
 
     #[test]
     fn intersect_scaled_sphere() {
-        let sphere = Shape::new_sphere_transformed(Matrix4x4::scale(2., 2., 2.));
+        let sphere = Shape::new_sphere_transformed(Matrix4x4::scale(2., 2., 2.)).to_shape2();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 2);
@@ -160,7 +160,7 @@ mod sphere_intersection_of_transformed_sphere_tests {
 
     #[test]
     fn intersect_translated_sphere() {
-        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(5., 0., 0.));
+        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(5., 0., 0.)).to_shape2();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 0);
@@ -176,7 +176,7 @@ mod sphere_normal_tests {
 
     #[test]
     fn normal_of_translated_sphere() {
-        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 1., 0.));
+        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 1., 0.)).to_shape2();
         assert_vector!(
             vector!(0., 0.7071, -0.7071),
             sphere.normal_at(point!(0., 1.70711, -0.70711)).to_vector()
@@ -187,7 +187,7 @@ mod sphere_normal_tests {
     fn normal_of_transformed_sphere() {
         let sphere = Shape::new_sphere_transformed(
             Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(radians!(PI / 5.)),
-        );
+        ).to_shape2();
         assert_vector!(
             vector!(0, 0.9701, -0.2425),
             sphere

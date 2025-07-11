@@ -8,7 +8,7 @@ pub use crate::world::default::test_world;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
-use crate::primatives::Shape;
+use crate::primatives::{Shape, Shape2};
 use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
 use math::tuple::color::Color;
@@ -32,7 +32,7 @@ impl<'w> World {
 }
 
 pub struct RenderableWorld<'w> {
-    pub(crate) shapes: Vec<Shape>,
+    pub(crate) shapes: Vec<Shape2>,
     pub lights: &'w Vec<PointLight>,
     pub background: Color,
     pub max_ray_generation: u32,

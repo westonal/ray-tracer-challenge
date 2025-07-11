@@ -54,7 +54,7 @@ mod precalculation_tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
         let ray = ray_first_gen!((0., 0., -5.), (0., 0., 1.));
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let intersection = Intersection::new(4., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(4., pre_calculations.t);
@@ -69,7 +69,7 @@ mod precalculation_tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_inside() {
         let ray = ray_first_gen!((0., 0., 0.), (0., 0., 1.));
-        let sphere = Shape::new_sphere();
+        let sphere = Shape::new_sphere().to_shape2();
         let intersection = Intersection::new(1., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(1., pre_calculations.t);
@@ -90,7 +90,7 @@ mod reflection_pre_calc_tests {
 
     #[test]
     fn precompute_the_reflection_vector() {
-        let plane = Shape::new_plane();
+        let plane = Shape::new_plane().to_shape2();
         let ray = ray_first_gen!(
             (0., 1., -1.),
             (0., -(2.0_f32.sqrt() / 2.), 2.0_f32.sqrt() / 2.)

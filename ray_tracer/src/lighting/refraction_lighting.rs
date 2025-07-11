@@ -198,7 +198,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_under_total_internal_reflection() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_shape2();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-2.0_f32.sqrt() / 2., &sphere),
@@ -212,7 +212,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_a_perpendicular_viewing_angle() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_shape2();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-1., &sphere),
@@ -226,7 +226,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_small_angle_and_n1_gt_n1() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_shape2();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![Intersection::new(1.8589, &sphere)]);
         let (hit, refractions) = intersections.hit().unwrap();
