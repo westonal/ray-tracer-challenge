@@ -1,8 +1,8 @@
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
+use crate::primatives::IntersectableShape;
 use crate::primatives::{Shape, ShapeId};
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
-use crate::primatives::IntersectableShape;
 
 pub trait Intersect {
     fn intersect(&self, ray: Ray) -> Intersections;

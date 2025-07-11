@@ -160,7 +160,8 @@ mod sphere_intersection_of_transformed_sphere_tests {
 
     #[test]
     fn intersect_translated_sphere() {
-        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(5., 0., 0.)).to_intersectable();
+        let sphere =
+            Shape::new_sphere_transformed(Matrix4x4::translation(5., 0., 0.)).to_intersectable();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 0);
@@ -176,7 +177,8 @@ mod sphere_normal_tests {
 
     #[test]
     fn normal_of_translated_sphere() {
-        let sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 1., 0.)).to_intersectable();
+        let sphere =
+            Shape::new_sphere_transformed(Matrix4x4::translation(0., 1., 0.)).to_intersectable();
         assert_vector!(
             vector!(0., 0.7071, -0.7071),
             sphere.normal_at(point!(0., 1.70711, -0.70711)).to_vector()
@@ -187,7 +189,8 @@ mod sphere_normal_tests {
     fn normal_of_transformed_sphere() {
         let sphere = Shape::new_sphere_transformed(
             Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(radians!(PI / 5.)),
-        ).to_intersectable();
+        )
+        .to_intersectable();
         assert_vector!(
             vector!(0, 0.9701, -0.2425),
             sphere

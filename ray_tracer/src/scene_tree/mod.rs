@@ -1,9 +1,8 @@
 mod flatten;
 mod manipulation;
 
-use math::matrix::matrix_4x4::Matrix4x4;
 use crate::primatives::Shape;
-use crate::transform::Transform;
+use math::matrix::matrix_4x4::Matrix4x4;
 
 pub enum SceneTree {
     Leaf(Shape),

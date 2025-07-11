@@ -1,7 +1,7 @@
-use math::matrix::matrix_4x4::Matrix4x4;
 use crate::primatives::IntersectableShape;
-use crate::primatives::Shape;
 use crate::scene_tree::SceneTree;
+use math::matrix::matrix_4x4::Matrix4x4;
+
 impl SceneTree {
     pub fn flatten(&self) -> Vec<IntersectableShape> {
         let mut result = vec![];

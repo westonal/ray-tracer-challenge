@@ -8,11 +8,11 @@ pub use crate::world::default::test_world;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
+use crate::primatives::IntersectableShape;
 use crate::primatives::Shape;
 use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
 use math::tuple::color::Color;
-use crate::primatives::IntersectableShape;
 
 pub struct World {
     pub scene_tree: SceneTree,

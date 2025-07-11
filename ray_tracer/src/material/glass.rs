@@ -36,8 +36,8 @@ mod glass_refractive_index_finding_tests {
 
     use crate::primatives::Shape;
 
-    use math::matrix::matrix_4x4::Matrix4x4;
     use crate::primatives::IntersectableShape;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     fn glass_sphere(refractive_index: f32, transform: Matrix4x4) -> IntersectableShape {
         let mut sphere = Shape::new_sphere_transformed(transform);

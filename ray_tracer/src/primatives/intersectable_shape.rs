@@ -1,11 +1,11 @@
-use math::tuple::point::Point;
-use math::tuple::vector::normal::Normal;
 use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::material::Material;
 use crate::primatives::ShapeId;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
 use crate::transform::Transform;
+use math::tuple::point::Point;
+use math::tuple::vector::normal::Normal;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct IntersectableShape {

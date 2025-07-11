@@ -36,7 +36,8 @@ mod plane_normal_tests {
 
     #[test]
     fn plane_normal_transformed() {
-        let plane = Shape::new_plane_transformed(Matrix4x4::rotation_z(radians!(PI / 2.))).to_intersectable();
+        let plane = Shape::new_plane_transformed(Matrix4x4::rotation_z(radians!(PI / 2.)))
+            .to_intersectable();
         assert_eq!(
             vector!(-1, -4.371139e-8, 0),
             *plane.normal_at(Point::origin())
