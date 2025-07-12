@@ -78,11 +78,7 @@ impl Default for World {
 
 impl Intersect for RenderableWorld<'_> {
     fn intersect(&self, ray: Ray) -> Intersections {
-        let mut results = Intersections::default();
-        for object in self.shapes.deref() {
-            results += object.intersect(ray);
-        }
-        results
+        self.shapes.intersect(ray)
     }
 }
 

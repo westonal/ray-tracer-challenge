@@ -1,14 +1,42 @@
-use crate::primatives::IntersectableShape;
+use crate::intersection::{Intersect, Intersections};
+use crate::primatives::{IntersectableShape, Shape};
+use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
+use crate::world::RenderableWorld;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::ops::{Deref, DerefMut};
 
 pub struct FlatScene {
-    shapes: Vec<IntersectableShape>,
+    shapes: Vec<Chain>,
+}
+
+pub enum Chain {
+    BoundingVolume(IntersectableShape, usize),
+    Shape(IntersectableShape),
+}
+
+impl Deref for Chain {
+    type Target = IntersectableShape;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Chain::BoundingVolume(s, _) => s,
+            Chain::Shape(s) => s,
+        }
+    }
+}
+
+impl DerefMut for Chain {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            Chain::BoundingVolume(s, _) => s,
+            Chain::Shape(s) => s,
+        }
+    }
 }
 
 impl Deref for FlatScene {
-    type Target = Vec<IntersectableShape>;
+    type Target = Vec<Chain>;
 
     fn deref(&self) -> &Self::Target {
         &self.shapes
@@ -22,6 +50,30 @@ impl DerefMut for FlatScene {
     }
 }
 
+impl Intersect for FlatScene {
+    fn intersect(&self, ray: Ray) -> Intersections {
+        let mut results = Intersections::default();
+        let mut i = 0;
+        while i < self.shapes.len() {
+            let item = self.shapes.get(i).unwrap();
+            match item {
+                Chain::BoundingVolume(b, skip) => {
+                    if b.intersect(ray).is_empty() {
+                        i = i + 1; //*skip;
+                    } else {
+                        i = i + 1;
+                    }
+                }
+                Chain::Shape(s) => {
+                    results += s.intersect(ray);
+                    i = i + 1;
+                }
+            }
+        }
+        results
+    }
+}
+
 impl SceneTree {
     pub fn flatten(&self) -> FlatScene {
         let mut result = vec![];
@@ -29,18 +81,37 @@ impl SceneTree {
         FlatScene { shapes: result }
     }
 
-    fn walk(&self, into: &mut Vec<IntersectableShape>, tree_matrix: Matrix4x4) {
+    fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
-                into.push(shape.to_intersectable())
+                into.push(Chain::Shape(shape.to_intersectable()))
             }
             SceneTree::Group {
-                children, matrix, ..
+                children, matrix, bounding_shape,
             } => {
-                for child in children {
-                    child.walk(into, tree_matrix * *matrix)
+                let matrix = tree_matrix * *matrix;
+
+                match bounding_shape {
+                    None => {
+                        for child in children {
+                            child.walk(into, matrix);
+                        }
+                    }
+                    Some(bounds) => {
+                        for child in children {
+                            let mut subtree = vec![];
+                            child.walk(&mut subtree, matrix);
+                            let mut bounds= bounds.clone();
+                            bounds.matrix = tree_matrix * bounds.matrix;
+                            into.push(Chain::BoundingVolume(
+                                bounds.to_intersectable(),
+                                subtree.len(),
+                            ));
+                            into.append(&mut subtree);
+                        }
+                    }
                 }
             }
         }

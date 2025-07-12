@@ -50,7 +50,7 @@ mod refraction_lighting_tests {
     use crate::world::World;
     use crate::{ray, ray_first_gen};
     use math::matrix::matrix_4x4::Matrix4x4;
-    use std::ops::DerefMut;
+    use std::ops::{Deref, DerefMut};
 
     use math::tuple::color::RED;
     use math::{assert_color, color, point};
@@ -112,13 +112,13 @@ mod refraction_lighting_tests {
         let a = world.shapes.deref_mut().get_mut(0).unwrap();
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;
-        let b = world.shapes.get_mut(1).unwrap();
+        let b = world.shapes.get_mut(1).unwrap().deref_mut();
         b.material.transparency = 1.;
         b.material.refractive_index = 1.5;
         let ray = ray!((0., 0., 0.1), (0., 1., 0.));
 
-        let a = world.shapes.get(0).unwrap();
-        let b = world.shapes.get(1).unwrap();
+        let a = world.shapes.get(0).unwrap().deref();
+        let b = world.shapes.get(1).unwrap().deref();
         let intersections = Intersections::new(vec![
             Intersection::new(-0.9899, a),
             Intersection::new(-0.4899, b),
