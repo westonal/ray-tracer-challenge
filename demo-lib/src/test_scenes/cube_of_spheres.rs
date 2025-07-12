@@ -8,6 +8,7 @@ use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
+use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
@@ -46,7 +47,12 @@ impl TestScene for CubeOfSpheres {
                 Self::double(
                     matrix.pre_scale_all(0.5),
                     Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
-                    |matrix| SceneTree::new_single(matrix, Self::cubes()),
+                    |matrix| {
+                        scene!(
+                            matrix: matrix;
+                            +Self::cubes();
+                        )
+                    },
                 )
             },
         ));
@@ -64,20 +70,26 @@ impl TestScene for CubeOfSpheres {
 
 impl CubeOfSpheres {
     fn cubes() -> SceneTree {
-        Self::double(
-            Matrix4x4::scale_all(0.5),
-            Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
-            |matrix| {
-                let mut sphere = Shape::new_sphere_transformed(matrix);
-                let mut material = Material::default();
-                material.reflectivity = 0.9;
-                material.specular = 1.;
-                material.ambient = 1.;
-                material.pattern = Pattern::Solid(color!(0, 0, 0));
-                sphere.material = material;
-
-                SceneTree::Leaf(sphere)
-            },
+        scene!(
+            matrix: Matrix4x4::scale_all(0.5);
+            bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+            +Self::double(
+                Matrix4x4::identity(),
+                None,
+                |matrix| {
+                    let mut sphere = Shape::new_sphere();
+                    let mut material = Material::default();
+                    material.reflectivity = 0.9;
+                    material.specular = 1.;
+                    material.ambient = 1.;
+                    material.pattern = Pattern::Solid(color!(0, 0, 0));
+                    sphere.material = material;
+                    scene!(
+                        matrix: matrix;
+                        +sphere;
+                    )
+                },
+            );
         )
     }
 
@@ -86,7 +98,7 @@ impl CubeOfSpheres {
         bound: Option<Shape>,
         f: T,
     ) -> SceneTree {
-        let mut tree = SceneTree::new_bounded_opt(matrix, bound);
+        let mut tree = SceneTree::new_bounded_opt(Matrix4x4::identity(), bound);
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
@@ -98,6 +110,9 @@ impl CubeOfSpheres {
                 }
             }
         }
-        tree
+        scene!(
+            matrix: matrix;
+            +tree;
+        )
     }
 }

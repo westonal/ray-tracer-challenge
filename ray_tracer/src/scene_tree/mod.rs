@@ -34,14 +34,6 @@ impl SceneTree {
         }
     }
 
-    pub fn new_single(matrix: Matrix4x4, tree: SceneTree) -> Self {
-        Self::Group {
-            matrix,
-            bounding_shape: None,
-            children: vec![tree],
-        }
-    }
-
     pub fn new_bounded(matrix: Matrix4x4, bounding_shape: Shape) -> Self {
         Self::Group {
             matrix,
