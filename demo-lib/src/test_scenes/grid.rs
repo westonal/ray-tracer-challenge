@@ -8,6 +8,7 @@ use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
+use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::world::World;
 
@@ -26,11 +27,7 @@ impl TestScene for Grid {
         for x in -x_count..(x_count + 1) {
             let mut column = SceneTree::new_bounded(
                 Matrix4x4::translation(x as f32, 0., 0.),
-                Some(Shape::new_cube_transformed(Matrix4x4::scale(
-                    scale,
-                    y_count as f32 + 0.5,
-                    scale,
-                ))),
+                Shape::new_cube_transformed(Matrix4x4::scale(scale, y_count as f32 + 0.5, scale)),
             );
             for y in -y_count..(y_count + 1) {
                 let mut material = Material::default();
@@ -51,9 +48,9 @@ impl TestScene for Grid {
         }
 
         let mut world = World::default();
-        world.add_tree(SceneTree::new_single(
-            Matrix4x4::translation(0., 0., -5.3),
-            root,
+        world.add_tree(scene!(
+            matrix:Matrix4x4::translation(0., 0., -5.3);
+            +root;
         ));
         world.add_light(PointLight::new(point!(10, 10, 7), *WHITE));
         world

@@ -32,3 +32,9 @@ impl Shape {
         }
     }
 }
+
+impl From<Shape> for IntersectableShape {
+    fn from(value: Shape) -> Self {
+        value.to_intersectable()
+    }
+}

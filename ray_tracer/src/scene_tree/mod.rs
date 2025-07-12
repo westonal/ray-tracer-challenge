@@ -42,11 +42,44 @@ impl SceneTree {
         }
     }
 
-    pub fn new_bounded(matrix: Matrix4x4, bounding_shape: Option<Shape>) -> Self {
+    pub fn new_bounded(matrix: Matrix4x4, bounding_shape: Shape) -> Self {
         Self::Group {
             matrix,
-            bounding_shape,
+            bounding_shape: Some(bounding_shape),
             children: Default::default(),
         }
     }
+
+    pub fn new_bounded_opt(matrix: Matrix4x4, bounding_shape: Option<Shape>) -> Self {
+        if let Some(b) = bounding_shape {
+            Self::new_bounded(matrix, b)
+        } else {
+            Self::new(matrix)
+        }
+    }
+}
+
+impl From<Shape> for SceneTree {
+    fn from(value: Shape) -> Self {
+        SceneTree::Leaf(value)
+    }
+}
+
+#[macro_export]
+macro_rules! scene {
+    ($(matrix:$matrix:expr;)?
+     $(bounding_volume:$bounding_volume:expr;)?
+     $(+$entry:expr;)*
+    ) => {
+        {
+            let _matrix = math::matrix::matrix_4x4::Matrix4x4::identity();
+            $(let _matrix = $matrix;)?
+            let mut _tree = $crate::scene_tree::SceneTree::new(_matrix);
+            $(let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
+            $(
+            _tree.add_tree($entry.into());
+            )*
+            _tree
+        }
+    };
 }

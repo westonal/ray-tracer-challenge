@@ -135,13 +135,14 @@ mod chain_intersect_tests {
 mod chain_build_from_tree_intersect_tests {
     use super::*;
     use crate::primatives::Shape;
-    use crate::ray;
+    use crate::{ray, scene};
     use math::{point, vector};
 
     #[test]
     fn single_shape_chain() {
-        let mut scene = SceneTree::default();
-        scene.add(Shape::new_sphere());
+        let scene = scene!(
+            +Shape::new_sphere();
+        );
         let scene = scene.flatten();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(2, intersections.len());
@@ -149,9 +150,10 @@ mod chain_build_from_tree_intersect_tests {
 
     #[test]
     fn two_shape_chain() {
-        let mut scene = SceneTree::default();
-        scene.add(Shape::new_sphere());
-        scene.add(Shape::new_sphere());
+        let scene = scene!(
+            +Shape::new_sphere();
+            +Shape::new_sphere();
+        );
         let scene = scene.flatten();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(4, intersections.len());
@@ -159,12 +161,13 @@ mod chain_build_from_tree_intersect_tests {
 
     #[test]
     fn bounding_volume_hit_no_skip_one() {
-        let mut scene = SceneTree::default();
-        scene.add(Shape::new_sphere());
-        let mut sub_scene =
-            SceneTree::new_bounded(Matrix4x4::identity(), Some(Shape::new_sphere()));
-        sub_scene.add(Shape::new_sphere());
-        scene.add_tree(sub_scene);
+        let scene = scene!(
+            +Shape::new_sphere();
+            +scene!(
+                bounding_volume: Shape::new_sphere();
+                +Shape::new_sphere();
+            );
+        );
 
         let scene = scene.flatten();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
@@ -173,39 +176,36 @@ mod chain_build_from_tree_intersect_tests {
 
     #[test]
     fn bounding_volume_missed_skip_one_due_to_bounding_volume_translation() {
-        let mut scene = SceneTree::default();
-        scene.add(Shape::new_sphere());
-        let mut sub_scene = SceneTree::new_bounded(
-            Matrix4x4::identity(),
-            Some(Shape::new_sphere_transformed(Matrix4x4::translation(
-                1.1, 0., 0.,
-            ))),
+        let scene = scene!(
+            +Shape::new_sphere();
+            +scene!(
+                bounding_volume: Shape::new_sphere_transformed(Matrix4x4::translation(1.1, 0., 0.));
+                +Shape::new_sphere();
+            );
+            +Shape::new_sphere();
         );
-        sub_scene.add(Shape::new_sphere());
-        scene.add_tree(sub_scene);
 
         let scene = scene.flatten();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
-        assert_eq!(2, intersections.len());
+        assert_eq!(4, intersections.len());
     }
 
     #[test]
     fn bounding_volume_missed_skip_one_due_to_scene_translation() {
-        let mut scene = SceneTree::default();
-        scene.add(Shape::new_sphere());
-        let mut sub_scene = SceneTree::new_bounded(
-            Matrix4x4::translation(1.1, 0., 0.),
-            Some(Shape::new_sphere()),
+        let scene = scene!(
+            +Shape::new_sphere();
+            +scene!(
+                matrix: Matrix4x4::translation(1.1, 0., 0.);
+                bounding_volume: Shape::new_sphere();
+                +Shape::new_sphere_transformed(Matrix4x4::translation(-1.1, 0., 0.));
+                +Shape::new_sphere();
+            );
+            +Shape::new_sphere();
         );
-        sub_scene.add(Shape::new_sphere_transformed(Matrix4x4::translation(
-            -1.1, 0., 0.,
-        )));
-        sub_scene.add(Shape::new_sphere());
-        scene.add_tree(sub_scene);
 
         let scene = scene.flatten();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
-        assert_eq!(2, intersections.len());
+        assert_eq!(4, intersections.len());
     }
 
     #[test]
@@ -214,9 +214,7 @@ mod chain_build_from_tree_intersect_tests {
         scene.add(Shape::new_sphere());
         let mut sub_scene = SceneTree::new_bounded(
             Matrix4x4::identity(),
-            Some(Shape::new_sphere_transformed(Matrix4x4::translation(
-                1.1, 0., 0.,
-            ))),
+            Shape::new_sphere_transformed(Matrix4x4::translation(1.1, 0., 0.)),
         );
         sub_scene.add(Shape::new_sphere()); // skipped
         sub_scene.add(Shape::new_sphere()); // skipped

@@ -86,7 +86,7 @@ impl CubeOfSpheres {
         bound: Option<Shape>,
         f: T,
     ) -> SceneTree {
-        let mut tree = SceneTree::new_bounded(matrix, bound);
+        let mut tree = SceneTree::new_bounded_opt(matrix, bound);
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
