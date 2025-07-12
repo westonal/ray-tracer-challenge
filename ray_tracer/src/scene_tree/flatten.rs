@@ -59,15 +59,13 @@ impl Intersect for FlatScene {
                 Chain::BoundingVolume(b, skip) => {
                     if b.intersect(ray).is_empty() {
                         i = i + *skip;
-                    } else {
-                        i = i + 1;
                     }
                 }
                 Chain::Shape(s) => {
                     results += s.intersect(ray);
-                    i = i + 1;
                 }
             }
+            i = i + 1;
         }
         results
     }
@@ -110,6 +108,11 @@ impl SceneTree {
                                 bounds.to_intersectable(),
                                 subtree.len(),
                             ));
+                            // bounds.material.transparency = 0.9;
+                            // into.push(Chain::Shape(
+                            //     bounds.to_intersectable(),
+                            //     //subtree.len(),
+                            // ));
                             into.append(&mut subtree);
                         }
                     }

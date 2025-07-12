@@ -1,7 +1,6 @@
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::{BLACK, GREEN, WHITE};
-use math::tuple::point::Point;
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
@@ -41,21 +40,13 @@ impl TestScene for CubeOfSpheres {
         );
         world.add(shape);
         world.add_tree(Self::double(
-            Matrix4x4::translation(0., 0.5, 0.),
-            Some(Shape::new_cube_transformed(Matrix4x4::scale_all(8.))),
-            |point| {
+            Matrix4x4::scale_all(2.).pre_translation(1.75, 2., 1.75),
+            Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
+            |matrix| {
                 Self::double(
-                    Matrix4x4::translation(point.x * 4., point.y * 4., point.z * 4.),
-                    Some(Shape::new_cube_transformed(
-                        Matrix4x4::translation(1., 1., 1.).pre_scale_all(3.),
-                    )),
-                    |point| {
-                        Self::cubes(Matrix4x4::translation(
-                            point.x * 2.,
-                            point.y * 2.,
-                            point.z * 2.,
-                        ))
-                    },
+                    matrix.pre_scale_all(0.5),
+                    Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
+                    |matrix| SceneTree::new_single(matrix, Self::cubes()),
                 )
             },
         ));
@@ -72,16 +63,12 @@ impl TestScene for CubeOfSpheres {
 }
 
 impl CubeOfSpheres {
-    fn cubes(matrix: Matrix4x4) -> SceneTree {
+    fn cubes() -> SceneTree {
         Self::double(
-            matrix,
-            Some(Shape::new_cube_transformed(
-                Matrix4x4::translation(0.5, 0.5, 0.5).pre_scale_all(2.),
-            )),
-            |point| {
-                let mut sphere = Shape::new_sphere_transformed(
-                    Matrix4x4::translation(point.x, point.y, point.z).pre_scale_all(0.5),
-                );
+            Matrix4x4::scale_all(0.5),
+            Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
+            |matrix| {
+                let mut sphere = Shape::new_sphere_transformed(matrix);
                 let mut material = Material::default();
                 material.reflectivity = 0.9;
                 material.specular = 1.;
@@ -94,7 +81,7 @@ impl CubeOfSpheres {
         )
     }
 
-    fn double<T: Fn(Point) -> SceneTree>(
+    fn double<T: Fn(Matrix4x4) -> SceneTree>(
         matrix: Matrix4x4,
         bound: Option<Shape>,
         f: T,
@@ -103,7 +90,11 @@ impl CubeOfSpheres {
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
-                    tree.add_tree(f(point!(x, y, z)));
+                    tree.add_tree(f(Matrix4x4::translation(
+                        x as f32 * 2. - 1.,
+                        y as f32 * 2. - 1.,
+                        z as f32 * 2. - 1.,
+                    )));
                 }
             }
         }
