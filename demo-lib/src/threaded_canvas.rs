@@ -1,8 +1,7 @@
 use crate::image_buffer_canvas::ImageBufferCanvas;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Block, BlockIterator, Canvas, PixelIterator, Size, ViewPort};
-use ray_tracer::world::RenderableWorld;
-use ray_tracer::world::render_world::{RenderPartialWorld, RenderWorld};
+use ray_tracer::{RenderPartialWorld, RenderWorld, RenderableWorld};
 use rayon::prelude::*;
 use std::ops::{Deref, DerefMut};
 

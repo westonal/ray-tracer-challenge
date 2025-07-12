@@ -1,7 +1,7 @@
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::rays::RayGeneration;
-use crate::world::RenderableWorld;
+use crate::render::RenderableWorld;
 use math::tuple::color::{Color, TRANSPARENT};
 
 impl RenderableWorld<'_> {
@@ -61,7 +61,7 @@ mod refraction_lighting_tests {
         let mut world = World::default();
         world.add(sphere);
         let world = world.prepare_for_render();
-        let sphere = world.shapes.get(0).unwrap();
+        let sphere = world.flat_scene.get(0).unwrap();
 
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = Intersections::new(vec![
@@ -86,7 +86,7 @@ mod refraction_lighting_tests {
         world.add(sphere);
 
         let world = world.prepare_for_render();
-        let sphere = world.shapes.get(0).unwrap();
+        let sphere = world.flat_scene.get(0).unwrap();
 
         println!("{}", sphere.id);
         println!("{}", sphere.material.transparency);
@@ -109,16 +109,16 @@ mod refraction_lighting_tests {
     fn the_refracted_color_with_a_refracted_ray() {
         let world = World::default_world();
         let mut world = world.prepare_for_render();
-        let a = world.shapes.deref_mut().get_mut(0).unwrap();
+        let a = world.flat_scene.deref_mut().get_mut(0).unwrap();
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;
-        let b = world.shapes.get_mut(1).unwrap().deref_mut();
+        let b = world.flat_scene.get_mut(1).unwrap().deref_mut();
         b.material.transparency = 1.;
         b.material.refractive_index = 1.5;
         let ray = ray!((0., 0., 0.1), (0., 1., 0.));
 
-        let a = world.shapes.get(0).unwrap().deref();
-        let b = world.shapes.get(1).unwrap().deref();
+        let a = world.flat_scene.get(0).unwrap().deref();
+        let b = world.flat_scene.get(1).unwrap().deref();
         let intersections = Intersections::new(vec![
             Intersection::new(-0.9899, a),
             Intersection::new(-0.4899, b),

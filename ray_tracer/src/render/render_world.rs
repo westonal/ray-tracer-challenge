@@ -1,6 +1,6 @@
 use crate::camera::Camera;
 use crate::canvas::Block;
-use crate::world::RenderableWorld;
+pub(crate) use crate::render::RenderableWorld;
 
 pub trait RenderWorld {
     fn render(&mut self, world: &RenderableWorld, camera: &Camera);

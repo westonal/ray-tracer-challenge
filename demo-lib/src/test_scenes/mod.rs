@@ -7,10 +7,10 @@ pub mod grid;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
+use ray_tracer::RenderWorld;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Size, ViewPort};
 use ray_tracer::world::World;
-use ray_tracer::world::render_world::RenderWorld;
 use std::time::Instant;
 
 pub trait TestScene {

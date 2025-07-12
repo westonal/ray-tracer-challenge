@@ -1,7 +1,7 @@
 use crate::canvas::Size;
 use crate::ray;
 use crate::rays::{Ray, RayGeneration};
-use crate::world::{RenderableWorld, World};
+use crate::render::RenderableWorld;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
 use math::{Angle, point};
@@ -64,6 +64,7 @@ mod camera_tests {
 
     use crate::view_matrix::ViewMatrix;
 
+    use crate::world::World;
     use math::{assert_color, assert_point, assert_vector, color, degrees, point, vector};
 
     #[test]

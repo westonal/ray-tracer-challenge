@@ -3,7 +3,7 @@ use crate::lighting::pre_calculations::PreCalculations;
 use crate::lighting::refraction_lighting::schlick;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::rays::RayGeneration;
-use crate::world::{RenderableWorld, World};
+use crate::render::RenderableWorld;
 use math::color;
 use math::tuple::color::Color;
 
@@ -88,7 +88,7 @@ mod world_shading_tests {
         let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 0, 1));
         let world = world.prepare_for_render();
-        let first = world.shapes.get(0).unwrap();
+        let first = world.flat_scene.get(0).unwrap();
         let intersection = Intersection::new(4., first);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
@@ -101,7 +101,7 @@ mod world_shading_tests {
         world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = ray_first_gen!(point!(0, 0, 0), vector!(0, 0, 1));
         let world = world.prepare_for_render();
-        let second = world.shapes.get(1).unwrap();
+        let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(0.5, second);
         let pre_calculations = intersection.to_pre_calculation(ray);
         let c = world.shade(pre_calculations);
@@ -141,6 +141,7 @@ mod world_shadow_shading_tests {
     use crate::lighting::PointLight;
     use crate::primatives::Shape;
     use crate::ray_first_gen;
+    use crate::world::World;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::{point, vector};
 
@@ -153,7 +154,7 @@ mod world_shadow_shading_tests {
             0., 0., 10.,
         )));
         let world = world.prepare_for_render();
-        let second = world.shapes.get(1).unwrap();
+        let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
         let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);
@@ -173,6 +174,7 @@ mod world_pattern_shading_tests {
     use crate::ray;
     use crate::rays::Ray;
     use crate::transform::Transform;
+    use crate::world::World;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLUE, GREEN, RED};
     use math::{degrees, point, vector};
@@ -184,7 +186,7 @@ mod world_pattern_shading_tests {
     impl TestScene {
         fn color_ray(&self, ray: Ray) -> Color {
             let world = &self.world.prepare_for_render();
-            let first = world.shapes.get(0).unwrap();
+            let first = world.flat_scene.get(0).unwrap();
             let intersection = Intersection::new(4., &first);
             let pre_calculations =
                 intersection.to_pre_calculation(RayGeneration::new_first_generation_ray(ray));

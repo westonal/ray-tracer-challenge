@@ -2,7 +2,7 @@ use crate::intersection::Intersect;
 use crate::lighting::PointLight;
 use crate::lighting::surface_hit::SurfaceHit;
 use crate::ray;
-use crate::world::RenderableWorld;
+use crate::render::RenderableWorld;
 use math::tuple::point::Point;
 
 impl RenderableWorld<'_> {

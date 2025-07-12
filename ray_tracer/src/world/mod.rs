@@ -1,16 +1,14 @@
 mod default;
-pub mod render_world;
 pub mod shading;
 mod shadows;
 
 #[cfg(test)]
 pub use crate::world::default::test_world;
 
-use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
 use crate::primatives::Shape;
-use crate::rays::Ray;
-use crate::scene_tree::{FlatScene, SceneTree};
+use crate::render::RenderableWorld;
+use crate::scene_tree::SceneTree;
 use math::tuple::color::Color;
 
 pub struct World {
@@ -23,19 +21,12 @@ pub struct World {
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
         RenderableWorld {
-            shapes: self.scene_tree.flatten(),
+            flat_scene: self.scene_tree.flatten(),
             lights: &self.lights,
             background: self.background,
             max_ray_generation: self.max_ray_generation,
         }
     }
-}
-
-pub struct RenderableWorld<'w> {
-    pub(crate) shapes: FlatScene,
-    pub lights: &'w Vec<PointLight>,
-    pub background: Color,
-    pub max_ray_generation: u32,
 }
 
 impl World {
@@ -75,12 +66,6 @@ impl Default for World {
     }
 }
 
-impl Intersect for RenderableWorld<'_> {
-    fn intersect(&self, ray: Ray) -> Intersections {
-        self.shapes.intersect(ray)
-    }
-}
-
 #[cfg(test)]
 mod world_tests {
     use super::*;
@@ -89,6 +74,7 @@ mod world_tests {
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
+    use crate::intersection::Intersect;
     use math::{color, point};
 
     #[test]
