@@ -11,7 +11,7 @@ impl RenderableWorld<'_> {
         self.lights
             .iter()
             .filter_map(|l| {
-                let intersections = self.intersect(ray!(point, l.position - point));
+                let intersections = self.intersect(&ray!(point, l.position - point));
                 if let Some((hit, _)) = intersections.hit() {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {
@@ -27,7 +27,7 @@ impl RenderableWorld<'_> {
         self.lights
             .iter()
             .filter_map(|l| {
-                let intersections = self.intersect(ray!(point.point, l.position - point.point));
+                let intersections = self.intersect(&ray!(point.point, l.position - point.point));
                 if let Some((hit, _)) = intersections.hit_excluding(point.shape_id) {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {

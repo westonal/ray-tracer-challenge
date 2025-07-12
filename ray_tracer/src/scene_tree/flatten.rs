@@ -34,7 +34,7 @@ impl Deref for FlatScene {
 }
 
 impl Intersect for FlatScene {
-    fn intersect(&self, ray: Ray) -> Intersections {
+    fn intersect(&self, ray: &Ray) -> Intersections {
         let mut results = Intersections::default();
         let mut i = 0;
         while i < self.shapes.len() {

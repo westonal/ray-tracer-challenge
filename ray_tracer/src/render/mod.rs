@@ -14,7 +14,7 @@ pub struct RenderableWorld<'w> {
 }
 
 impl Intersect for RenderableWorld<'_> {
-    fn intersect(&self, ray: Ray) -> Intersections {
+    fn intersect(&self, ray: &Ray) -> Intersections {
         self.flat_scene.intersect(ray)
     }
 }

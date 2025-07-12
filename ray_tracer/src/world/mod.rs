@@ -102,7 +102,7 @@ mod world_tests {
         )));
         let world = world.prepare_for_render();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
-        let intersections = world.intersect(ray);
+        let intersections = world.intersect(&ray);
         assert_eq!(intersections.len(), 4);
         assert_eq!(intersections[0].t, 4.);
         assert_eq!(intersections[1].t, 4.5);

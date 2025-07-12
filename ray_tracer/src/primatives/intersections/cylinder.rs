@@ -12,7 +12,7 @@ pub enum CylinderCapStyle {
 }
 
 impl Cylinder {
-    pub(crate) fn intersect(ray: Ray, cylinder_cap_style: &CylinderCapStyle) -> Vec<f32> {
+    pub(crate) fn intersect(ray: &Ray, cylinder_cap_style: &CylinderCapStyle) -> Vec<f32> {
         let direction = vector!(ray.direction.x, 0., ray.direction.z);
 
         let mut result = Vec::with_capacity(2);
@@ -103,9 +103,9 @@ mod cylinder_intersection_miss_tests {
             #[test]
             fn $name() {
                 let cylinder = Shape::new_open_cylinder().to_intersectable();
-                let intersections = cylinder.intersect($ray);
+                let intersections = cylinder.intersect(&$ray);
                 assert_eq!(intersections.len(), 0);
-                assert!(!cylinder.fast_hit($ray))
+                assert!(!cylinder.fast_hit(&$ray))
             }
             )*
         };
@@ -133,9 +133,9 @@ mod cylinder_intersection_hit_tests {
                 let cylinder = Shape::new_open_cylinder_transformed(
                     Matrix4x4::scale(1., 8., 1.)
                 ).to_intersectable();
-                let intersections = cylinder.intersect($ray.normalize());
+                let intersections = cylinder.intersect(&$ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
-                assert!(cylinder.fast_hit($ray))
+                assert!(cylinder.fast_hit(&$ray))
             }
             )*
         };
@@ -194,8 +194,13 @@ mod cylinder_truncate_tests {
                         .pre_scale(1., 0.5, 1.)
                         .pre_translation(0., 1., 0.)
                     ).to_intersectable();
-                    let intersections = cylinder.intersect($ray.normalize());
+                    let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!($expect, intersections.len());
+                    if $expect > 0 {
+                        assert!(cylinder.fast_hit(&$ray));
+                    }else{
+                        assert!(!cylinder.fast_hit(&$ray));
+                    }
                 }
             )*
         };
@@ -230,9 +235,9 @@ mod cylinder_cap_intersection_tests {
                         // .pre_scale(1., 0.5, 1.)
                         // .pre_translation(0., 1., 0.)
                     ).to_intersectable();
-                    let intersections = cylinder.intersect($ray.normalize());
+                    let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
-                    assert!(cylinder.fast_hit($ray))
+                    assert!(cylinder.fast_hit(&$ray))
                 }
             )*
         };

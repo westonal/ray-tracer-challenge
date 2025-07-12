@@ -6,7 +6,7 @@ use math::{max, min, vector};
 pub struct Cube {}
 
 impl Cube {
-    pub(crate) fn fast_hit(ray: Ray) -> bool {
+    pub(crate) fn fast_hit(ray: &Ray) -> bool {
         let (x_tmin, x_tmax) = Self::check_axis(ray.origin.x, ray.direction.x);
         let (y_tmin, y_tmax) = Self::check_axis(ray.origin.y, ray.direction.y);
         let (z_tmin, z_tmax) = Self::check_axis(ray.origin.z, ray.direction.z);
@@ -17,7 +17,7 @@ impl Cube {
         tmin <= tmax
     }
 
-    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
+    pub(crate) fn intersect(ray: &Ray) -> Vec<f32> {
         let (x_tmin, x_tmax) = Self::check_axis(ray.origin.x, ray.direction.x);
         let (y_tmin, y_tmax) = Self::check_axis(ray.origin.y, ray.direction.y);
         let (z_tmin, z_tmax) = Self::check_axis(ray.origin.z, ray.direction.z);
@@ -72,7 +72,7 @@ mod cube_intersection_tests {
     use crate::primatives::Shape;
     use crate::ray;
 
-    fn run_intersection_test(ray: Ray) -> (f32, f32) {
+    fn run_intersection_test(ray: &Ray) -> (f32, f32) {
         let cube = Shape::new_cube().to_intersectable();
         let intersections = cube.intersect(ray);
         assert!(cube.fast_hit(ray));
@@ -89,7 +89,7 @@ mod cube_intersection_tests {
         #[test]
         fn $name(){
             let (expected_n1,expected_n2) = $value;
-            let (actual_n1,actual_n2) = run_intersection_test($ray);
+            let (actual_n1,actual_n2) = run_intersection_test(&$ray);
             assert_eq!(expected_n1, actual_n1, "n1");
             assert_eq!(expected_n2, actual_n2, "n2");
         }
@@ -120,9 +120,9 @@ mod cube_intersection_missing_tests {
                 #[test]
                 fn $name() {
                     let cube = Shape::new_cube().to_intersectable();
-                    let intersections = cube.intersect($ray);
+                    let intersections = cube.intersect(&$ray);
                     assert_eq!(0, intersections.len());
-                    assert!(!cube.fast_hit($ray))
+                    assert!(!cube.fast_hit(&$ray))
                 }
             )*
         }

@@ -1,13 +1,13 @@
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::IntersectableShape;
-use crate::primatives::{Shape, ShapeId};
+use crate::primatives::ShapeId;
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
 
 pub trait Intersect {
-    fn intersect(&self, ray: Ray) -> Intersections;
+    fn intersect(&self, ray: &Ray) -> Intersections;
 
-    fn fast_hit(&self, ray: Ray) -> bool {
+    fn fast_hit(&self, ray: &Ray) -> bool {
         self.intersect(ray).hit().is_some()
     }
 }
@@ -84,6 +84,7 @@ impl<'s> Intersection<'s> {
 #[cfg(test)]
 mod sorting_tests {
     use super::*;
+    use crate::primatives::Shape;
 
     #[test]
     fn intersections_are_sorted_in_create() {

@@ -24,20 +24,20 @@ impl IntersectableShape {
 }
 
 impl Intersect for IntersectableShape {
-    fn intersect(&self, ray: Ray) -> Intersections {
+    fn intersect(&self, ray: &Ray) -> Intersections {
         // Convert world ray into object space
         let ray = self.transform.world_ray_to_object_ray(ray);
         let result = self
             .surface
-            .intersect(ray)
+            .intersect(&ray)
             .iter()
             .map(|f| Intersection::new(*f, self))
             .collect();
         Intersections::new(result)
     }
 
-    fn fast_hit(&self, ray: Ray) -> bool {
+    fn fast_hit(&self, ray: &Ray) -> bool {
         let ray = self.transform.world_ray_to_object_ray(ray);
-        self.surface.fast_hit(ray)
+        self.surface.fast_hit(&ray)
     }
 }
