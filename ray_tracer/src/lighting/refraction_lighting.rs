@@ -41,7 +41,6 @@ impl RenderableWorld<'_> {
 
 #[cfg(test)]
 mod refraction_lighting_tests {
-
     use crate::intersection::{Intersection, Intersections};
     use crate::lighting::PointLight;
     use crate::material::Material;
@@ -51,6 +50,7 @@ mod refraction_lighting_tests {
     use crate::world::World;
     use crate::{ray, ray_first_gen};
     use math::matrix::matrix_4x4::Matrix4x4;
+    use std::ops::DerefMut;
 
     use math::tuple::color::RED;
     use math::{assert_color, color, point};
@@ -109,7 +109,7 @@ mod refraction_lighting_tests {
     fn the_refracted_color_with_a_refracted_ray() {
         let world = World::default_world();
         let mut world = world.prepare_for_render();
-        let a = world.shapes.get_mut(0).unwrap();
+        let a = world.shapes.deref_mut().get_mut(0).unwrap();
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;
         let b = world.shapes.get_mut(1).unwrap();

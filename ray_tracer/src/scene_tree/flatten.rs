@@ -1,12 +1,32 @@
 use crate::primatives::IntersectableShape;
 use crate::scene_tree::SceneTree;
 use math::matrix::matrix_4x4::Matrix4x4;
+use std::ops::{Deref, DerefMut};
+
+pub struct FlatScene {
+    shapes: Vec<IntersectableShape>,
+}
+
+impl Deref for FlatScene {
+    type Target = Vec<IntersectableShape>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.shapes
+    }
+}
+
+#[cfg(test)] // TODO I don't like this just for modifying shapes in tests
+impl DerefMut for FlatScene {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.shapes
+    }
+}
 
 impl SceneTree {
-    pub fn flatten(&self) -> Vec<IntersectableShape> {
+    pub fn flatten(&self) -> FlatScene {
         let mut result = vec![];
         self.walk(&mut result, Matrix4x4::identity());
-        result
+        FlatScene { shapes: result }
     }
 
     fn walk(&self, into: &mut Vec<IntersectableShape>, tree_matrix: Matrix4x4) {

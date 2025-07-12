@@ -5,13 +5,13 @@ mod shadows;
 
 #[cfg(test)]
 pub use crate::world::default::test_world;
+use std::ops::Deref;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
-use crate::primatives::IntersectableShape;
 use crate::primatives::Shape;
 use crate::rays::Ray;
-use crate::scene_tree::SceneTree;
+use crate::scene_tree::{FlatScene, SceneTree};
 use math::tuple::color::Color;
 
 pub struct World {
@@ -33,7 +33,7 @@ impl<'w> World {
 }
 
 pub struct RenderableWorld<'w> {
-    pub(crate) shapes: Vec<IntersectableShape>,
+    pub(crate) shapes: FlatScene,
     pub lights: &'w Vec<PointLight>,
     pub background: Color,
     pub max_ray_generation: u32,
@@ -79,7 +79,7 @@ impl Default for World {
 impl Intersect for RenderableWorld<'_> {
     fn intersect(&self, ray: Ray) -> Intersections {
         let mut results = Intersections::default();
-        for object in &self.shapes {
+        for object in self.shapes.deref() {
             results += object.intersect(ray);
         }
         results
