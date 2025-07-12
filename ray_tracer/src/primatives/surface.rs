@@ -4,6 +4,7 @@ use crate::primatives::intersections::{CylinderCapStyle, Plane};
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
+use crate::primatives::triangle::Triangle;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub(crate) enum Surface {
@@ -18,6 +19,8 @@ pub(crate) enum Surface {
 
     /// A cylinder with center at origin and radius 1, infinite length
     UnitCylinder(CylinderCapStyle),
+    
+    SingleTriangle(Triangle)
 }
 
 impl Surface {
@@ -27,6 +30,7 @@ impl Surface {
             Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
             Surface::UnitCube => Cube::fast_hit(ray),
             Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
+            &Surface::SingleTriangle(_) => todo!(),
         }
     }
 
@@ -36,6 +40,7 @@ impl Surface {
             Surface::PlaneXZ => Plane::intersect(ray),
             Surface::UnitCube => Cube::intersect(ray),
             Surface::UnitCylinder(style) => Cylinder::intersect(ray, style),
+            &Surface::SingleTriangle(_) => todo!(),
         }
     }
 
@@ -45,6 +50,7 @@ impl Surface {
             Surface::PlaneXZ => Plane::normal_at(object_point),
             Surface::UnitCube => Cube::normal_at(object_point),
             Surface::UnitCylinder(style) => Cylinder::normal_at(object_point, style),
+            &Surface::SingleTriangle(triangle) => triangle.normal.to_vector(),
         }
     }
 }
