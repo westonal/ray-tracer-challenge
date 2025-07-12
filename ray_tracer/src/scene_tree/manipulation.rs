@@ -9,19 +9,19 @@ impl SceneTree {
         }
     }
 
-    pub fn add_tree(&mut self, object: SceneTree) {
+    pub fn add_tree<T: Into<SceneTree>>(&mut self, object: T) {
         match self {
             SceneTree::Leaf(_) => {
                 panic!("Can't add to another leaf")
             }
             SceneTree::Group { children, .. } => {
-                children.push(object);
+                children.push(object.into());
             }
         }
     }
 
     pub fn add(&mut self, object: Shape) {
-        self.add_tree(SceneTree::Leaf(object));
+        self.add_tree(object);
     }
 }
 

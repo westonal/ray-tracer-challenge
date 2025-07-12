@@ -66,10 +66,10 @@ macro_rules! scene {
         {
             let _matrix = math::matrix::matrix_4x4::Matrix4x4::identity();
             $(let _matrix = $matrix;)?
-            let mut _tree = $crate::scene_tree::SceneTree::new(_matrix);
-            $(let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
+            let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new(_matrix);
+            $(let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
             $(
-            _tree.add_tree($entry.into());
+            _tree.add_tree($entry);
             )*
             _tree
         }
