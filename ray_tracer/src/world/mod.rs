@@ -5,7 +5,6 @@ mod shadows;
 
 #[cfg(test)]
 pub use crate::world::default::test_world;
-use std::ops::Deref;
 
 use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;

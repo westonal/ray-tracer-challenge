@@ -1,8 +1,7 @@
 use crate::intersection::{Intersect, Intersections};
-use crate::primatives::{IntersectableShape, Shape};
+use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
-use crate::world::RenderableWorld;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::ops::{Deref, DerefMut};
 
@@ -59,7 +58,7 @@ impl Intersect for FlatScene {
             match item {
                 Chain::BoundingVolume(b, skip) => {
                     if b.intersect(ray).is_empty() {
-                        i = i + 1; //*skip;
+                        i = i + *skip;
                     } else {
                         i = i + 1;
                     }
@@ -89,7 +88,9 @@ impl SceneTree {
                 into.push(Chain::Shape(shape.to_intersectable()))
             }
             SceneTree::Group {
-                children, matrix, bounding_shape,
+                children,
+                matrix,
+                bounding_shape,
             } => {
                 let matrix = tree_matrix * *matrix;
 
@@ -103,8 +104,8 @@ impl SceneTree {
                         for child in children {
                             let mut subtree = vec![];
                             child.walk(&mut subtree, matrix);
-                            let mut bounds= bounds.clone();
-                            bounds.matrix = tree_matrix * bounds.matrix;
+                            let mut bounds = bounds.clone();
+                            bounds.matrix = matrix * bounds.matrix;
                             into.push(Chain::BoundingVolume(
                                 bounds.to_intersectable(),
                                 subtree.len(),
