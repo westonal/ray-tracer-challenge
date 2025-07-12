@@ -6,7 +6,6 @@ mod shadows;
 pub use crate::world::default::test_world;
 
 use crate::lighting::PointLight;
-use crate::primatives::Shape;
 use crate::render::RenderableWorld;
 use crate::scene_tree::SceneTree;
 use math::tuple::color::Color;
@@ -46,11 +45,7 @@ impl World {
         self.scene_tree.shape_count()
     }
 
-    pub fn add_tree(&mut self, object: SceneTree) {
-        self.scene_tree.add_tree(object);
-    }
-
-    pub fn add(&mut self, object: Shape) {
+    pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
         self.scene_tree.add(object);
     }
 }

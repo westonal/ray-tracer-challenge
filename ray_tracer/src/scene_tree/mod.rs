@@ -69,7 +69,7 @@ macro_rules! scene {
             let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new(_matrix);
             $(let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
             $(
-            _tree.add_tree($entry);
+            _tree.add($entry);
             )*
             _tree
         }

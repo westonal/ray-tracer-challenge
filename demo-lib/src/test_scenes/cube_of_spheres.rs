@@ -68,7 +68,7 @@ impl TestScene for CubeOfSpheres {
         );
 
         let mut world = World::default();
-        world.add_tree(scene);
+        world.add(scene);
         world.max_ray_generation = 2;
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
         world
@@ -111,7 +111,7 @@ impl CubeOfSpheres {
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
-                    tree.add_tree(f(Matrix4x4::translation(
+                    tree.add(f(Matrix4x4::translation(
                         x as f32 * 2. - 1.,
                         y as f32 * 2. - 1.,
                         z as f32 * 2. - 1.,

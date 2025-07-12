@@ -44,11 +44,11 @@ impl TestScene for Grid {
                 sphere.material = material;
                 column.add(sphere);
             }
-            root.add_tree(column);
+            root.add(column);
         }
 
         let mut world = World::default();
-        world.add_tree(scene!(
+        world.add(scene!(
             matrix:Matrix4x4::translation(0., 0., -5.3);
             +root;
         ));

@@ -47,7 +47,7 @@ impl TestScene for GlassSphereWithAir {
             );
         );
 
-        world.add_tree(scene);
+        world.add(scene);
         world
     }
 

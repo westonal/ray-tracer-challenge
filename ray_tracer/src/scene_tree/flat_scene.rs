@@ -218,7 +218,7 @@ mod chain_build_from_tree_intersect_tests {
         );
         sub_scene.add(Shape::new_sphere()); // skipped
         sub_scene.add(Shape::new_sphere()); // skipped
-        scene.add_tree(sub_scene);
+        scene.add(sub_scene);
         scene.add(Shape::new_sphere());
         scene.add(Shape::new_sphere());
 

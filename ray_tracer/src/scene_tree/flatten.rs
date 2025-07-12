@@ -85,7 +85,7 @@ mod flatten_tests {
         let mut branch = SceneTree::default();
         branch.add(Shape::new_cube());
 
-        tree.add_tree(branch);
+        tree.add(branch);
 
         let vec = tree.flatten();
         assert_eq!(2, vec.len());
@@ -100,7 +100,7 @@ mod flatten_tests {
         branch.add(Shape::new_cube());
         branch.add(Shape::new_plane());
 
-        tree.add_tree(branch);
+        tree.add(branch);
 
         let vec = tree.flatten();
         assert_eq!(3, vec.len());
@@ -128,7 +128,7 @@ mod flatten_matrix_tests {
         let mut branch = SceneTree::new(b);
         branch.add(Shape::new_cube_transformed(c));
 
-        root.add_tree(branch);
+        root.add(branch);
         root.add(Shape::new_cylinder_transformed(d));
 
         let vec = root.flatten();
