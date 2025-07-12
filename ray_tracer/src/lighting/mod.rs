@@ -267,6 +267,8 @@ mod reflection_lighting_tests {
         world.set_light(PointLight::new(Point::origin(), *WHITE));
         world.add(sphere);
         world.add(plane);
+
+        let world = world.prepare_for_render();
         // Shoot straight at sphere
         assert_eq!(
             *RED,
@@ -284,7 +286,7 @@ mod reflection_lighting_tests {
         // two parallel reflective planes
         let plane1 = solid_reflective_plane(*GREEN, 0.25);
         let mut plane2 = solid_reflective_plane(*RED, 0.25);
-        plane2.transform = Transform::new(Matrix4x4::translation(0., 10., 0.));
+        plane2.matrix = Matrix4x4::translation(0., 10., 0.);
         let mut world = World::default();
         world.max_ray_generation = 4;
         world.set_light(PointLight::new(Point::origin(), *WHITE));
@@ -297,6 +299,8 @@ mod reflection_lighting_tests {
             ray!((0., 5., 0.), (0., -1., 0.)),
             world.max_ray_generation,
         );
+
+        let world = world.prepare_for_render();
         assert_eq!(color!(0, 1, 0), world.color_at(ray));
 
         // second case should have one color from the reflection

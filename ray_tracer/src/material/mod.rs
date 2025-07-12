@@ -6,7 +6,7 @@ pub mod refraction;
 use crate::material::pattern::Pattern;
 use math::tuple::color::Color;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Material {
     pub pattern: Pattern,
     pub ambient: f32,

@@ -5,14 +5,14 @@ use math::vector;
 
 pub struct Cylinder {}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum CylinderCapStyle {
     Open,
     Closed,
 }
 
 impl Cylinder {
-    pub(crate) fn intersect(ray: Ray, cylinder_cap_style: &CylinderCapStyle) -> Vec<f32> {
+    pub(crate) fn intersect(ray: &Ray, cylinder_cap_style: &CylinderCapStyle) -> Vec<f32> {
         let direction = vector!(ray.direction.x, 0., ray.direction.z);
 
         let mut result = Vec::with_capacity(2);
@@ -102,9 +102,10 @@ mod cylinder_intersection_miss_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_open_cylinder();
-                let intersections = cylinder.intersect($ray);
+                let cylinder = Shape::new_open_cylinder().to_intersectable();
+                let intersections = cylinder.intersect(&$ray);
                 assert_eq!(intersections.len(), 0);
+                assert!(!cylinder.fast_hit(&$ray))
             }
             )*
         };
@@ -131,9 +132,10 @@ mod cylinder_intersection_hit_tests {
             fn $name() {
                 let cylinder = Shape::new_open_cylinder_transformed(
                     Matrix4x4::scale(1., 8., 1.)
-                );
-                let intersections = cylinder.intersect($ray.normalize());
+                ).to_intersectable();
+                let intersections = cylinder.intersect(&$ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
+                assert!(cylinder.fast_hit(&$ray))
             }
             )*
         };
@@ -159,7 +161,7 @@ mod cylinder_normal_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cylinder = Shape::new_open_cylinder();
+                    let cylinder = Shape::new_open_cylinder().to_intersectable();
                     math::assert_vector!(cylinder.normal_at($point).to_vector(), $expect);
                 }
             )*
@@ -191,9 +193,14 @@ mod cylinder_truncate_tests {
                         Matrix4x4::translation(0., 1., 0.)
                         .pre_scale(1., 0.5, 1.)
                         .pre_translation(0., 1., 0.)
-                    );
-                    let intersections = cylinder.intersect($ray.normalize());
+                    ).to_intersectable();
+                    let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!($expect, intersections.len());
+                    if $expect > 0 {
+                        assert!(cylinder.fast_hit(&$ray));
+                    }else{
+                        assert!(!cylinder.fast_hit(&$ray));
+                    }
                 }
             )*
         };
@@ -227,9 +234,10 @@ mod cylinder_cap_intersection_tests {
                         // Matrix4x4::translation(0., 1., 0.)
                         // .pre_scale(1., 0.5, 1.)
                         // .pre_translation(0., 1., 0.)
-                    );
-                    let intersections = cylinder.intersect($ray.normalize());
+                    ).to_intersectable();
+                    let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
+                    assert!(cylinder.fast_hit(&$ray))
                 }
             )*
         };
@@ -260,7 +268,7 @@ mod cylinder_cap_normal_tests {
                     // cylinder 1..2
                     let cylinder = Shape::new_cylinder_transformed(
                         Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
-                    );
+                    ).to_intersectable();
                     assert_vector!(cylinder.normal_at($point).to_vector(), $expected);
                 }
             )*

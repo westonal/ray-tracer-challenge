@@ -6,7 +6,18 @@ use math::{max, min, vector};
 pub struct Cube {}
 
 impl Cube {
-    pub(crate) fn intersect(ray: Ray) -> Vec<f32> {
+    pub(crate) fn fast_hit(ray: &Ray) -> bool {
+        let (x_tmin, x_tmax) = Self::check_axis(ray.origin.x, ray.direction.x);
+        let (y_tmin, y_tmax) = Self::check_axis(ray.origin.y, ray.direction.y);
+        let (z_tmin, z_tmax) = Self::check_axis(ray.origin.z, ray.direction.z);
+
+        let tmin = max!(x_tmin, y_tmin, z_tmin);
+        let tmax = min!(x_tmax, y_tmax, z_tmax);
+
+        tmin <= tmax
+    }
+
+    pub(crate) fn intersect(ray: &Ray) -> Vec<f32> {
         let (x_tmin, x_tmax) = Self::check_axis(ray.origin.x, ray.direction.x);
         let (y_tmin, y_tmax) = Self::check_axis(ray.origin.y, ray.direction.y);
         let (z_tmin, z_tmax) = Self::check_axis(ray.origin.z, ray.direction.z);
@@ -61,9 +72,10 @@ mod cube_intersection_tests {
     use crate::primatives::Shape;
     use crate::ray;
 
-    fn run_intersection_test(ray: Ray) -> (f32, f32) {
-        let cube = Shape::new_cube();
+    fn run_intersection_test(ray: &Ray) -> (f32, f32) {
+        let cube = Shape::new_cube().to_intersectable();
         let intersections = cube.intersect(ray);
+        assert!(cube.fast_hit(ray));
         assert_eq!(2, intersections.len());
         (
             intersections.get(0).unwrap().t,
@@ -77,7 +89,7 @@ mod cube_intersection_tests {
         #[test]
         fn $name(){
             let (expected_n1,expected_n2) = $value;
-            let (actual_n1,actual_n2) = run_intersection_test($ray);
+            let (actual_n1,actual_n2) = run_intersection_test(&$ray);
             assert_eq!(expected_n1, actual_n1, "n1");
             assert_eq!(expected_n2, actual_n2, "n2");
         }
@@ -106,10 +118,11 @@ mod cube_intersection_missing_tests {
         ($($name:ident: $ray:expr)*) => {
             $(
                 #[test]
-                fn $name(){
-                    let cube = Shape::new_cube();
-                    let intersections = cube.intersect($ray);
+                fn $name() {
+                    let cube = Shape::new_cube().to_intersectable();
+                    let intersections = cube.intersect(&$ray);
                     assert_eq!(0, intersections.len());
+                    assert!(!cube.fast_hit(&$ray))
                 }
             )*
         }
@@ -136,7 +149,7 @@ mod cube_normal_tests {
         $(
             #[test]
             fn $name(){
-                let cube = Shape::new_cube();
+                let cube = Shape::new_cube().to_intersectable();
                 assert_eq!($normal, *cube.normal_at($point));
             }
         )*

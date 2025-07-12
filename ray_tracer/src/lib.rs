@@ -5,21 +5,12 @@ pub mod lighting;
 pub mod material;
 pub mod primatives;
 pub mod rays;
+mod render;
+pub mod scene_tree;
 pub mod transform;
 pub mod view_matrix;
 pub mod world;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use render::RenderableWorld;
+pub use render::render_world::RenderPartialWorld;
+pub use render::render_world::RenderWorld;

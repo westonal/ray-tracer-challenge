@@ -5,7 +5,7 @@ use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub(crate) enum Surface {
     /// A sphere with center at origin and radius 1
     UnitSphere,
@@ -21,7 +21,16 @@ pub(crate) enum Surface {
 }
 
 impl Surface {
-    pub(crate) fn intersect(&self, ray: Ray) -> Vec<f32> {
+    pub(crate) fn fast_hit(&self, ray: &Ray) -> bool {
+        match self {
+            Surface::UnitSphere => !Sphere::intersect(ray).is_empty(),
+            Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
+            Surface::UnitCube => Cube::fast_hit(ray),
+            Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
+        }
+    }
+
+    pub(crate) fn intersect(&self, ray: &Ray) -> Vec<f32> {
         match self {
             Surface::UnitSphere => Sphere::intersect(ray),
             Surface::PlaneXZ => Plane::intersect(ray),

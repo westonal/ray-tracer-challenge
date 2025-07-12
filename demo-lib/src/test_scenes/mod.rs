@@ -7,10 +7,10 @@ pub mod grid;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
+use ray_tracer::RenderWorld;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Size, ViewPort};
 use ray_tracer::world::World;
-use ray_tracer::world::render_world::RenderWorld;
 use std::time::Instant;
 
 pub trait TestScene {
@@ -44,6 +44,8 @@ impl<T: TestScene> RenderTestScene<T> for T {
         let camera = T::build_camera(size);
 
         let now = Instant::now();
+
+        let world = world.prepare_for_render();
         canvas.render(&world, &camera);
         let duration = now.elapsed();
         let pixels = canvas.size().width() * canvas.size().height();

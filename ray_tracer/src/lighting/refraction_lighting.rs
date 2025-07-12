@@ -1,10 +1,10 @@
 use crate::lighting::pre_calculations::PreCalculations;
 use crate::material::refraction::RefractionMediumIndexes;
 use crate::rays::RayGeneration;
-use crate::world::World;
+use crate::render::RenderableWorld;
 use math::tuple::color::{Color, TRANSPARENT};
 
-impl World {
+impl RenderableWorld<'_> {
     pub fn refracted_color(
         &self,
         pre_calculations: &PreCalculations,
@@ -41,7 +41,6 @@ impl World {
 
 #[cfg(test)]
 mod refraction_lighting_tests {
-
     use crate::intersection::{Intersection, Intersections};
     use crate::lighting::PointLight;
     use crate::material::Material;
@@ -51,6 +50,7 @@ mod refraction_lighting_tests {
     use crate::world::World;
     use crate::{ray, ray_first_gen};
     use math::matrix::matrix_4x4::Matrix4x4;
+    use std::ops::Deref;
 
     use math::tuple::color::RED;
     use math::{assert_color, color, point};
@@ -60,7 +60,8 @@ mod refraction_lighting_tests {
         let sphere = Shape::new_sphere();
         let mut world = World::default();
         world.add(sphere);
-        let sphere = world.shapes.get(0).unwrap();
+        let world = world.prepare_for_render();
+        let sphere = world.flat_scene.get(0).unwrap();
 
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = Intersections::new(vec![
@@ -83,7 +84,9 @@ mod refraction_lighting_tests {
         sphere.material = Material::glass();
         let mut world = World::default();
         world.add(sphere);
-        let sphere = world.shapes.get(0).unwrap();
+
+        let world = world.prepare_for_render();
+        let sphere = world.flat_scene.get(0).unwrap();
 
         println!("{}", sphere.id);
         println!("{}", sphere.material.transparency);
@@ -105,15 +108,18 @@ mod refraction_lighting_tests {
     #[test]
     fn the_refracted_color_with_a_refracted_ray() {
         let mut world = World::default_world();
-        let a = world.shapes.get_mut(0).unwrap();
+        let a = world.scene_tree.get_mut_shape(0);
         a.material.ambient = 1.;
         a.material.pattern = Pattern::Test;
-        let b = world.shapes.get_mut(1).unwrap();
+        let b = world.scene_tree.get_mut_shape(1);
         b.material.transparency = 1.;
         b.material.refractive_index = 1.5;
+
+        let world = world.prepare_for_render();
         let ray = ray!((0., 0., 0.1), (0., 1., 0.));
-        let a = world.shapes.get(0).unwrap();
-        let b = world.shapes.get(1).unwrap();
+
+        let a = world.flat_scene.get(0).unwrap().deref();
+        let b = world.flat_scene.get(1).unwrap().deref();
         let intersections = Intersections::new(vec![
             Intersection::new(-0.9899, a),
             Intersection::new(-0.4899, b),
@@ -148,6 +154,7 @@ mod refraction_lighting_tests {
         ball.material.ambient = 0.5;
         world.add(ball);
 
+        let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
@@ -171,6 +178,7 @@ mod refraction_lighting_tests {
         ball.material.ambient = 0.5;
         world.add(ball);
 
+        let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(
             (0., 0., -3.),
             (0., -2.0_f32.sqrt() / 2., 2.0_f32.sqrt() / 2.)
@@ -191,7 +199,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_under_total_internal_reflection() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-2.0_f32.sqrt() / 2., &sphere),
@@ -205,7 +213,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_a_perpendicular_viewing_angle() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-1., &sphere),
@@ -219,7 +227,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_small_angle_and_n1_gt_n1() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = Shape::new_sphere().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![Intersection::new(1.8589, &sphere)]);
         let (hit, refractions) = intersections.hit().unwrap();

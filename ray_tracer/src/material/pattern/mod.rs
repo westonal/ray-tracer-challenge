@@ -8,7 +8,7 @@ use math::color;
 use math::tuple::color::{Color, WHITE};
 use math::tuple::point::Point;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Pattern {
     Solid(Color),
     Stripe(Color, Color, Transform),

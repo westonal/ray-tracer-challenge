@@ -9,6 +9,7 @@ use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
+use ray_tracer::scene;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
@@ -28,14 +29,25 @@ impl TestScene for GlassSphereWithAir {
             Pattern::Checker(*BLACK, *WHITE, Transform::new(Matrix4x4::scale_all(3.)));
         world.add(plane);
 
-        let mut sphere = Shape::new_sphere_transformed(Matrix4x4::scale_all(5.));
-        sphere.material = Material::glass();
-        world.add(sphere);
+        let scene = scene!(
+            matrix: Matrix4x4::scale_all(5.);
+            bounding_volume:Shape::new_cube();
+            +{
+                let mut sphere = Shape::new_sphere();
+                sphere.material = Material::glass();
+                sphere
+            };
+            +scene!(
+                matrix: Matrix4x4::scale_all(0.5);
+                +{
+                    let mut sphere = Shape::new_sphere();
+                    sphere.material = Material::air();
+                    sphere
+                };
+            );
+        );
 
-        let mut bubble = Shape::new_sphere_transformed(Matrix4x4::scale_all(2.5));
-        bubble.material = Material::air();
-        world.add(bubble);
-
+        world.add(scene);
         world
     }
 

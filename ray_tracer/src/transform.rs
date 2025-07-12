@@ -4,7 +4,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::tuple::vector::normal::Normal;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Transform {
     object_to_world_transform: Matrix4x4,
     world_to_object_transform: Matrix4x4,
@@ -15,8 +15,8 @@ impl Transform {
         let world_normal = self.world_to_object_transform.transpose() * object_normal;
         world_normal.force_vector().normalize()
     }
-    pub(crate) fn world_ray_to_object_ray(&self, world_ray: Ray) -> Ray {
-        self.world_to_object_transform * world_ray
+    pub(crate) fn world_ray_to_object_ray(&self, world_ray: &Ray) -> Ray {
+        self.world_to_object_transform * *world_ray
     }
     pub(crate) fn world_point_to_object_point(&self, point: Point) -> Point {
         (self.world_to_object_transform * point).try_into().unwrap()

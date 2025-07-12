@@ -2,17 +2,17 @@ use crate::intersection::Intersect;
 use crate::lighting::PointLight;
 use crate::lighting::surface_hit::SurfaceHit;
 use crate::ray;
-use crate::world::World;
+use crate::render::RenderableWorld;
 use math::tuple::point::Point;
 
-impl World {
+impl RenderableWorld<'_> {
     /// Which lights are not occluded by objects in the scene
     pub(crate) fn direct_lights(&self, point: Point) -> Vec<&PointLight> {
         self.lights
             .iter()
             .filter_map(|l| {
-                let intersections = self.intersect(ray!(point, l.position - point));
-                if let Some((hit, refractions)) = intersections.hit() {
+                let intersections = self.intersect(&ray!(point, l.position - point));
+                if let Some((hit, _)) = intersections.hit() {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {
                     Some(l)
@@ -21,11 +21,13 @@ impl World {
             .collect::<Vec<&PointLight>>()
     }
 
-    pub(crate) fn direct_lights_2(&self, point: &SurfaceHit) -> Vec<&PointLight> {
+    /// Which lights are not occluded by objects in the scene, excluding the supplied surface
+    /// TODO: This could be an issue for future non-convex surfaces, unable to cast a shadow on themselves
+    pub(crate) fn direct_lights_excluding_surface(&self, point: &SurfaceHit) -> Vec<&PointLight> {
         self.lights
             .iter()
             .filter_map(|l| {
-                let intersections = self.intersect(ray!(point.point, l.position - point.point));
+                let intersections = self.intersect(&ray!(point.point, l.position - point.point));
                 if let Some((hit, _)) = intersections.hit_excluding(point.shape_id) {
                     if hit.t < 1. { None } else { Some(l) }
                 } else {
@@ -52,6 +54,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(0, 10, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
     }
@@ -63,6 +66,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(5, -5, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 0);
     }
@@ -74,6 +78,7 @@ mod shadow_tests {
         world.set_light(light);
         world.add(Shape::new_sphere());
         let point = point!(-11, 11, 0);
+        let world = world.prepare_for_render();
         let direct_lights = world.direct_lights(point);
         assert_eq!(direct_lights.len(), 1);
     }

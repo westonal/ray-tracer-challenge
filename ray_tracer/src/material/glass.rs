@@ -36,13 +36,14 @@ mod glass_refractive_index_finding_tests {
 
     use crate::primatives::Shape;
 
+    use crate::primatives::IntersectableShape;
     use math::matrix::matrix_4x4::Matrix4x4;
 
-    fn glass_sphere(refractive_index: f32, transform: Matrix4x4) -> Shape {
+    fn glass_sphere(refractive_index: f32, transform: Matrix4x4) -> IntersectableShape {
         let mut sphere = Shape::new_sphere_transformed(transform);
         sphere.material = Material::glass();
         sphere.material.refractive_index = refractive_index;
-        sphere
+        sphere.to_intersectable()
     }
 
     fn run_test(index: usize) -> (f32, f32) {
