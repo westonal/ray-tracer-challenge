@@ -5,21 +5,22 @@ use math::matrix::matrix_4x4::Matrix4x4;
 impl SceneTree {
     pub fn flatten(&self) -> Vec<IntersectableShape> {
         let mut result = vec![];
-        self.walk(&mut result);
+        self.walk(&mut result, Matrix4x4::identity());
         result
     }
 
-    fn walk(&self, into: &mut Vec<IntersectableShape>) {
+    fn walk(&self, into: &mut Vec<IntersectableShape>, tree_matrix: Matrix4x4) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
-                // TODO apply group matrix here
-                shape.matrix = shape.matrix * Matrix4x4::identity();
+                shape.matrix = tree_matrix * shape.matrix;
                 into.push(shape.to_intersectable())
             }
-            SceneTree::Group { children, .. } => {
+            SceneTree::Group {
+                children, matrix, ..
+            } => {
                 for child in children {
-                    child.walk(into)
+                    child.walk(into, tree_matrix * *matrix)
                 }
             }
         }
@@ -77,5 +78,46 @@ mod flatten_tests {
 
         let vec = tree.flatten();
         assert_eq!(3, vec.len());
+    }
+}
+
+#[cfg(test)]
+mod flatten_matrix_tests {
+    use super::*;
+    use crate::primatives::Shape;
+    use crate::transform::Transform;
+    use math::degrees;
+
+    #[test]
+    fn combine_matrix_from_parent() {
+        let r = Matrix4x4::shear(2.0, 3.0, 4.0, 5.0, 6.0, 7.0);
+        let a = Matrix4x4::scale_all(2.0);
+        let b = Matrix4x4::translation(1.0, 2.0, 3.0);
+        let c = Matrix4x4::rotation_x(degrees!(90));
+        let d = Matrix4x4::rotation_y(degrees!(45));
+
+        let mut root = SceneTree::new(r);
+        root.add(Shape::new_sphere_transformed(a));
+
+        let mut branch = SceneTree::new(b);
+        branch.add(Shape::new_cube_transformed(c));
+
+        root.add_tree(branch);
+        root.add(Shape::new_cylinder_transformed(d));
+
+        let vec = root.flatten();
+
+        // root (r)
+        //   - tree (i)
+        //       - sphere (a) => r * a
+        //   - tree (b)
+        //       - cube (c) => r * c * b
+        //   - cylinder (d) => r * d
+        //
+
+        assert_eq!(3, vec.len());
+        assert_eq!(Transform::new(r * a), vec.get(0).unwrap().transform);
+        assert_eq!(Transform::new(r * b * c), vec.get(1).unwrap().transform);
+        assert_eq!(Transform::new(r * d), vec.get(2).unwrap().transform);
     }
 }

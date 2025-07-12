@@ -56,6 +56,10 @@ impl World {
         self.scene_tree.shape_count()
     }
 
+    pub fn add_tree(&mut self, object: SceneTree) {
+        self.scene_tree.add_tree(object);
+    }
+
     pub fn add(&mut self, object: Shape) {
         self.scene_tree.add(object);
     }

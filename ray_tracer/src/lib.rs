@@ -5,7 +5,7 @@ pub mod lighting;
 pub mod material;
 pub mod primatives;
 pub mod rays;
-mod scene_tree;
+pub mod scene_tree;
 pub mod transform;
 pub mod view_matrix;
 pub mod world;
