@@ -22,40 +22,55 @@ impl TestScene for CubeOfSpheres {
     }
 
     fn build_world() -> World {
+        let scene = scene!(
+            +{
+                let mut shape = Shape::new_plane();
+                shape.material.pattern = Pattern::Checker(
+                    *WHITE,
+                    *BLACK,
+                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(2.)),
+                );
+                shape.material.reflectivity = 0.5;
+                shape
+            };
+            +{
+                let mut shape = Shape::new_plane_transformed(Matrix4x4::translation(0., 45., 0.));
+                shape.material.pattern = Pattern::Checker(
+                    *GREEN,
+                    *BLACK,
+                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(10.)),
+                );
+                shape
+            };
+            +scene!(
+                matrix: Matrix4x4::translation(3.5, 4., 3.5);
+                +scene!(
+                    matrix: Matrix4x4::scale_all(2.);
+                    bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+                    +Self::double(
+                        |matrix| {
+                            scene!(
+                                matrix: matrix.pre_scale_all(0.5);
+                                bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+                                +Self::double(
+                                    |matrix| {
+                                        scene!(
+                                            matrix: matrix;
+                                            +Self::cubes();
+                                        )
+                                    },
+                                );
+                            )
+                        },
+                    );
+                );
+            );
+        );
+
         let mut world = World::default();
+        world.add_tree(scene);
         world.max_ray_generation = 2;
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
-        let mut shape = Shape::new_plane();
-        shape.material.pattern = Pattern::Checker(
-            *WHITE,
-            *BLACK,
-            Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(2.)),
-        );
-        shape.material.reflectivity = 0.5;
-        world.add(shape);
-        let mut shape = Shape::new_plane_transformed(Matrix4x4::translation(0., 45., 0.));
-        shape.material.pattern = Pattern::Checker(
-            *GREEN,
-            *BLACK,
-            Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(10.)),
-        );
-        world.add(shape);
-        world.add_tree(Self::double(
-            Matrix4x4::scale_all(2.).pre_translation(1.75, 2., 1.75),
-            Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
-            |matrix| {
-                Self::double(
-                    matrix.pre_scale_all(0.5),
-                    Some(Shape::new_cube_transformed(Matrix4x4::scale_all(2.))),
-                    |matrix| {
-                        scene!(
-                            matrix: matrix;
-                            +Self::cubes();
-                        )
-                    },
-                )
-            },
-        ));
         world
     }
 
@@ -74,8 +89,6 @@ impl CubeOfSpheres {
             matrix: Matrix4x4::scale_all(0.5);
             bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
             +Self::double(
-                Matrix4x4::identity(),
-                None,
                 |matrix| {
                     let mut sphere = Shape::new_sphere();
                     let mut material = Material::default();
@@ -93,12 +106,8 @@ impl CubeOfSpheres {
         )
     }
 
-    fn double<T: Fn(Matrix4x4) -> SceneTree>(
-        matrix: Matrix4x4,
-        bound: Option<Shape>,
-        f: T,
-    ) -> SceneTree {
-        let mut tree = SceneTree::new_bounded_opt(Matrix4x4::identity(), bound);
+    fn double<T: Fn(Matrix4x4) -> SceneTree>(f: T) -> SceneTree {
+        let mut tree = SceneTree::default();
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
@@ -110,9 +119,6 @@ impl CubeOfSpheres {
                 }
             }
         }
-        scene!(
-            matrix: matrix;
-            +tree;
-        )
+        tree
     }
 }
