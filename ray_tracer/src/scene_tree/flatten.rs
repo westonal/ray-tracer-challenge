@@ -1,65 +1,12 @@
-use crate::intersection::{Intersect, Intersections};
-use crate::primatives::IntersectableShape;
-use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
+use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
-use std::ops::Deref;
-
-pub struct FlatScene {
-    shapes: Vec<Chain>,
-}
-
-pub enum Chain {
-    BoundingVolume(IntersectableShape, usize),
-    Shape(IntersectableShape),
-}
-
-impl Deref for Chain {
-    type Target = IntersectableShape;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Chain::BoundingVolume(s, _) => s,
-            Chain::Shape(s) => s,
-        }
-    }
-}
-
-impl Deref for FlatScene {
-    type Target = Vec<Chain>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.shapes
-    }
-}
-
-impl Intersect for FlatScene {
-    fn intersect(&self, ray: &Ray) -> Intersections {
-        let mut results = Intersections::default();
-        let mut i = 0;
-        while i < self.shapes.len() {
-            let item = self.shapes.get(i).unwrap();
-            match item {
-                Chain::BoundingVolume(b, skip) => {
-                    if !b.fast_hit(ray) {
-                        i = i + *skip;
-                    }
-                }
-                Chain::Shape(s) => {
-                    results += s.intersect(ray);
-                }
-            }
-            i = i + 1;
-        }
-        results
-    }
-}
 
 impl SceneTree {
     pub fn flatten(&self) -> FlatScene {
-        let mut result = vec![];
-        self.walk(&mut result, Matrix4x4::identity());
-        FlatScene { shapes: result }
+        let mut chain = vec![];
+        self.walk(&mut chain, Matrix4x4::identity());
+        FlatScene::new(chain)
     }
 
     fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4) {
