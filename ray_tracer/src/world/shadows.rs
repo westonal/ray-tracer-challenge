@@ -21,7 +21,9 @@ impl RenderableWorld<'_> {
             .collect::<Vec<&PointLight>>()
     }
 
-    pub(crate) fn direct_lights_2(&self, point: &SurfaceHit) -> Vec<&PointLight> {
+    /// Which lights are not occluded by objects in the scene, excluding the supplied surface
+    /// TODO: This could be an issue for future non-convex surfaces, unable to cast a shadow on themselves
+    pub(crate) fn direct_lights_excluding_surface(&self, point: &SurfaceHit) -> Vec<&PointLight> {
         self.lights
             .iter()
             .filter_map(|l| {
