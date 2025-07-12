@@ -105,6 +105,7 @@ mod cylinder_intersection_miss_tests {
                 let cylinder = Shape::new_open_cylinder().to_intersectable();
                 let intersections = cylinder.intersect($ray);
                 assert_eq!(intersections.len(), 0);
+                assert!(!cylinder.fast_hit($ray))
             }
             )*
         };
@@ -134,6 +135,7 @@ mod cylinder_intersection_hit_tests {
                 ).to_intersectable();
                 let intersections = cylinder.intersect($ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
+                assert!(cylinder.fast_hit($ray))
             }
             )*
         };
@@ -230,6 +232,7 @@ mod cylinder_cap_intersection_tests {
                     ).to_intersectable();
                     let intersections = cylinder.intersect($ray.normalize());
                     assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
+                    assert!(cylinder.fast_hit($ray))
                 }
             )*
         };

@@ -35,4 +35,9 @@ impl Intersect for IntersectableShape {
             .collect();
         Intersections::new(result)
     }
+
+    fn fast_hit(&self, ray: Ray) -> bool {
+        let ray = self.transform.world_ray_to_object_ray(ray);
+        self.surface.fast_hit(ray)
+    }
 }

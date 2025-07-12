@@ -47,6 +47,7 @@ mod sphere_intersection_tests {
         assert_eq!(intersections.len(), 2);
         assert_eq!(intersections[0].t, 4.);
         assert_eq!(intersections[1].t, 6.);
+        assert!(sphere.fast_hit(ray))
     }
 
     #[test]
@@ -56,6 +57,7 @@ mod sphere_intersection_tests {
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 1);
         assert_eq!(intersections[0].t, 5.);
+        assert!(sphere.fast_hit(ray))
     }
 
     #[test]
@@ -64,6 +66,7 @@ mod sphere_intersection_tests {
         let ray = Ray::new(Point::point(0., 2., -5.), Vector::vector(0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 0);
+        assert!(!sphere.fast_hit(ray))
     }
 
     #[test]
@@ -74,6 +77,7 @@ mod sphere_intersection_tests {
         assert_eq!(intersections.len(), 2);
         assert_eq!(intersections[0].t, -1.);
         assert_eq!(intersections[1].t, 1.);
+        assert!(sphere.fast_hit(ray))
     }
 
     #[test]
@@ -84,6 +88,7 @@ mod sphere_intersection_tests {
         assert_eq!(intersections.len(), 2);
         assert_eq!(intersections[0].t, -6.);
         assert_eq!(intersections[1].t, -4.);
+        assert!(sphere.fast_hit(ray))
     }
 }
 
@@ -156,15 +161,17 @@ mod sphere_intersection_of_transformed_sphere_tests {
         assert_eq!(intersections.len(), 2);
         assert_eq!(intersections[0].t, 3.);
         assert_eq!(intersections[1].t, 7.);
+        assert!(sphere.fast_hit(ray))
     }
 
     #[test]
-    fn intersect_translated_sphere() {
+    fn miss_translated_sphere() {
         let sphere =
             Shape::new_sphere_transformed(Matrix4x4::translation(5., 0., 0.)).to_intersectable();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(ray);
         assert_eq!(intersections.len(), 0);
+        assert!(!sphere.fast_hit(ray))
     }
 }
 

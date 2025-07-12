@@ -59,39 +59,49 @@ mod plane_intersection_tests {
     #[test]
     fn parallel_ray_misses() {
         let plane = Shape::new_plane().to_intersectable();
-        assert!(plane.intersect(ray!((0., 1., 0.), (1., 0., 0.))).is_empty());
+        let ray = ray!((0., 1., 0.), (1., 0., 0.));
+        assert!(plane.intersect(ray).is_empty());
+        assert!(!plane.fast_hit(ray))
     }
 
     #[test]
     fn coplanar_ray_misses() {
         let plane = Shape::new_plane().to_intersectable();
-        assert!(plane.intersect(ray!((0., 0., 0.), (1., 0., 0.))).is_empty());
+        let ray = ray!((0., 0., 0.), (1., 0., 0.));
+        assert!(plane.intersect(ray).is_empty());
+        assert!(!plane.fast_hit(ray))
     }
 
     #[test]
     fn ray_intersect_from_above() {
         let plane = Shape::new_plane().to_intersectable();
-        let intersections = plane.intersect(ray!((0., 1., 0.), (0., -1., 0.)));
+        let ray = ray!((0., 1., 0.), (0., -1., 0.));
+        let intersections = plane.intersect(ray);
         assert_eq!(1, intersections.len());
         assert_eq!(&plane, intersections[0].shape);
         assert_eq!(1., intersections[0].t);
+        assert!(plane.fast_hit(ray))
     }
 
     #[test]
     fn ray_intersect_from_below() {
         let plane = Shape::new_plane().to_intersectable();
-        let intersections = plane.intersect(ray!((0., -1., 0.), (0., 1., 0.)));
+        let ray = ray!((0., -1., 0.), (0., 1., 0.));
+        let intersections = plane.intersect(ray);
         assert_eq!(1, intersections.len());
         assert_eq!(&plane, intersections[0].shape);
         assert_eq!(1., intersections[0].t);
+        assert!(plane.fast_hit(ray))
     }
 
     #[test]
     fn ray_intersect_from_above_behind() {
         let plane = Shape::new_plane().to_intersectable();
-        let intersections = plane.intersect(ray!((0., 2., 0.), (0., 1., 0.)));
+        let ray = ray!((0., 2., 0.), (0., 1., 0.));
+        let intersections = plane.intersect(ray);
         assert_eq!(1, intersections.len());
         assert_eq!(&plane, intersections[0].shape);
         assert_eq!(-2., intersections[0].t);
+        assert!(plane.fast_hit(ray))
     }
 }

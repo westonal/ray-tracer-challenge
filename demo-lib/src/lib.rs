@@ -1,5 +1,5 @@
 use math::tuple::color::Color;
-use ray_tracer::canvas::{Canvas, ViewPort};
+use ray_tracer::canvas::Canvas;
 use ray_tracer::material::Material;
 
 mod image_buffer_canvas;

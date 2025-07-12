@@ -6,6 +6,10 @@ use std::ops::{AddAssign, Deref};
 
 pub trait Intersect {
     fn intersect(&self, ray: Ray) -> Intersections;
+
+    fn fast_hit(&self, ray: Ray) -> bool {
+        self.intersect(ray).hit().is_some()
+    }
 }
 
 pub struct Intersection<'s> {

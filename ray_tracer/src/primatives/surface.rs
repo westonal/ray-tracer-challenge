@@ -21,6 +21,15 @@ pub(crate) enum Surface {
 }
 
 impl Surface {
+    pub(crate) fn fast_hit(&self, ray: Ray) -> bool {
+        match self {
+            Surface::UnitSphere => !Sphere::intersect(ray).is_empty(),
+            Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
+            Surface::UnitCube => Cube::fast_hit(ray),
+            Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
+        }
+    }
+
     pub(crate) fn intersect(&self, ray: Ray) -> Vec<f32> {
         match self {
             Surface::UnitSphere => Sphere::intersect(ray),

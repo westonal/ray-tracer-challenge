@@ -27,30 +27,6 @@ impl SceneTree {
 
 #[cfg(test)]
 impl SceneTree {
-    pub(crate) fn get_shape(&self, index: usize) -> &Shape {
-        match self {
-            SceneTree::Leaf(item) => {
-                if index == 0 {
-                    item
-                } else {
-                    panic!()
-                }
-            }
-            SceneTree::Group { children, .. } => {
-                let mut countdown = index;
-                for (i, item) in children.iter().enumerate() {
-                    let branch_size = item.shape_count();
-                    if branch_size > countdown {
-                        return item.get_shape(countdown);
-                    } else {
-                        countdown -= branch_size;
-                    }
-                }
-                panic!()
-            }
-        }
-    }
-
     pub(crate) fn get_mut_shape(&mut self, index: usize) -> &mut Shape {
         match self {
             SceneTree::Leaf(item) => {
@@ -62,7 +38,7 @@ impl SceneTree {
             }
             SceneTree::Group { children, .. } => {
                 let mut countdown = index;
-                for (i, item) in children.iter_mut().enumerate() {
+                for item in children.iter_mut() {
                     let branch_size = item.shape_count();
                     if branch_size > countdown {
                         return item.get_mut_shape(countdown);

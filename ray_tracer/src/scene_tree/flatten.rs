@@ -41,7 +41,7 @@ impl Intersect for FlatScene {
             let item = self.shapes.get(i).unwrap();
             match item {
                 Chain::BoundingVolume(b, skip) => {
-                    if b.intersect(ray).is_empty() {
+                    if !b.fast_hit(ray) {
                         i = i + *skip;
                     }
                 }
