@@ -3,7 +3,7 @@ use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
 use crate::scene_tree::SceneTree;
 use math::matrix::matrix_4x4::Matrix4x4;
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
 
 pub struct FlatScene {
     shapes: Vec<Chain>,
@@ -25,27 +25,11 @@ impl Deref for Chain {
     }
 }
 
-impl DerefMut for Chain {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        match self {
-            Chain::BoundingVolume(s, _) => s,
-            Chain::Shape(s) => s,
-        }
-    }
-}
-
 impl Deref for FlatScene {
     type Target = Vec<Chain>;
 
     fn deref(&self) -> &Self::Target {
         &self.shapes
-    }
-}
-
-#[cfg(test)] // TODO I don't like this just for modifying shapes in tests
-impl DerefMut for FlatScene {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.shapes
     }
 }
 
