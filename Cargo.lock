@@ -318,6 +318,7 @@ dependencies = [
  "criterion",
  "image",
  "math",
+ "obj",
  "ray_tracer",
  "rayon",
 ]

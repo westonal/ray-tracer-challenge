@@ -5,6 +5,7 @@ pub mod cylinders;
 pub mod glass_sphere_with_air;
 pub mod grid;
 pub mod triangles;
+pub mod teapot;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
