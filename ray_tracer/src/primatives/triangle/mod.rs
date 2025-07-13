@@ -1,6 +1,5 @@
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
-use math::tuple::vector::normal::Normal;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Triangle {
@@ -13,7 +12,7 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub(crate) fn new(p1: Point, p2: Point, p3: Point) -> Self {
+    pub fn new(p1: Point, p2: Point, p3: Point) -> Self {
         let e1 = p2 - p1;
         let e2 = p3 - p1;
         let normal = e2.cross(e1).normalize();

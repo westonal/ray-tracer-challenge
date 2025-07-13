@@ -1,7 +1,7 @@
+use crate::primatives::triangle::Triangle;
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
-use crate::primatives::triangle::Triangle;
 
 impl Triangle {
     pub(crate) fn intersect(&self, ray: &Ray) -> Vec<f32> {
@@ -9,16 +9,16 @@ impl Triangle {
         let det = self.e1.dot(&dir_cross_e2);
         if det.abs() < Self::TRIANGLE_EPSILON {
             // Parallel
-            return vec![]
+            return vec![];
         };
 
         let f = det.recip();
         let p1_to_origin = ray.origin - self.p1;
-        let u = f* p1_to_origin.dot(&dir_cross_e2);
+        let u = f * p1_to_origin.dot(&dir_cross_e2);
 
         if u < 0. || u > 1. {
             // Miss edge p1-p3
-            return vec![]
+            return vec![];
         }
 
         let origin_cross_e1 = p1_to_origin.cross(self.e1);
@@ -26,10 +26,10 @@ impl Triangle {
 
         if v < 0. || (u + v) > 1. {
             // Miss edge p1-p2 and p2-p3
-            return vec![]
+            return vec![];
         }
 
-        vec!(f * self.e2.dot(&origin_cross_e1))
+        vec![f * self.e2.dot(&origin_cross_e1)]
     }
 
     pub(crate) fn normal_at(&self, _object_point: Point) -> Vector {
@@ -41,12 +41,10 @@ impl Triangle {
 
 #[cfg(test)]
 mod triangle_intersection_tests {
-    use math::{point, vector};
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
-    use crate::rays::Ray;
-    use math::tuple::point::Point;
-    use math::tuple::vector::Vector;
+    use math::{point, vector};
+
     use crate::primatives::triangle::Triangle;
     use crate::ray;
 
@@ -97,8 +95,6 @@ mod triangle_intersection_tests {
     hit!(
         strike; point!(0, 0.5, -2) => vector!(0, 0, 1); expect_t: 2.
     );
-
-
 }
 //     #[test]
 //     fn tangential_intersection() {

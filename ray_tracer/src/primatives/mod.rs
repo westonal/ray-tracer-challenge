@@ -9,3 +9,4 @@ mod triangle;
 pub use intersectable_shape::IntersectableShape;
 pub use shape::Shape;
 pub use shape_id::ShapeId;
+pub use triangle::Triangle;

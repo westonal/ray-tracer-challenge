@@ -1,10 +1,10 @@
 use crate::primatives::intersections::Sphere;
 use crate::primatives::intersections::{Cube, Cylinder};
 use crate::primatives::intersections::{CylinderCapStyle, Plane};
+use crate::primatives::triangle::Triangle;
 use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
-use crate::primatives::triangle::Triangle;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub(crate) enum Surface {
@@ -20,7 +20,7 @@ pub(crate) enum Surface {
     /// A cylinder with center at origin and radius 1, infinite length
     UnitCylinder(CylinderCapStyle),
 
-    SingleTriangle(Triangle)
+    SingleTriangle(Triangle),
 }
 
 impl Surface {

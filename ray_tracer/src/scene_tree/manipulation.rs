@@ -51,6 +51,7 @@ impl SceneTree {
 #[cfg(test)]
 mod build_tree_tests {
     use super::*;
+    use crate::primatives::Shape;
 
     #[test]
     fn new_tree() {
