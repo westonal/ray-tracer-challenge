@@ -1,5 +1,6 @@
 use math::point;
 use math::tuple::point::Point;
+use std::ops::{Deref, Index};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjPointIndex(usize);
@@ -8,8 +9,33 @@ pub struct ObjPointIndex(usize);
 pub struct ObjTriangle(ObjPointIndex, ObjPointIndex, ObjPointIndex);
 
 #[derive(Debug, PartialEq)]
+pub struct PointCollection(Vec<Point>);
+
+impl Deref for PointCollection {
+    type Target = Vec<Point>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Index<ObjPointIndex> for PointCollection {
+    type Output = Point;
+
+    fn index(&self, index: ObjPointIndex) -> &Self::Output {
+        self.0.get(index.0).unwrap()
+    }
+}
+
+impl PointCollection {
+    pub fn of(&self, index: &ObjTriangle) -> [Point; 3] {
+        [self[index.0], self[index.1], self[index.2]]
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub struct Obj {
-    points: Vec<Point>,
+    points: PointCollection,
     triangles: Vec<ObjTriangle>,
 }
 
@@ -21,6 +47,12 @@ impl Default for Obj {
             points: Default::default(),
             triangles: Default::default(),
         }
+    }
+}
+
+impl Default for PointCollection {
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
 
@@ -69,8 +101,16 @@ impl TryFrom<&str> for Obj {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let x = value
             .split("\n")
+            .map(|s| {
+                let comment = s.find("#");
+                if let Some(idx) = comment {
+                    &s[0..idx]
+                } else {
+                    s
+                }
+            })
+            .map(|s| s.trim())
             .enumerate()
-            .map(|(i, s)| (i, s.trim()))
             .filter(|(_, s)| !s.is_empty());
 
         let mut points: Vec<Point> = Default::default();
@@ -109,7 +149,10 @@ impl TryFrom<&str> for Obj {
                 }
             }
         }
-        Ok(Obj { points, triangles })
+        Ok(Obj {
+            points: PointCollection(points),
+            triangles,
+        })
     }
 }
 
@@ -132,7 +175,7 @@ impl Obj {
 #[cfg(test)]
 mod reader_tests {
     use super::*;
-    use math::point;
+    use math::{assert_point, point};
 
     #[test]
     fn ignore_lines_not_that_are_not_understood() {
@@ -153,7 +196,18 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        assert_eq!(vec!(point!(1, 2, 3.5)), obj.points);
+        assert_eq!(vec!(point!(1, 2, 3.5)), *obj.points);
+    }
+
+    #[test]
+    fn read_a_single_point_with_comment() {
+        let input = "
+            v 1 2 3.5 # 4 5 6
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        assert_eq!(vec!(point!(1, 2, 3.5)), *obj.points);
     }
 
     #[test]
@@ -195,6 +249,54 @@ mod reader_tests {
                 ObjPointIndex(1)
             )),
             obj.triangles
+        );
+    }
+
+    #[test]
+    fn access_points_by_index() {
+        let input = "
+            v -1 1 1
+            v -1 0 2
+            v 1 0 3
+            f 1 2 3
+            f -1 -3 2
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        let triangle = obj.triangles.get(0).unwrap();
+        assert_point!(point!(-1, 1, 1), obj.points[triangle.0]);
+        assert_point!(point!(-1, 0, 2), obj.points[triangle.1]);
+        assert_point!(point!(1, 0, 3), obj.points[triangle.2]);
+
+        let triangle = obj.triangles.get(1).unwrap();
+        assert_point!(point!(1, 0, 3), obj.points[triangle.0]);
+        assert_point!(point!(-1, 1, 1), obj.points[triangle.1]);
+        assert_point!(point!(-1, 0, 2), obj.points[triangle.2]);
+    }
+
+    #[test]
+    fn access_points_by_triangle() {
+        let input = "
+            v -1 1 1
+            v -1 0 2
+            v 1 0 3
+            f 1 2 3
+            f -1 -3 2
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        let triangle = obj.triangles.get(0).unwrap();
+        assert_eq!(
+            [point!(-1, 1, 1), point!(-1, 0, 2), point!(1, 0, 3)],
+            obj.points.of(triangle)
+        );
+
+        let triangle = obj.triangles.get(1).unwrap();
+        assert_eq!(
+            [point!(1, 0, 3), point!(-1, 1, 1), point!(-1, 0, 2)],
+            obj.points.of(triangle)
         );
     }
 }
