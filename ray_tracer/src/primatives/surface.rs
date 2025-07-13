@@ -19,7 +19,7 @@ pub(crate) enum Surface {
 
     /// A cylinder with center at origin and radius 1, infinite length
     UnitCylinder(CylinderCapStyle),
-    
+
     SingleTriangle(Triangle)
 }
 
@@ -30,7 +30,7 @@ impl Surface {
             Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
             Surface::UnitCube => Cube::fast_hit(ray),
             Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
-            &Surface::SingleTriangle(_) => todo!(),
+            &Surface::SingleTriangle(triangle) => !triangle.intersect(ray).is_empty(),
         }
     }
 
@@ -40,7 +40,7 @@ impl Surface {
             Surface::PlaneXZ => Plane::intersect(ray),
             Surface::UnitCube => Cube::intersect(ray),
             Surface::UnitCylinder(style) => Cylinder::intersect(ray, style),
-            &Surface::SingleTriangle(_) => todo!(),
+            &Surface::SingleTriangle(triangle) => triangle.intersect(ray),
         }
     }
 
@@ -50,7 +50,7 @@ impl Surface {
             Surface::PlaneXZ => Plane::normal_at(object_point),
             Surface::UnitCube => Cube::normal_at(object_point),
             Surface::UnitCylinder(style) => Cylinder::normal_at(object_point, style),
-            &Surface::SingleTriangle(triangle) => triangle.normal.to_vector(),
+            &Surface::SingleTriangle(triangle) => triangle.normal_at(object_point),
         }
     }
 }

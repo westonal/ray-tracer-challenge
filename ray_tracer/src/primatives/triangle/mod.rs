@@ -4,12 +4,12 @@ use math::tuple::vector::normal::Normal;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Triangle {
-    p1: Point,
+    pub(crate) p1: Point,
     p2: Point,
     p3: Point,
-    e1: Vector,
-    e2: Vector,
-    pub(crate) normal: Normal,
+    pub(crate) e1: Vector,
+    pub(crate) e2: Vector,
+    pub(crate) normal: Vector,
 }
 
 impl Triangle {
@@ -23,7 +23,7 @@ impl Triangle {
             p3,
             e1,
             e2,
-            normal,
+            normal: normal.to_vector(),
         }
     }
 }
@@ -38,7 +38,7 @@ mod create_triangle_tests {
         let triangle = Triangle::new(point!(0, 1, 0), point!(-1, 0, 0), point!(1, 0, 0));
         assert_vector!(vector!(-1, -1, 0), triangle.e1);
         assert_vector!(vector!(1, -1, 0), triangle.e2);
-        assert_vector!(vector!(0, 0, -1), triangle.normal.to_vector());
+        assert_vector!(vector!(0, 0, -1), triangle.normal);
     }
 }
 
