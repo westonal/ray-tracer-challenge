@@ -1,6 +1,6 @@
 [workspace]
 members = [
     "demo", "demo-lib",
-    "math",
+    "math", "obj",
     "ray_tracer",
 ]
