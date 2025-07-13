@@ -48,6 +48,13 @@ macro_rules! read_triple_vec {
     }};
 }
 
+macro_rules! parse_vec {
+    ($t:tt, $args:expr) => {{
+        let args: Vec<$t> = $args.iter().map(|f| f.parse::<$t>().unwrap()).collect();
+        args
+    }};
+}
+
 #[derive(Debug, PartialEq)]
 pub struct ObjError {
     line_number: usize,
@@ -100,9 +107,9 @@ impl TryFrom<&str> for Obj {
             if s.starts_with("f ") {
                 let args: &Vec<&str> = &s[2..].split_ascii_whitespace().collect();
                 println!("  <{:?}>", args);
-                if args.len() == 3 {
+                if args.len() >= 3 {
                     let args: Result<Vec<ObjPointIndex>, ObjError> =
-                        read_triple_vec!(i32, args)
+                        parse_vec!(i32, args)
                             .into_iter()
                             .map(|i| {
                                 Self::relative_index_to_absolute(i, points.len())
@@ -110,10 +117,7 @@ impl TryFrom<&str> for Obj {
                             })
                             .collect();
                     let args = args?;
-                    let x1: ObjPointIndex = *args.get(0).unwrap();
-                    let x2: ObjPointIndex = *args.get(1).unwrap();
-                    let x3: ObjPointIndex = *args.get(2).unwrap();
-                    triangles.push([x1, x2, x3].into());
+                    triangles.append(&mut to_triangles(args));
                 } else {
                     return Err(ObjError::new(line, s, "Face has too few fields"));
                 }
@@ -124,6 +128,17 @@ impl TryFrom<&str> for Obj {
             triangles,
         })
     }
+}
+
+fn to_triangles(points: Vec<ObjPointIndex>) -> Vec<ObjTriangle> {
+    let mut result = vec![];
+    let p1: ObjPointIndex = *points.get(0).unwrap();
+    let mut p2: ObjPointIndex = *points.get(1).unwrap();
+    for p in points.into_iter().skip(2) {
+        result.push([p1, p2, p].into());
+        p2 = p;
+    }
+    result
 }
 
 impl Obj {
@@ -233,6 +248,20 @@ mod reader_tests {
         assert_point!(point!(-1, 0, 2), obj.points[triangle[2]]);
     }
 
+    macro_rules! assert_triangles {
+        ($obj: expr; $($i:expr => $p1:expr, $p2:expr, $p3:expr;)+) => {
+            {
+            $(
+                let triangle = $obj.triangles.get($i).unwrap();
+                assert_eq!(
+                    [$p1, $p2, $p3],
+                    $obj.points.of(triangle)
+                );
+            )+
+            }
+        };
+    }
+
     #[test]
     fn access_points_by_triangle() {
         let input = "
@@ -245,16 +274,29 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        let triangle = obj.triangles.get(0).unwrap();
-        assert_eq!(
-            [point!(-1, 1, 1), point!(-1, 0, 2), point!(1, 0, 3)],
-            obj.points.of(triangle)
+        assert_triangles!(obj;
+            0 => point!(-1, 1, 1), point!(-1, 0, 2), point!(1, 0, 3);
+            1 => point!(1, 0, 3), point!(-1, 1, 1), point!(-1, 0, 2);
         );
+    }
 
-        let triangle = obj.triangles.get(1).unwrap();
-        assert_eq!(
-            [point!(1, 0, 3), point!(-1, 1, 1), point!(-1, 0, 2)],
-            obj.points.of(triangle)
+    #[test]
+    fn triangulating_polygons() {
+        let input = "
+            v -1 1 11
+            v -1 0 12
+            v  1 0 13
+            v  1 1 14
+            v  0 2 15
+            f 1 2 3 4 5
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+        assert_eq!(3, obj.triangles.len());
+        assert_triangles!(obj;
+            0 => point!(-1, 1, 11), point!(-1, 0, 12), point!(1, 0, 13);
+            1 => point!(-1, 1, 11), point!( 1, 0, 13), point!(1, 1, 14);
+            2 => point!(-1, 1, 11), point!( 1, 1, 14), point!(0, 2, 15);
         );
     }
 }
