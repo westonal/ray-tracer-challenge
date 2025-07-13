@@ -5,11 +5,14 @@ use demo_lib::test_scenes::cubes::Cubes;
 use demo_lib::test_scenes::cylinders::Cylinders;
 use demo_lib::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use demo_lib::test_scenes::grid::Grid;
+use demo_lib::test_scenes::teapot::Teapot;
 use demo_lib::test_scenes::triangles::Triangles;
 use ray_tracer::canvas::Size;
 
 fn main() {
     let size = Size::HD_720P;
+    Teapot::render_scene(size);
+    return;
     Triangles::render_scene(size);
     Chapter7Scene::render_scene(size);
     GlassSphereWithAir::render_scene(size);
