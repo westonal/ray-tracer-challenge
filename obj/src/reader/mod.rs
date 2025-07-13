@@ -1,10 +1,14 @@
+mod group;
 mod obj_triangle;
 mod point_collection;
 
+use crate::reader::group::Group;
 pub use crate::reader::obj_triangle::ObjTriangle;
 pub use crate::reader::point_collection::PointCollection;
 use math::point;
 use math::tuple::point::Point;
+use std::collections::HashMap;
+use std::ops::Index;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjPointIndex(usize);
@@ -12,7 +16,35 @@ pub struct ObjPointIndex(usize);
 #[derive(Debug, PartialEq)]
 pub struct Obj {
     points: PointCollection,
-    triangles: Vec<ObjTriangle>,
+    default_group: Group,
+    groups: HashMap<String, Group>,
+}
+
+impl Obj {
+    fn new(points: PointCollection, mut groups: HashMap<Option<String>, Group>) -> Obj {
+        let default_group = groups.remove(&None).unwrap();
+        let named_groups = groups
+            .into_iter()
+            .filter_map(|(name, triangles)| {
+                if let Some(name) = name {
+                    Some((name, triangles))
+                } else {
+                    None
+                }
+            })
+            .collect();
+        Obj {
+            points,
+            default_group,
+            groups: named_groups,
+        }
+    }
+
+    pub fn group_names(&self) -> Vec<&String> {
+        let mut vec: Vec<&String> = self.groups.keys().collect();
+        vec.sort();
+        vec
+    }
 }
 
 type ObjResult = Result<Obj, ObjError>;
@@ -21,8 +53,17 @@ impl Default for Obj {
     fn default() -> Self {
         Self {
             points: Default::default(),
-            triangles: Default::default(),
+            default_group: Group::default_group(Default::default()),
+            groups: Default::default(),
         }
+    }
+}
+
+impl<T: AsRef<str>> Index<T> for Obj {
+    type Output = Group;
+
+    fn index(&self, index: T) -> &Self::Output {
+        &self.groups[index.as_ref()]
     }
 }
 
@@ -37,21 +78,21 @@ macro_rules! read_triple {
     }};
 }
 
-macro_rules! read_triple_vec {
+macro_rules! parse_vec {
     ($t:tt, $args:expr) => {{
         let args: Vec<$t> = $args.iter().map(|f| f.parse::<$t>().unwrap()).collect();
+        args
+    }};
+}
+
+macro_rules! read_triple_vec {
+    ($t:tt, $args:expr) => {{
+        let args = parse_vec!($t, $args);
         vec![
             *args.get(0).unwrap(),
             *args.get(1).unwrap(),
             *args.get(2).unwrap(),
         ]
-    }};
-}
-
-macro_rules! parse_vec {
-    ($t:tt, $args:expr) => {{
-        let args: Vec<$t> = $args.iter().map(|f| f.parse::<$t>().unwrap()).collect();
-        args
     }};
 }
 
@@ -92,6 +133,8 @@ impl TryFrom<&str> for Obj {
 
         let mut points: Vec<Point> = Default::default();
         let mut triangles: Vec<ObjTriangle> = Default::default();
+        let mut group_name: Option<String> = None;
+        let mut groups = HashMap::default();
         for (line, s) in x {
             println!("<{}>", s);
             if s.starts_with("v ") {
@@ -122,11 +165,19 @@ impl TryFrom<&str> for Obj {
                     return Err(ObjError::new(line, s, "Face has too few fields"));
                 }
             }
+            if s.starts_with("g ") {
+                // close prior group
+                groups.insert(group_name.clone(), Group::new(group_name, triangles));
+                // start a group
+                triangles = vec![];
+                group_name = Some(s[2..].to_string());
+            }
         }
-        Ok(Obj {
-            points: points.into(),
-            triangles,
-        })
+
+        // close group
+        groups.insert(group_name.clone(), Group::new(group_name, triangles));
+
+        Ok(Obj::new(points.into(), groups))
     }
 }
 
@@ -156,6 +207,21 @@ impl Obj {
         }
     }
 }
+
+#[cfg(test)]
+macro_rules! assert_triangles {
+        ($obj: expr; $group: expr; $($i:expr => $p1:expr, $p2:expr, $p3:expr;)+) => {
+            {
+            $(
+                let triangle = $group.triangles.get($i).unwrap();
+                assert_eq!(
+                    [$p1, $p2, $p3],
+                    $obj.points.of(triangle)
+                );
+            )+
+            }
+        };
+    }
 
 #[cfg(test)]
 mod reader_tests {
@@ -207,7 +273,7 @@ mod reader_tests {
         let obj: Obj = input.try_into().unwrap();
 
         let expected: ObjTriangle = [ObjPointIndex(0), ObjPointIndex(1), ObjPointIndex(2)].into();
-        assert_eq!(vec!(expected), obj.triangles);
+        assert_eq!(vec!(expected), *obj.default_group);
     }
 
     #[test]
@@ -222,7 +288,7 @@ mod reader_tests {
         let obj: Obj = input.try_into().unwrap();
 
         let expected: ObjTriangle = [ObjPointIndex(2), ObjPointIndex(0), ObjPointIndex(1)].into();
-        assert_eq!(vec!(expected), obj.triangles);
+        assert_eq!(vec!(expected), *obj.default_group);
     }
 
     #[test]
@@ -237,29 +303,15 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        let triangle = obj.triangles.get(0).unwrap();
+        let triangle = obj.default_group.get(0).unwrap();
         assert_point!(point!(-1, 1, 1), obj.points[triangle[0]]);
         assert_point!(point!(-1, 0, 2), obj.points[triangle[1]]);
         assert_point!(point!(1, 0, 3), obj.points[triangle[2]]);
 
-        let triangle = obj.triangles.get(1).unwrap();
+        let triangle = obj.default_group.get(1).unwrap();
         assert_point!(point!(1, 0, 3), obj.points[triangle[0]]);
         assert_point!(point!(-1, 1, 1), obj.points[triangle[1]]);
         assert_point!(point!(-1, 0, 2), obj.points[triangle[2]]);
-    }
-
-    macro_rules! assert_triangles {
-        ($obj: expr; $($i:expr => $p1:expr, $p2:expr, $p3:expr;)+) => {
-            {
-            $(
-                let triangle = $obj.triangles.get($i).unwrap();
-                assert_eq!(
-                    [$p1, $p2, $p3],
-                    $obj.points.of(triangle)
-                );
-            )+
-            }
-        };
     }
 
     #[test]
@@ -274,7 +326,7 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        assert_triangles!(obj;
+        assert_triangles!(obj; obj.default_group;
             0 => point!(-1, 1, 1), point!(-1, 0, 2), point!(1, 0, 3);
             1 => point!(1, 0, 3), point!(-1, 1, 1), point!(-1, 0, 2);
         );
@@ -292,11 +344,53 @@ mod reader_tests {
         ";
 
         let obj: Obj = input.try_into().unwrap();
-        assert_eq!(3, obj.triangles.len());
-        assert_triangles!(obj;
+        assert_eq!(3, obj.default_group.len());
+        assert_triangles!(obj; obj.default_group;
             0 => point!(-1, 1, 11), point!(-1, 0, 12), point!(1, 0, 13);
             1 => point!(-1, 1, 11), point!( 1, 0, 13), point!(1, 1, 14);
             2 => point!(-1, 1, 11), point!( 1, 1, 14), point!(0, 2, 15);
+        );
+    }
+}
+
+#[cfg(test)]
+mod obj_groups_tests {
+    use super::*;
+
+    #[test]
+    fn access_group_triangles() {
+        let input = "
+            v 0 0 1
+            v 0 0 2
+            v 0 0 3
+            v 0 0 4
+            v 0 0 5
+            v 0 0 6
+            f 1 2 3 # default group
+            g first group
+            f 1 3 5
+            g second group
+            f 4 5 6
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+        assert_eq!(1, obj.default_group.len());
+        assert_triangles!(obj; obj.default_group;
+            0 => point!(0, 0, 1), point!(0, 0, 2), point!(0, 0, 3);
+        );
+
+        assert_eq!(vec!("first group", "second group"), obj.group_names());
+
+        let g = &obj["first group"];
+        assert_eq!(1, g.len());
+        assert_triangles!(obj; g;
+            0 => point!(0, 0, 1), point!(0, 0, 3), point!(0, 0, 5);
+        );
+
+        let g = &obj["second group"];
+        assert_eq!(1, g.len());
+        assert_triangles!(obj; g;
+            0 => point!(0, 0, 4), point!(0, 0, 5), point!(0, 0, 6);
         );
     }
 }
