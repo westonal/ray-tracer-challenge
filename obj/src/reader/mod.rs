@@ -1,37 +1,14 @@
+mod point_collection;
+
+pub use crate::reader::point_collection::PointCollection;
 use math::point;
 use math::tuple::point::Point;
-use std::ops::{Deref, Index};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjPointIndex(usize);
 
 #[derive(Debug, PartialEq)]
 pub struct ObjTriangle(ObjPointIndex, ObjPointIndex, ObjPointIndex);
-
-#[derive(Debug, PartialEq)]
-pub struct PointCollection(Vec<Point>);
-
-impl Deref for PointCollection {
-    type Target = Vec<Point>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Index<ObjPointIndex> for PointCollection {
-    type Output = Point;
-
-    fn index(&self, index: ObjPointIndex) -> &Self::Output {
-        self.0.get(index.0).unwrap()
-    }
-}
-
-impl PointCollection {
-    pub fn of(&self, index: &ObjTriangle) -> [Point; 3] {
-        [self[index.0], self[index.1], self[index.2]]
-    }
-}
 
 #[derive(Debug, PartialEq)]
 pub struct Obj {
@@ -47,12 +24,6 @@ impl Default for Obj {
             points: Default::default(),
             triangles: Default::default(),
         }
-    }
-}
-
-impl Default for PointCollection {
-    fn default() -> Self {
-        Self(Default::default())
     }
 }
 
@@ -150,7 +121,7 @@ impl TryFrom<&str> for Obj {
             }
         }
         Ok(Obj {
-            points: PointCollection(points),
+            points: points.into(),
             triangles,
         })
     }
