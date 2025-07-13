@@ -38,7 +38,7 @@ impl SceneTree {
                             bounds.matrix = matrix * bounds.matrix;
                             into.push(Chain::BoundingVolume(
                                 bounds.to_intersectable(),
-                                subtree.len(),// + 1,
+                                subtree.len(), // + 1,
                             ));
                             // bounds2.material.transparency = 0.9;
                             // into.push(Chain::Shape(

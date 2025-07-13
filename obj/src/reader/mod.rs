@@ -3,7 +3,7 @@ mod obj_triangle;
 mod point_collection;
 mod vector_collection;
 
-use crate::reader::group::Group;
+pub use crate::reader::group::Group;
 pub use crate::reader::obj_triangle::ObjTriangle;
 pub use crate::reader::point_collection::PointCollection;
 pub use crate::reader::vector_collection::VectorCollection;
@@ -21,9 +21,9 @@ pub struct ObjNormalIndex(usize);
 
 #[derive(Debug, PartialEq)]
 pub struct Obj {
-    points: PointCollection,
-    normals: VectorCollection,
-    default_group: Group,
+    pub points: PointCollection,
+    pub normals: VectorCollection,
+    pub default_group: Group,
     groups: HashMap<String, Group>,
 }
 
