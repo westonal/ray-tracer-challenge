@@ -22,8 +22,8 @@ impl Index<ObjPointIndex> for PointCollection {
 }
 
 impl PointCollection {
-    pub fn of(&self, index: &ObjTriangle) -> [Point; 3] {
-        [self[index.0], self[index.1], self[index.2]]
+    pub fn of(&self, triangle: &ObjTriangle) -> [Point; 3] {
+        [self[triangle[0]], self[triangle[1]], self[triangle[2]]]
     }
 }
 

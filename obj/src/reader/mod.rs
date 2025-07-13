@@ -1,14 +1,13 @@
+mod obj_triangle;
 mod point_collection;
 
+pub use crate::reader::obj_triangle::ObjTriangle;
 pub use crate::reader::point_collection::PointCollection;
 use math::point;
 use math::tuple::point::Point;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjPointIndex(usize);
-
-#[derive(Debug, PartialEq)]
-pub struct ObjTriangle(ObjPointIndex, ObjPointIndex, ObjPointIndex);
 
 #[derive(Debug, PartialEq)]
 pub struct Obj {
@@ -114,7 +113,7 @@ impl TryFrom<&str> for Obj {
                     let x1: ObjPointIndex = *args.get(0).unwrap();
                     let x2: ObjPointIndex = *args.get(1).unwrap();
                     let x3: ObjPointIndex = *args.get(2).unwrap();
-                    triangles.push(ObjTriangle(x1, x2, x3));
+                    triangles.push([x1, x2, x3].into());
                 } else {
                     return Err(ObjError::new(line, s, "Face has too few fields"));
                 }
@@ -192,14 +191,8 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        assert_eq!(
-            vec!(ObjTriangle(
-                ObjPointIndex(0),
-                ObjPointIndex(1),
-                ObjPointIndex(2)
-            )),
-            obj.triangles
-        );
+        let expected: ObjTriangle = [ObjPointIndex(0), ObjPointIndex(1), ObjPointIndex(2)].into();
+        assert_eq!(vec!(expected), obj.triangles);
     }
 
     #[test]
@@ -213,14 +206,8 @@ mod reader_tests {
 
         let obj: Obj = input.try_into().unwrap();
 
-        assert_eq!(
-            vec!(ObjTriangle(
-                ObjPointIndex(2),
-                ObjPointIndex(0),
-                ObjPointIndex(1)
-            )),
-            obj.triangles
-        );
+        let expected: ObjTriangle = [ObjPointIndex(2), ObjPointIndex(0), ObjPointIndex(1)].into();
+        assert_eq!(vec!(expected), obj.triangles);
     }
 
     #[test]
@@ -236,14 +223,14 @@ mod reader_tests {
         let obj: Obj = input.try_into().unwrap();
 
         let triangle = obj.triangles.get(0).unwrap();
-        assert_point!(point!(-1, 1, 1), obj.points[triangle.0]);
-        assert_point!(point!(-1, 0, 2), obj.points[triangle.1]);
-        assert_point!(point!(1, 0, 3), obj.points[triangle.2]);
+        assert_point!(point!(-1, 1, 1), obj.points[triangle[0]]);
+        assert_point!(point!(-1, 0, 2), obj.points[triangle[1]]);
+        assert_point!(point!(1, 0, 3), obj.points[triangle[2]]);
 
         let triangle = obj.triangles.get(1).unwrap();
-        assert_point!(point!(1, 0, 3), obj.points[triangle.0]);
-        assert_point!(point!(-1, 1, 1), obj.points[triangle.1]);
-        assert_point!(point!(-1, 0, 2), obj.points[triangle.2]);
+        assert_point!(point!(1, 0, 3), obj.points[triangle[0]]);
+        assert_point!(point!(-1, 1, 1), obj.points[triangle[1]]);
+        assert_point!(point!(-1, 0, 2), obj.points[triangle[2]]);
     }
 
     #[test]
