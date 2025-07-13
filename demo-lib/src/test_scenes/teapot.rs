@@ -3,13 +3,14 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::{BLACK, WHITE};
 use math::tuple::point::Point;
 use math::{degrees, point, vector};
-use obj::reader::Obj;
+use obj::{Group, Obj};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene;
+use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
@@ -44,22 +45,24 @@ pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange, usi
 
 impl AABBBuilder {
     pub(crate) fn to_bounding(&self) -> Shape {
-        Shape::new_cube_transformed(Matrix4x4::identity()
-            .pre_translation(self.0.min,self.1.min,self.2.min)
-            .pre_scale(
-            self.0.width(),
-            self.1.width(),
-            self.2.width(),
-        )
-            .pre_translation(0.5,0.5,0.5)
-            .pre_scale_all(0.5)
+        Shape::new_cube_transformed(
+            Matrix4x4::identity()
+                .pre_translation(self.0.min, self.1.min, self.2.min)
+                .pre_scale(self.0.width(), self.1.width(), self.2.width())
+                .pre_translation(0.5, 0.5, 0.5)
+                .pre_scale_all(0.5),
         )
     }
 }
 
 impl AABBBuilder {
     fn new() -> Self {
-        Self(Default::default(), Default::default(), Default::default(), 0)
+        Self(
+            Default::default(),
+            Default::default(),
+            Default::default(),
+            0,
+        )
     }
 }
 
@@ -77,6 +80,12 @@ impl AABBBuilder {
         self.2.push(point.z);
         self.3 += 1;
     }
+
+    fn push_points(&mut self, points: &[Point]) {
+        for p in points {
+            self.push_point(p);
+        }
+    }
 }
 
 impl TestScene for Teapot {
@@ -92,40 +101,14 @@ impl TestScene for Teapot {
             .expect("Unable to open");
 
         println!("Loaded Obj");
-        println!(
-            "{} Points, {} Triangles",
-            obj.points.len(),
-            obj.triangles.len()
-        );
-
         let mut teapot = scene!();
-        let mut teapot_part = scene!();
 
-        let mut aabb = AABBBuilder::new();
-        for t in obj.triangles.iter() {
-            let p1 = obj[t.0];
-            let p2 = obj[t.1];
-            let p3 = obj[t.2];
-            aabb.push_point(&p1);
-            aabb.push_point(&p2);
-            aabb.push_point(&p3);
-            let triangle = Shape::new_triangle(Triangle::new(p1, p2, p3));
-            teapot_part.add(scene!(+triangle;));
+        teapot.add(Self::add_group(&obj, &obj.default_group));
 
-            if aabb.3 > 300 {
-                teapot.add(scene!(
-                    bounding_volume: aabb.to_bounding();
-                    +teapot_part;
-                ));
-                teapot_part = scene!();
-                aabb = AABBBuilder::new();
-            }
+        for g in obj.group_names() {
+            let g = &obj[g];
+            teapot.add(Self::add_group(&obj, g));
         }
-
-        teapot.add(scene!(
-            bounding_volume: aabb.to_bounding();
-            +teapot_part;
-        ));
 
         let teapot = scene!(
             +teapot;
@@ -152,5 +135,43 @@ impl TestScene for Teapot {
             ViewMatrix::new_look_at(point!(10, 8, 5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
         camera
+    }
+}
+
+impl Teapot {
+    fn add_group(obj: &Obj, g: &Group) -> SceneTree {
+        println!(
+            "{}: {} Triangles",
+            g.name.clone().unwrap_or("Default Group".to_string()),
+            g.len()
+        );
+
+        let mut group = scene!();
+
+        let mut teapot_part = scene!();
+
+        let mut aabb = AABBBuilder::new();
+        for t in g.iter() {
+            let points = obj.points.of(t);
+            aabb.push_points(&points);
+            let triangle = Shape::new_triangle(Triangle::new(points[0], points[1], points[2]));
+            teapot_part.add(triangle);
+
+            if aabb.3 > 300 {
+                group.add(scene!(
+                    bounding_volume: aabb.to_bounding();
+                    +teapot_part;
+                ));
+                teapot_part = scene!();
+                aabb = AABBBuilder::new();
+            }
+        }
+
+        group.add(scene!(
+            bounding_volume: aabb.to_bounding();
+            +teapot_part;
+        ));
+
+        group
     }
 }
