@@ -1,8 +1,6 @@
 use crate::intersection::{Intersect, Intersections};
 use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
-use crate::scene_tree::SceneTree;
-use math::matrix::matrix_4x4::Matrix4x4;
 use std::ops::Deref;
 
 pub struct FlatScene {
@@ -75,6 +73,7 @@ mod chain_intersect_tests {
     use super::*;
     use crate::primatives::Shape;
     use crate::ray;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::{point, vector};
 
     #[test]
@@ -135,7 +134,9 @@ mod chain_intersect_tests {
 mod chain_build_from_tree_intersect_tests {
     use super::*;
     use crate::primatives::Shape;
+    use crate::scene_tree::SceneTree;
     use crate::{ray, scene};
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::{point, vector};
 
     #[test]
