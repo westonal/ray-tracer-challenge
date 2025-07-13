@@ -333,6 +333,25 @@ mod reader_tests {
     }
 
     #[test]
+    fn access_points_by_triangle_different_relatives() {
+        let input = "
+            v -1 1 1
+            v -1 0 2
+            v 1 0 3
+            f -1 -2 -3
+            v 1 0 4
+            f -1 -2 -3 # same line, but different points
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        assert_triangles!(obj; obj.default_group;
+            0 => point!(1, 0, 3), point!(-1, 0, 2), point!(-1, 1, 1);
+            1 => point!(1, 0, 4), point!(1, 0, 3),  point!(-1, 0, 2);
+        );
+    }
+
+    #[test]
     fn triangulating_polygons() {
         let input = "
             v -1 1 11
@@ -458,6 +477,40 @@ mod reader_parse_failure_tests {
         let error = obj.err().unwrap();
         assert_eq!("Face index out of bounds", error.message);
         assert_eq!("f 1 2 4", error.line);
+        assert_eq!(5, error.line_number);
+    }
+
+    #[test]
+    fn a_face_with_an_out_of_bounds_index_larger_than_vertex_count_at_time() {
+        let input = "
+            v -1 1 0
+            v -1 0 0
+            v 1 0 0
+            f 1 2 4
+            v 1 0 1
+        ";
+
+        let obj: ObjResult = input.try_into();
+        let error = obj.err().unwrap();
+        assert_eq!("Face index out of bounds", error.message);
+        assert_eq!("f 1 2 4", error.line);
+        assert_eq!(5, error.line_number);
+    }
+
+    #[test]
+    fn a_face_with_a_negative_out_of_bounds_index_larger_than_vertex_count_at_time() {
+        let input = "
+            v -1 1 0
+            v -1 0 0
+            v 1 0 0
+            f 1 2 -4
+            v 1 0 1
+        ";
+
+        let obj: ObjResult = input.try_into();
+        let error = obj.err().unwrap();
+        assert_eq!("Face index out of bounds", error.message);
+        assert_eq!("f 1 2 -4", error.line);
         assert_eq!(5, error.line_number);
     }
 
