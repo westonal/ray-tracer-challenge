@@ -40,7 +40,7 @@ impl AABBBuilderRange {
 }
 
 #[derive(Debug)]
-pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange);
+pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange, usize);
 
 impl AABBBuilder {
     pub(crate) fn to_bounding(&self) -> Shape {
@@ -59,7 +59,7 @@ impl AABBBuilder {
 
 impl AABBBuilder {
     fn new() -> Self {
-        Self(Default::default(), Default::default(), Default::default())
+        Self(Default::default(), Default::default(), Default::default(), 0)
     }
 }
 
@@ -75,6 +75,7 @@ impl AABBBuilder {
         self.0.push(point.x);
         self.1.push(point.y);
         self.2.push(point.z);
+        self.3 += 1;
     }
 }
 
@@ -98,6 +99,7 @@ impl TestScene for Teapot {
         );
 
         let mut teapot = scene!();
+        let mut teapot_part = scene!();
 
         let mut aabb = AABBBuilder::new();
         for t in obj.triangles.iter() {
@@ -108,14 +110,24 @@ impl TestScene for Teapot {
             aabb.push_point(&p2);
             aabb.push_point(&p3);
             let triangle = Shape::new_triangle(Triangle::new(p1, p2, p3));
-            teapot.add(scene!(+triangle;))
+            teapot_part.add(scene!(+triangle;));
+
+            if aabb.3 > 300 {
+                teapot.add(scene!(
+                    bounding_volume: aabb.to_bounding();
+                    +teapot_part;
+                ));
+                teapot_part = scene!();
+                aabb = AABBBuilder::new();
+            }
         }
 
-        println!("{:?}", aabb);
-        println!("{:?}", aabb.to_bounding());
+        teapot.add(scene!(
+            bounding_volume: aabb.to_bounding();
+            +teapot_part;
+        ));
 
         let teapot = scene!(
-            bounding_volume: aabb.to_bounding();
             +teapot;
         );
 

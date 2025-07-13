@@ -34,14 +34,15 @@ impl SceneTree {
                             let mut subtree = vec![];
                             child.walk(&mut subtree, matrix);
                             let mut bounds = bounds.clone();
+                            // let mut bounds2 = bounds.clone();
                             bounds.matrix = matrix * bounds.matrix;
                             into.push(Chain::BoundingVolume(
                                 bounds.to_intersectable(),
-                                subtree.len(),
+                                subtree.len(),// + 1,
                             ));
-                            // bounds.material.transparency = 0.9;
+                            // bounds2.material.transparency = 0.9;
                             // into.push(Chain::Shape(
-                            //     bounds.to_intersectable(),
+                            //     bounds2.to_intersectable(),
                             //     //subtree.len(),
                             // ));
                             into.append(&mut subtree);
