@@ -117,11 +117,14 @@ impl TestScene for Teapot {
         );
 
         let world_scene = scene!(
-            +{
-                let mut plane = Shape::new_plane();
-                plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::identity());
-                plane
-            };
+            +scene!(
+                matrix: Matrix4x4::translation(0.,-10.,0.);
+                +{
+                    let mut plane = Shape::new_plane();
+                    plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::identity());
+                    plane
+                };
+            );
             +teapot;
         );
 
