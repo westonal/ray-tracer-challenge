@@ -111,6 +111,7 @@ impl TestScene for Teapot {
         }
 
         let teapot = scene!(
+            matrix: Matrix4x4::rotation_y(degrees!(30));
             +teapot;
         );
 
@@ -132,7 +133,7 @@ impl TestScene for Teapot {
     fn build_camera(size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(45));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(10, 8, 5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
+            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0, 0), vector!(0, 1, 0)).into(),
         );
         camera
     }
