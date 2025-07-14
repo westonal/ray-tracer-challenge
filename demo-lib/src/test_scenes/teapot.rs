@@ -16,6 +16,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use std::default::Default;
 use std::fs;
+use ray_tracer::material::Material;
 
 pub struct Teapot {}
 
@@ -155,7 +156,8 @@ impl Teapot {
         for t in g.iter() {
             let points = obj.points.of(t);
             aabb.push_points(&points);
-            let triangle = Shape::new_triangle(Triangle::new(points[0], points[1], points[2]));
+            let mut triangle = Shape::new_triangle(Triangle::new(points[0], points[1], points[2]));
+            triangle.material = Material::glass();
             teapot_part.add(triangle);
 
             if aabb.3 > 300 {
