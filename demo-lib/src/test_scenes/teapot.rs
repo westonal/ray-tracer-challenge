@@ -94,7 +94,7 @@ impl TestScene for Teapot {
     }
 
     fn build_world() -> World {
-        let obj: Obj = fs::read_to_string("objs/teapot.obj")
+        let obj: Obj = fs::read_to_string("objs/pawn-chess.obj")
             .unwrap()
             .as_str()
             .try_into()

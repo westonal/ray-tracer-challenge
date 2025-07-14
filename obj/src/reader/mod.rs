@@ -85,6 +85,23 @@ macro_rules! parse_vec {
     }};
 }
 
+fn trim_before_slash(s:&str) -> &str{
+    if let Some(i) = s.find("/"){
+        &s[..i]
+    }else {
+        s
+    }
+}
+
+macro_rules! parse_vec2 {
+    ($t:tt, $args:expr) => {{
+        let args: Vec<$t> = $args.iter()
+            .map(|f| trim_before_slash(f).parse::<$t>().unwrap())
+            .collect();
+        args
+    }};
+}
+
 macro_rules! read_triple_vec {
     ($t:tt, $args:expr) => {{
         let args = parse_vec!($t, $args);
@@ -152,7 +169,7 @@ impl TryFrom<&str> for Obj {
                 println!("  <{:?}>", args);
                 if args.len() >= 3 {
                     let args: Result<Vec<ObjPointIndex>, ObjError> =
-                        parse_vec!(i32, args)
+                        parse_vec2!(i32, args)
                             .into_iter()
                             .map(|i| {
                                 Self::relative_index_to_absolute(i, points.len())
