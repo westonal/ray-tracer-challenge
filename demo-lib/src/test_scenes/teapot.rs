@@ -1,6 +1,6 @@
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{BLACK, WHITE};
+use math::tuple::color::{BLACK, RED, WHITE};
 use math::tuple::point::Point;
 use math::{degrees, point, vector};
 use obj::{Group, Obj};
@@ -118,7 +118,7 @@ impl TestScene for Teapot {
         let world_scene = scene!(
             +{
                 let mut plane = Shape::new_plane();
-                plane.material.pattern = Pattern::Checker(*WHITE, *BLACK, Transform::identity());
+                plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::identity());
                 plane
             };
             +teapot;
@@ -126,14 +126,14 @@ impl TestScene for Teapot {
 
         let mut world = World::default();
         world.add(world_scene);
-        world.add_light(PointLight::new(point!(0, 20, 10), *WHITE));
+        world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
         world
     }
 
     fn build_camera(size: Size) -> Camera {
-        let mut camera = Camera::new(size, degrees!(45));
+        let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0, 0), vector!(0, 1, 0)).into(),
+            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0.8, 0), vector!(0, 1, 0)).into(),
         );
         camera
     }
