@@ -10,7 +10,7 @@ use demo_lib::test_scenes::triangles::Triangles;
 use ray_tracer::canvas::Size;
 
 fn main() {
-    let size = Size::HD_720P;
+    let size = Size::UHD_4K;
     Teapot::render_scene(size);
     return;
     Triangles::render_scene(size);
