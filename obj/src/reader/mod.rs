@@ -1,27 +1,38 @@
 mod group;
 mod obj_triangle;
 mod point_collection;
+mod vector_collection;
 
 use crate::reader::group::Group;
 pub use crate::reader::obj_triangle::ObjTriangle;
 pub use crate::reader::point_collection::PointCollection;
-use math::point;
+pub use crate::reader::vector_collection::VectorCollection;
 use math::tuple::point::Point;
+use math::tuple::vector::Vector;
+use math::{point, vector};
 use std::collections::HashMap;
 use std::ops::Index;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjPointIndex(usize);
 
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub struct ObjNormalIndex(usize);
+
 #[derive(Debug, PartialEq)]
 pub struct Obj {
     points: PointCollection,
+    normals: VectorCollection,
     default_group: Group,
     groups: HashMap<String, Group>,
 }
 
 impl Obj {
-    fn new(points: PointCollection, mut groups: HashMap<Option<String>, Group>) -> Obj {
+    fn new(
+        points: PointCollection,
+        normals: VectorCollection,
+        mut groups: HashMap<Option<String>, Group>,
+    ) -> Obj {
         let default_group = groups.remove(&None).unwrap();
         let named_groups = groups
             .into_iter()
@@ -35,6 +46,7 @@ impl Obj {
             .collect();
         Obj {
             points,
+            normals,
             default_group,
             groups: named_groups,
         }
@@ -53,6 +65,7 @@ impl Default for Obj {
     fn default() -> Self {
         Self {
             points: Default::default(),
+            normals: Default::default(),
             default_group: Group::default_group(Default::default()),
             groups: Default::default(),
         }
@@ -132,14 +145,13 @@ impl TryFrom<&str> for Obj {
             .filter(|(_, s)| !s.is_empty());
 
         let mut points: Vec<Point> = Default::default();
+        let mut normals: Vec<Vector> = Default::default();
         let mut triangles: Vec<ObjTriangle> = Default::default();
         let mut group_name: Option<String> = None;
         let mut groups = HashMap::default();
         for (line, s) in x {
-            println!("<{}>", s);
             if s.starts_with("v ") {
                 let args: &Vec<&str> = &s[2..].split_ascii_whitespace().collect();
-                println!("  <{:?}>", args);
                 if args.len() == 3 {
                     let args = read_triple!(f32, args);
                     points.push(point!(args[0], args[1], args[2]));
@@ -147,9 +159,17 @@ impl TryFrom<&str> for Obj {
                     return Err(ObjError::new(line, s, "Point has too few fields"));
                 }
             }
+            if s.starts_with("vn ") {
+                let args: &Vec<&str> = &s[3..].split_ascii_whitespace().collect();
+                if args.len() == 3 {
+                    let args = read_triple!(f32, args);
+                    normals.push(vector!(args[0], args[1], args[2]));
+                } else {
+                    return Err(ObjError::new(line, s, "Normal has too few fields"));
+                }
+            }
             if s.starts_with("f ") {
                 let args: &Vec<&str> = &s[2..].split_ascii_whitespace().collect();
-                println!("  <{:?}>", args);
                 if args.len() >= 3 {
                     let args: Result<Vec<ObjPointIndex>, ObjError> =
                         parse_vec!(i32, args)
@@ -177,7 +197,7 @@ impl TryFrom<&str> for Obj {
         // close group
         groups.insert(group_name.clone(), Group::new(group_name, triangles));
 
-        Ok(Obj::new(points.into(), groups))
+        Ok(Obj::new(points.into(), normals.into(), groups))
     }
 }
 
@@ -226,7 +246,7 @@ macro_rules! assert_triangles {
 #[cfg(test)]
 mod reader_tests {
     use super::*;
-    use math::{assert_point, point};
+    use math::{assert_point, point, vector};
 
     #[test]
     fn ignore_lines_not_that_are_not_understood() {
@@ -259,6 +279,17 @@ mod reader_tests {
         let obj: Obj = input.try_into().unwrap();
 
         assert_eq!(vec!(point!(1, 2, 3.5)), *obj.points);
+    }
+
+    #[test]
+    fn read_a_single_normal() {
+        let input = "
+            vn 1 2 3.5
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        assert_eq!(vec!(vector!(1, 2, 3.5)), *obj.normals);
     }
 
     #[test]
@@ -426,6 +457,19 @@ mod reader_parse_failure_tests {
         let error = obj.err().unwrap();
         assert_eq!("Point has too few fields", error.message);
         assert_eq!("v 3 4", error.line);
+        assert_eq!(2, error.line_number);
+    }
+
+    #[test]
+    fn a_vertex_normal_with_too_few_items() {
+        let input = "
+            vn 1 2
+        ";
+
+        let obj: ObjResult = input.try_into();
+        let error = obj.err().unwrap();
+        assert_eq!("Normal has too few fields", error.message);
+        assert_eq!("vn 1 2", error.line);
         assert_eq!(2, error.line_number);
     }
 
