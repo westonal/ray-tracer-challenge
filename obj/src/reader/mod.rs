@@ -19,6 +19,10 @@ pub struct ObjPointIndex(usize);
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjNormalIndex(usize);
 
+pub fn point_to_normal_index(o: ObjPointIndex)->ObjNormalIndex{
+    ObjNormalIndex(o.0)
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Obj {
     pub points: PointCollection,

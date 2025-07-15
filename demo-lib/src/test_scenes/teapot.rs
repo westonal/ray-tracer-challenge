@@ -2,6 +2,7 @@ use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::{BLACK, RED, WHITE};
 use math::tuple::point::Point;
+use math::tuple::vector::Vector;
 use math::{degrees, point, vector};
 use obj::{Group, Obj};
 use ray_tracer::camera::Camera;
@@ -155,7 +156,14 @@ impl Teapot {
         for t in g.iter() {
             let points = obj.points.of(t);
             aabb.push_points(&points);
-            let triangle = Shape::new_triangle(Triangle::new(points[0], points[1], points[2]));
+
+            let triangle = match obj.normals.of(t) {
+                None => Shape::new_triangle(Triangle::new(points[0], points[1], points[2])),
+                Some(normals) => Shape::new_triangle(Triangle::new_smooth(
+                    points[0], points[1], points[2], normals[0], normals[1], normals[2],
+                )),
+            };
+
             teapot_part.add(triangle);
 
             if aabb.3 > 300 {

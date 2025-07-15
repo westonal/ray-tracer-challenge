@@ -1,4 +1,5 @@
-use crate::ObjNormalIndex;
+use crate::{ObjNormalIndex, ObjTriangle, PointCollection};
+use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use std::ops::{Deref, Index};
 
@@ -18,6 +19,12 @@ impl Index<ObjNormalIndex> for VectorCollection {
 
     fn index(&self, index: ObjNormalIndex) -> &Self::Output {
         self.0.get(index.0).unwrap()
+    }
+}
+
+impl VectorCollection {
+    pub fn of(&self, triangle: &ObjTriangle) -> Option<[Vector; 3]> {
+        triangle.normal_indicies.map(|i| i.map(|f| self[f]))
     }
 }
 
