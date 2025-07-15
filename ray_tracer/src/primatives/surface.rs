@@ -1,3 +1,4 @@
+use crate::intersection::{FUV, UV};
 use crate::primatives::intersections::Sphere;
 use crate::primatives::intersections::{Cube, Cylinder};
 use crate::primatives::intersections::{CylinderCapStyle, Plane};
@@ -30,27 +31,43 @@ impl Surface {
             Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
             Surface::UnitCube => Cube::fast_hit(ray),
             Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
-            &Surface::SingleTriangle(triangle) => !triangle.intersect(ray).is_empty(),
+            &Surface::SingleTriangle(triangle) => triangle.intersect(ray).is_some(),
         }
     }
 
-    pub(crate) fn intersect(&self, ray: &Ray) -> Vec<f32> {
+    pub(crate) fn intersect(&self, ray: &Ray) -> Vec<FUV> {
         match self {
-            Surface::UnitSphere => Sphere::intersect(ray),
-            Surface::PlaneXZ => Plane::intersect(ray),
-            Surface::UnitCube => Cube::intersect(ray),
-            Surface::UnitCylinder(style) => Cylinder::intersect(ray, style),
-            &Surface::SingleTriangle(triangle) => triangle.intersect(ray),
+            Surface::UnitSphere => Sphere::intersect(ray)
+                .iter()
+                .map(|f| FUV::justF(*f))
+                .collect(),
+            Surface::PlaneXZ => Plane::intersect(ray)
+                .iter()
+                .map(|f| FUV::justF(*f))
+                .collect(),
+            Surface::UnitCube => Cube::intersect(ray)
+                .iter()
+                .map(|f| FUV::justF(*f))
+                .collect(),
+            Surface::UnitCylinder(style) => Cylinder::intersect(ray, style)
+                .iter()
+                .map(|f| FUV::justF(*f))
+                .collect(),
+            &Surface::SingleTriangle(triangle) => triangle
+                .intersect(ray)
+                .iter()
+                .map(|(f, uv)| FUV::new(*f, *uv))
+                .collect(),
         }
     }
 
-    pub(crate) fn normal_at(&self, object_point: Point) -> Vector {
+    pub(crate) fn normal_at(&self, object_point: Point, uv:Option<UV>) -> Vector {
         match self {
             Surface::UnitSphere => Sphere::normal_at(object_point),
             Surface::PlaneXZ => Plane::normal_at(object_point),
             Surface::UnitCube => Cube::normal_at(object_point),
             Surface::UnitCylinder(style) => Cylinder::normal_at(object_point, style),
-            &Surface::SingleTriangle(triangle) => triangle.normal_at(object_point),
+            &Surface::SingleTriangle(triangle) => triangle.normal_at(object_point, uv),
         }
     }
 }

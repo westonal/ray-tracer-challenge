@@ -2,6 +2,7 @@ use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::IntersectableShape;
 use crate::primatives::ShapeId;
 use crate::rays::Ray;
+use std::iter::Fuse;
 use std::ops::{AddAssign, Deref};
 
 pub trait Intersect {
@@ -12,9 +13,45 @@ pub trait Intersect {
     }
 }
 
-pub struct Intersection<'s> {
+#[derive(Copy, Clone)]
+pub struct UV {
+    pub u: f32,
+    pub v: f32,
+}
+
+#[derive(Copy, Clone)]
+pub struct FUV {
     pub t: f32,
+    pub uv: Option<UV>,
+}
+
+impl FUV {
+    pub(crate) fn new(f: f32, uv:UV) -> Self {
+        Self { t: f, uv: Some(uv) }
+    }
+
+    pub(crate) fn justF(f: f32) -> Self {
+        Self { t: f, uv: None }
+    }
+}
+
+impl UV {
+    pub fn new(u: f32, v: f32) -> Self {
+        Self { u, v }
+    }
+}
+
+pub struct Intersection<'s> {
+    pub fuv: FUV,
     pub shape: &'s IntersectableShape,
+}
+
+impl Deref for Intersection<'_> {
+    type Target = FUV;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fuv
+    }
 }
 
 #[derive(Default)]
@@ -76,8 +113,18 @@ impl<'s> Deref for Intersections<'s> {
 }
 
 impl<'s> Intersection<'s> {
+    pub fn new_fuv(fuv:FUV, shape: &'s IntersectableShape) -> Self {
+        Self {
+            fuv,
+            shape,
+        }
+    }
+
     pub fn new(t: f32, shape: &'s IntersectableShape) -> Self {
-        Self { t, shape }
+        Self {
+            fuv: FUV { t, uv: None },
+            shape,
+        }
     }
 }
 

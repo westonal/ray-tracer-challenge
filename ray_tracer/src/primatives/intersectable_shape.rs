@@ -1,4 +1,4 @@
-use crate::intersection::{Intersect, Intersection, Intersections};
+use crate::intersection::{Intersect, Intersection, Intersections, UV};
 use crate::material::Material;
 use crate::primatives::ShapeId;
 use crate::primatives::surface::Surface;
@@ -15,11 +15,18 @@ pub struct IntersectableShape {
     pub(crate) surface: Surface,
 }
 
+
+
 impl IntersectableShape {
-    pub fn normal_at(&self, point: Point) -> Normal {
+    pub fn normal_at_with_uv(&self, point: Point, uv: Option<UV>) -> Normal {
         let object_point: Point = self.transform.world_point_to_object_point(point);
-        let object_normal = self.surface.normal_at(object_point);
+        let object_normal = self.surface.normal_at(object_point, uv);
         self.transform.object_normal_to_world_normal(object_normal)
+    }
+
+    #[cfg(test)]
+    pub fn normal_at(&self, point: Point) -> Normal {
+        self.normal_at_with_uv(point, None)
     }
 }
 
@@ -31,7 +38,7 @@ impl Intersect for IntersectableShape {
             .surface
             .intersect(&ray)
             .iter()
-            .map(|f| Intersection::new(*f, self))
+            .map(|f| Intersection::new_fuv(*f, self))
             .collect();
         Intersections::new(result)
     }
