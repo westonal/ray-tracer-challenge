@@ -61,7 +61,7 @@ impl Surface {
         }
     }
 
-    pub(crate) fn normal_at(&self, object_point: Point, uv:Option<UV>) -> Vector {
+    pub(crate) fn normal_at(&self, object_point: Point, uv: Option<UV>) -> Vector {
         match self {
             Surface::UnitSphere => Sphere::normal_at(object_point),
             Surface::PlaneXZ => Plane::normal_at(object_point),

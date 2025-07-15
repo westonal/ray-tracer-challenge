@@ -2,7 +2,6 @@ use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::IntersectableShape;
 use crate::primatives::ShapeId;
 use crate::rays::Ray;
-use std::iter::Fuse;
 use std::ops::{AddAssign, Deref};
 
 pub trait Intersect {
@@ -26,7 +25,7 @@ pub struct FUV {
 }
 
 impl FUV {
-    pub(crate) fn new(f: f32, uv:UV) -> Self {
+    pub(crate) fn new(f: f32, uv: UV) -> Self {
         Self { t: f, uv: Some(uv) }
     }
 
@@ -113,11 +112,8 @@ impl<'s> Deref for Intersections<'s> {
 }
 
 impl<'s> Intersection<'s> {
-    pub fn new_fuv(fuv:FUV, shape: &'s IntersectableShape) -> Self {
-        Self {
-            fuv,
-            shape,
-        }
+    pub fn new_fuv(fuv: FUV, shape: &'s IntersectableShape) -> Self {
+        Self { fuv, shape }
     }
 
     pub fn new(t: f32, shape: &'s IntersectableShape) -> Self {

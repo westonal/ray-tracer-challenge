@@ -188,7 +188,9 @@ mod sphere_normal_tests {
             Shape::new_sphere_transformed(Matrix4x4::translation(0., 1., 0.)).to_intersectable();
         assert_vector!(
             vector!(0., 0.7071, -0.7071),
-            sphere.normal_at(point!(0., 1.70711, -0.70711).into()).to_vector()
+            sphere
+                .normal_at(point!(0., 1.70711, -0.70711).into())
+                .to_vector()
         );
     }
 

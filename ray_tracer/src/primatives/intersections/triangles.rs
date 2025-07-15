@@ -116,8 +116,9 @@ mod smooth_triangle_normal_interpolation_tests {
     use super::*;
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
-    use math::{assert_vector, point, vector};
     use crate::primatives::intersectable_shape::PointUv;
+    use crate::ray_first_gen;
+    use math::{assert_vector, point, vector};
 
     #[test]
     fn a_smooth_triangle_uses_uv_to_interpolate_normal() {
@@ -133,9 +134,39 @@ mod smooth_triangle_normal_interpolation_tests {
             n3,
         ))
         .to_intersectable();
-        let normal = triangle.normal_at(PointUv::point_with_some_uv(Point::origin(), UV::new(0.45, 0.25)));
+        let normal = triangle.normal_at(PointUv::point_with_some_uv(
+            Point::origin(),
+            UV::new(0.45, 0.25),
+        ));
 
         assert_vector!(vector!(-0.55470, 0.83205, 0.), normal.to_vector());
+    }
+
+    #[test]
+    fn a_smooth_triangle_uses_uv_to_interpolate_normal_with_ray() {
+        let ray = ray_first_gen!(point!(-0.2, 0.3, -2), vector!(0, 0, 1));
+
+        let n1 = vector!(0, 1, 0);
+        let n2 = vector!(-1, 0, 0);
+        let n3 = vector!(1, 0, 0);
+        let triangle = Shape::new_triangle(Triangle::new_smooth(
+            point!(0, 1, 0),
+            point!(-1, 0, 0),
+            point!(1, 0, 0),
+            n1,
+            n2,
+            n3,
+        ))
+        .to_intersectable();
+
+        let intersections = triangle.intersect(&ray);
+        assert_eq!(1, intersections.len());
+        let intersection = &intersections[0];
+        let calculations = intersection.to_pre_calculation(ray);
+        assert_vector!(
+            vector!(-0.55470, 0.83205, 0.),
+            calculations.normal.to_vector()
+        );
     }
 }
 
