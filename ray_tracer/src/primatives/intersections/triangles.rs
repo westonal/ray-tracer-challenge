@@ -117,6 +117,7 @@ mod smooth_triangle_normal_interpolation_tests {
     use crate::intersection::Intersect;
     use crate::primatives::Shape;
     use math::{assert_vector, point, vector};
+    use crate::primatives::intersectable_shape::PointUv;
 
     #[test]
     fn a_smooth_triangle_uses_uv_to_interpolate_normal() {
@@ -132,9 +133,9 @@ mod smooth_triangle_normal_interpolation_tests {
             n3,
         ))
         .to_intersectable();
-        let normal = triangle.normal_at_with_uv(Point::origin(), Some(UV::new(0.45, 0.25)));
+        let normal = triangle.normal_at(PointUv::point_with_some_uv(Point::origin(), UV::new(0.45, 0.25)));
 
-        assert_vector!(vector!(-1, -1, -1), normal.to_vector());
+        assert_vector!(vector!(-0.55470, 0.83205, 0.), normal.to_vector());
     }
 }
 

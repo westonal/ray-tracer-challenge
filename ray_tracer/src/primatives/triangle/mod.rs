@@ -102,7 +102,7 @@ mod normal_tests {
         .to_intersectable();
         assert_vector!(
             vector!(0, 0, -1),
-            shape.normal_at(point!(0, 0.5, 0)).to_vector()
+            shape.normal_at(point!(0, 0.5, 0).into()).to_vector()
         );
     }
 }

@@ -150,7 +150,7 @@ mod cube_normal_tests {
             #[test]
             fn $name(){
                 let cube = Shape::new_cube().to_intersectable();
-                assert_eq!($normal, *cube.normal_at($point));
+                assert_eq!($normal, *cube.normal_at($point.into()));
             }
         )*
         }

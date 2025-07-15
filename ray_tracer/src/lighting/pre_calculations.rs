@@ -18,7 +18,7 @@ pub struct PreCalculations<'s> {
 impl<'s> Intersection<'s> {
     pub fn to_pre_calculation(&'s self, ray: RayGeneration) -> PreCalculations<'s> {
         let point = ray.position(self.t);
-        let normal = self.shape.normal_at(point);
+        let normal = self.shape.normal_at(point.into());
         let eye = (-ray.direction).normalize();
         let inside = normal.dot(&eye) < 0.;
         let normal = if inside { -normal } else { normal };

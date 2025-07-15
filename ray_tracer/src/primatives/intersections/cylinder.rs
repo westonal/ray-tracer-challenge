@@ -162,7 +162,7 @@ mod cylinder_normal_tests {
                 #[test]
                 fn $name() {
                     let cylinder = Shape::new_open_cylinder().to_intersectable();
-                    math::assert_vector!(cylinder.normal_at($point).to_vector(), $expect);
+                    math::assert_vector!(cylinder.normal_at($point.into()).to_vector(), $expect);
                 }
             )*
         };
@@ -269,7 +269,7 @@ mod cylinder_cap_normal_tests {
                     let cylinder = Shape::new_cylinder_transformed(
                         Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
                     ).to_intersectable();
-                    assert_vector!(cylinder.normal_at($point).to_vector(), $expected);
+                    assert_vector!(cylinder.normal_at($point.into()).to_vector(), $expected);
                 }
             )*
         };

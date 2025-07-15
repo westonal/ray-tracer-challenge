@@ -15,18 +15,38 @@ pub struct IntersectableShape {
     pub(crate) surface: Surface,
 }
 
+pub struct PointUv {
+    point: Point,
+    uv: Option<UV>,
+}
 
-
-impl IntersectableShape {
-    pub fn normal_at_with_uv(&self, point: Point, uv: Option<UV>) -> Normal {
-        let object_point: Point = self.transform.world_point_to_object_point(point);
-        let object_normal = self.surface.normal_at(object_point, uv);
-        self.transform.object_normal_to_world_normal(object_normal)
+impl PointUv {
+    pub fn new(point: Point, uv: Option<UV>) -> Self {
+        Self { point, uv }
     }
 
     #[cfg(test)]
-    pub fn normal_at(&self, point: Point) -> Normal {
-        self.normal_at_with_uv(point, None)
+    pub fn point_no_uv(point: Point) -> Self {
+        Self::new(point, None)
+    }
+
+    pub fn point_with_some_uv(point: Point, uv: UV) -> Self {
+        Self::new(point, Some(uv))
+    }
+}
+
+#[cfg(test)]
+impl From<Point> for PointUv {
+    fn from(value: Point) -> Self {
+        PointUv::point_no_uv(value)
+    }
+}
+
+impl IntersectableShape {
+    pub fn normal_at(&self, point_uv: PointUv) -> Normal {
+        let object_point: Point = self.transform.world_point_to_object_point(point_uv.point);
+        let object_normal = self.surface.normal_at(object_point, point_uv.uv);
+        self.transform.object_normal_to_world_normal(object_normal)
     }
 }
 
