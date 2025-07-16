@@ -6,6 +6,7 @@ mod image_buffer_canvas;
 mod png_write;
 pub mod test_scenes;
 mod threaded_canvas;
+mod obj_loader;
 
 fn fill_all_with_gradient<C: Canvas<Color>>(canvas: &mut C) {
     let size = canvas.size();
