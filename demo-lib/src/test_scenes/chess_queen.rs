@@ -1,8 +1,8 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{RED, WHITE};
-use math::{degrees, point, vector};
+use math::tuple::color::{BLACK, RED, WHITE};
+use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -15,31 +15,39 @@ use ray_tracer::world::World;
 use std::default::Default;
 use ray_tracer::material::Material;
 
-pub struct Pawn {}
+pub struct Queen {}
 
-impl TestScene for Pawn {
+impl TestScene for Queen {
     fn name() -> &'static str {
-        "chess_pawn"
+        "chess_queen"
     }
 
     fn build_world() -> World {
-        let pawn = scene!(
-            matrix: Matrix4x4::rotation_y(degrees!(-60));
+        let queen = scene!(
+            matrix: Matrix4x4::translation(0.75,0.,0.)
+            .pre_scale_all(0.22);
             +obj!(
-                path: "objs/chess/pawn.obj";
-                material: Material::glass();
+                path: "objs/chess/queen.obj";
+                material: {
+                    let mut glass = Material::glass();
+                    glass.reflectivity = 0.9;
+                    glass.transparency = 0.7;
+                    glass.ambient = 0.2;
+                    glass.pattern = Pattern::Solid(color!(0.5, 0.5, 0.5));
+                    glass
+                };
             );
         );
 
         let world_scene = scene!(
             +{
                 let mut plane = Shape::new_plane();
-                plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::new(
+                plane.material.pattern = Pattern::Checker(*WHITE, *BLACK, Transform::new(
                     Matrix4x4::scale_all(2.6).pre_translation(0.5, 0., 0.5)
                 ));
                 plane
             };
-            +pawn;
+            +queen;
         );
 
         let mut world = World::default();
@@ -51,7 +59,7 @@ impl TestScene for Pawn {
     fn build_camera(size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.4, 0), vector!(0, 1, 0)).into(),
+            ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.8, 0), vector!(0, 1, 0)).into(),
         );
         camera
     }

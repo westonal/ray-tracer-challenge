@@ -24,7 +24,7 @@ impl TestScene for Teapot {
     fn build_world() -> World {
         let teapot = scene!(
             matrix: Matrix4x4::rotation_y(degrees!(-60));
-            +obj!(path: "objs/teapot.obj");
+            +obj!(path: "objs/teapot.obj";);
         );
 
         let world_scene = scene!(

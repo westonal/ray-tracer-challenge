@@ -1,86 +1,100 @@
-use std::fs;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use obj::{Group, Obj};
+use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
+use std::fs;
 
 #[macro_export]
 macro_rules! obj {
-    (path: $path:expr) => {
-        {
-            let obj: obj::Obj = std::fs::read_to_string($path)
-                .unwrap()
-                .as_str()
-                .try_into()
-                .expect(&format!("Unable to open {}", $path));
+    (path: $path:expr; $(material: $material:expr;)?) => {{
+        let obj: obj::Obj = std::fs::read_to_string($path)
+            .unwrap()
+            .as_str()
+            .try_into()
+            .expect(&format!("Unable to open {}", $path));
 
-            println!("Loaded Obj {}", $path);
-            $crate::obj_loader::obj_to_scene(&obj)
+        println!("Loaded Obj {}", $path);
+        let mut _mat = None;
+        $(_mat = Some($material);)?
+        $crate::obj_loader::ObjLoader::new(_mat).obj_to_scene(&obj)
+    }};
+}
+
+pub struct ObjLoader {
+    material: Option<Material>,
+}
+
+impl ObjLoader {
+    pub fn new(material: Option<Material>) -> Self {
+        Self { material }
+    }
+
+    pub fn obj_to_scene(&self, obj: &Obj) -> SceneTree {
+        let mut scene = scene!();
+        scene.add(self.add_group(&obj, &obj.default_group));
+
+        for g in obj.group_names() {
+            let g = &obj[g];
+            scene.add(self.add_group(&obj, g));
         }
-    };
-}
 
-pub fn obj_to_scene(obj: &Obj) -> SceneTree {
-    let mut scene = scene!();
-    scene.add(add_group(&obj, &obj.default_group));
-
-    for g in obj.group_names() {
-        let g = &obj[g];
-        scene.add(add_group(&obj, g));
+        scene
     }
 
-    scene
-}
+    fn add_group(&self, obj: &Obj, g: &Group) -> SceneTree {
+        println!(
+            "{}: {} Triangles",
+            g.name.clone().unwrap_or("Default Group".to_string()),
+            g.len()
+        );
 
-fn add_group(obj: &Obj, g: &Group) -> SceneTree {
-    println!(
-        "{}: {} Triangles",
-        g.name.clone().unwrap_or("Default Group".to_string()),
-        g.len()
-    );
+        let mut group = scene!();
 
-    let mut group = scene!();
+        if g.len() == 0 {
+            return group;
+        }
 
-    if g.len() == 0 {
-        return group;
-    }
+        let mut part = scene!();
 
-    let mut part = scene!();
+        let mut aabb = AABBBuilder::new();
+        for t in g.iter() {
+            let points = obj.points.of(t);
+            aabb.push_points(&points);
 
-    let mut aabb = AABBBuilder::new();
-    for t in g.iter() {
-        let points = obj.points.of(t);
-        aabb.push_points(&points);
+            let mut triangle = match obj.normals.of(t) {
+                None => Shape::new_triangle(Triangle::new(points[0], points[1], points[2])),
+                Some(normals) => Shape::new_triangle(Triangle::new_smooth(
+                    points[0], points[1], points[2], normals[0], normals[1], normals[2],
+                )),
+            };
 
-        let triangle = match obj.normals.of(t) {
-            None => Shape::new_triangle(Triangle::new(points[0], points[1], points[2])),
-            Some(normals) => Shape::new_triangle(Triangle::new_smooth(
-                points[0], points[1], points[2], normals[0], normals[1], normals[2],
-            )),
-        };
+            if let Some(m) = &self.material {
+                triangle.material = m.clone();
+            }
 
-        part.add(triangle);
+            part.add(triangle);
 
-        if aabb.3 > 300 {
-            group.add(scene!(
+            if aabb.3 > 300 {
+                group.add(scene!(
                     bounding_volume: aabb.to_bounding();
                     +part;
                 ));
-            part = scene!();
-            aabb = AABBBuilder::new();
+                part = scene!();
+                aabb = AABBBuilder::new();
+            }
         }
-    }
 
-    group.add(scene!(
+        group.add(scene!(
             bounding_volume: aabb.to_bounding();
             +part;
         ));
 
-    group
+        group
+    }
 }
-
 
 #[derive(Debug)]
 struct AABBBuilderRange {

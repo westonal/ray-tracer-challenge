@@ -7,6 +7,7 @@ pub mod grid;
 pub mod teapot;
 pub mod triangles;
 pub mod chess_pawn;
+pub mod chess_queen;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
