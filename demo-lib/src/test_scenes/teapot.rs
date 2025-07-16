@@ -1,8 +1,7 @@
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{BLACK, RED, WHITE};
+use math::tuple::color::{RED, WHITE};
 use math::tuple::point::Point;
-use math::tuple::vector::Vector;
 use math::{degrees, point, vector};
 use obj::{Group, Obj};
 use ray_tracer::camera::Camera;
@@ -112,7 +111,7 @@ impl TestScene for Teapot {
         }
 
         let teapot = scene!(
-            matrix: Matrix4x4::rotation_y(degrees!(30));
+            matrix: Matrix4x4::rotation_y(degrees!(-60));
             +teapot;
         );
 
@@ -149,6 +148,10 @@ impl Teapot {
         );
 
         let mut group = scene!();
+
+        if g.len() == 0 {
+            return group;
+        }
 
         let mut teapot_part = scene!();
 
