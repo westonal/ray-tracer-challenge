@@ -1,8 +1,10 @@
+mod face_triple;
 mod group;
 mod obj_triangle;
 mod point_collection;
 mod vector_collection;
 
+use crate::reader::face_triple::FaceTriple;
 pub use crate::reader::group::Group;
 pub use crate::reader::obj_triangle::ObjTriangle;
 pub use crate::reader::point_collection::PointCollection;
@@ -19,7 +21,7 @@ pub struct ObjPointIndex(usize);
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ObjNormalIndex(usize);
 
-pub fn point_to_normal_index(o: ObjPointIndex)->ObjNormalIndex{
+pub fn point_to_normal_index(o: ObjPointIndex) -> ObjNormalIndex {
     ObjNormalIndex(o.0)
 }
 
@@ -175,15 +177,13 @@ impl TryFrom<&str> for Obj {
             if s.starts_with("f ") {
                 let args: &Vec<&str> = &s[2..].split_ascii_whitespace().collect();
                 if args.len() >= 3 {
-                    let args: Result<Vec<ObjPointIndex>, ObjError> =
-                        parse_vec!(i32, args)
-                            .into_iter()
-                            .map(|i| {
-                                Self::relative_index_to_absolute(i, points.len())
-                                    .ok_or(ObjError::new(line, s, "Face index out of bounds"))
-                            })
+                    let args: Result<Vec<(ObjPointIndex, Option<ObjNormalIndex>)>, &'static str> =
+                        parse_vec!(FaceTriple, args)
+                            .iter()
+                            .map(|m| Self::resolve_indexes(m, &points, &normals))
                             .collect();
-                    let args = args?;
+                    let args: Vec<(ObjPointIndex, Option<ObjNormalIndex>)> =
+                        args.map_err(|err| ObjError::new(line, s, err))?;
                     triangles.append(&mut to_triangles(args));
                 } else {
                     return Err(ObjError::new(line, s, "Face has too few fields"));
@@ -205,20 +205,38 @@ impl TryFrom<&str> for Obj {
     }
 }
 
-fn to_triangles(points: Vec<ObjPointIndex>) -> Vec<ObjTriangle> {
+fn to_triangles(points: Vec<(ObjPointIndex, Option<ObjNormalIndex>)>) -> Vec<ObjTriangle> {
     let mut result = vec![];
-    let p1: ObjPointIndex = *points.get(0).unwrap();
-    let mut p2: ObjPointIndex = *points.get(1).unwrap();
-    for p in points.into_iter().skip(2) {
-        result.push([p1, p2, p].into());
+    let (p1, n1) = *points.get(0).unwrap();
+    let (mut p2, mut n2) = *points.get(1).unwrap();
+    for (p, n) in points.into_iter().skip(2) {
+        result.push(([p1, p2, p], [n1, n2, n]).into());
         p2 = p;
+        n2 = n;
     }
     result
 }
 
 impl Obj {
-    fn relative_index_to_absolute(relative: i32, points_length: usize) -> Option<ObjPointIndex> {
-        let points_length = points_length as i32;
+    fn resolve_indexes(
+        face_triple: &FaceTriple,
+        points: &Vec<Point>,
+        normals: &Vec<Vector>,
+    ) -> Result<(ObjPointIndex, Option<ObjNormalIndex>), &'static str> {
+        let point = Self::relative_index_to_absolute_point(face_triple.index, points.len())
+            .ok_or("Face index out of bounds")?;
+        let normal = match face_triple.normal {
+            None => None,
+            Some(normal) => Some(
+                Self::relative_index_to_absolute_normal(normal, normals.len())
+                    .ok_or("Face index out of bounds")?,
+            ),
+        };
+        Ok((point, normal))
+    }
+
+    fn relative_index_to_absolute(relative: i32, length: usize) -> Option<usize> {
+        let points_length = length as i32;
         let positive = if relative < 0 {
             points_length + relative + 1
         } else {
@@ -227,8 +245,22 @@ impl Obj {
         if positive == 0 || positive > points_length {
             None
         } else {
-            Some(ObjPointIndex(positive as usize - 1))
+            Some(positive as usize - 1)
         }
+    }
+
+    fn relative_index_to_absolute_point(
+        relative: i32,
+        points_length: usize,
+    ) -> Option<ObjPointIndex> {
+        Self::relative_index_to_absolute(relative, points_length).map(|i| ObjPointIndex(i))
+    }
+
+    fn relative_index_to_absolute_normal(
+        relative: i32,
+        normals_length: usize,
+    ) -> Option<ObjNormalIndex> {
+        Self::relative_index_to_absolute(relative, normals_length).map(|i| ObjNormalIndex(i))
     }
 }
 
@@ -404,6 +436,50 @@ mod reader_tests {
             1 => point!(-1, 1, 11), point!( 1, 0, 13), point!(1, 1, 14);
             2 => point!(-1, 1, 11), point!( 1, 1, 14), point!(0, 2, 15);
         );
+    }
+
+    #[test]
+    fn read_a_single_triangle_face_with_normals() {
+        let input = "
+            v -1 1 0
+            v -1 0 0
+            v 1 0 0
+            vn 1 0 0
+            vn 0 1 0
+            vn 0 0 1
+            f 1//2 2//3 3//1
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        let expected: ObjTriangle = (
+            [ObjPointIndex(0), ObjPointIndex(1), ObjPointIndex(2)],
+            [ObjNormalIndex(1), ObjNormalIndex(2), ObjNormalIndex(0)],
+        )
+            .into();
+        assert_eq!(vec!(expected), *obj.default_group);
+    }
+
+    #[test]
+    fn read_a_single_triangle_face_with_negative_normals() {
+        let input = "
+            v -1 1 0
+            v -1 0 0
+            v 1 0 0
+            vn 1 0 0
+            vn 0 1 0
+            vn 0 0 1
+            f 1//-1 2//-2 3//-3
+        ";
+
+        let obj: Obj = input.try_into().unwrap();
+
+        let expected: ObjTriangle = (
+            [ObjPointIndex(0), ObjPointIndex(1), ObjPointIndex(2)],
+            [ObjNormalIndex(2), ObjNormalIndex(1), ObjNormalIndex(0)],
+        )
+            .into();
+        assert_eq!(vec!(expected), *obj.default_group);
     }
 }
 

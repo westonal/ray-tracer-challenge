@@ -1,5 +1,4 @@
-use crate::{ObjNormalIndex, ObjTriangle, PointCollection};
-use math::tuple::point::Point;
+use crate::{ObjNormalIndex, ObjTriangle};
 use math::tuple::vector::Vector;
 use std::ops::{Deref, Index};
 

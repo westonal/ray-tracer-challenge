@@ -23,7 +23,7 @@ impl Index<ObjPointIndex> for PointCollection {
 
 impl PointCollection {
     pub fn of(&self, triangle: &ObjTriangle) -> [Point; 3] {
-        [self[triangle[0]], self[triangle[1]], self[triangle[2]]]
+        triangle.indicies.map(|f| self[f])
     }
 }
 
