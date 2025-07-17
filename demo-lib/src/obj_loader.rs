@@ -5,7 +5,6 @@ use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
-use std::fs;
 
 #[macro_export]
 macro_rules! obj {

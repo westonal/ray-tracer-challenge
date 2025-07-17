@@ -5,7 +5,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 
 impl Triangle {
-    pub(crate) fn intersect(&self, ray: &Ray) -> Option<(f32, UV)> {
+    pub(crate) fn intersect(&self, ray: &Ray) -> Option<(UV, f32)> {
         let dir_cross_e2 = ray.direction.cross(self.e2);
         let det = self.e1.dot(&dir_cross_e2);
         if det.abs() < Self::TRIANGLE_EPSILON {
@@ -30,7 +30,7 @@ impl Triangle {
             return None;
         }
 
-        Some((f * self.e2.dot(&origin_cross_e1), UV::new(u, v)))
+        Some((UV::new(u, v), f * self.e2.dot(&origin_cross_e1)))
     }
 
     pub(crate) fn normal_at(&self, _object_point: Point, uv: Option<UV>) -> Vector {

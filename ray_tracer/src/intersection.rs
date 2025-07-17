@@ -18,19 +18,20 @@ pub struct UV {
     pub v: f32,
 }
 
+/// Optional [UV] and a `t`.
 #[derive(Copy, Clone)]
-pub struct FUV {
-    pub t: f32,
+pub struct UVt {
     pub uv: Option<UV>,
+    pub t: f32,
 }
 
-impl FUV {
-    pub(crate) fn new(f: f32, uv: UV) -> Self {
-        Self { t: f, uv: Some(uv) }
+impl UVt {
+    pub(crate) fn new(uv: UV, t: f32) -> Self {
+        Self { uv: Some(uv), t }
     }
 
-    pub(crate) fn justF(f: f32) -> Self {
-        Self { t: f, uv: None }
+    pub(crate) fn just_t(t: f32) -> Self {
+        Self { uv: None, t }
     }
 }
 
@@ -41,12 +42,12 @@ impl UV {
 }
 
 pub struct Intersection<'s> {
-    pub fuv: FUV,
+    pub fuv: UVt,
     pub shape: &'s IntersectableShape,
 }
 
 impl Deref for Intersection<'_> {
-    type Target = FUV;
+    type Target = UVt;
 
     fn deref(&self) -> &Self::Target {
         &self.fuv
@@ -112,13 +113,13 @@ impl<'s> Deref for Intersections<'s> {
 }
 
 impl<'s> Intersection<'s> {
-    pub fn new_fuv(fuv: FUV, shape: &'s IntersectableShape) -> Self {
+    pub fn new_fuv(fuv: UVt, shape: &'s IntersectableShape) -> Self {
         Self { fuv, shape }
     }
 
     pub fn new(t: f32, shape: &'s IntersectableShape) -> Self {
         Self {
-            fuv: FUV { t, uv: None },
+            fuv: UVt { t, uv: None },
             shape,
         }
     }

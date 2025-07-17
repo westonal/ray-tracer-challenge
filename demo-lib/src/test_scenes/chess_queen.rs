@@ -1,11 +1,12 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{BLACK, RED, WHITE};
+use math::tuple::color::{BLACK, WHITE};
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
+use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::scene;
@@ -13,7 +14,6 @@ use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use std::default::Default;
-use ray_tracer::material::Material;
 
 pub struct Queen {}
 

@@ -1,4 +1,4 @@
-use crate::intersection::{FUV, UV};
+use crate::intersection::{UV, UVt};
 use crate::primatives::intersections::Sphere;
 use crate::primatives::intersections::{Cube, Cylinder};
 use crate::primatives::intersections::{CylinderCapStyle, Plane};
@@ -31,32 +31,32 @@ impl Surface {
             Surface::PlaneXZ => !Plane::intersect(ray).is_empty(),
             Surface::UnitCube => Cube::fast_hit(ray),
             Surface::UnitCylinder(style) => !Cylinder::intersect(ray, style).is_empty(),
-            &Surface::SingleTriangle(triangle) => triangle.intersect(ray).is_some(),
+            Surface::SingleTriangle(triangle) => triangle.intersect(ray).is_some(),
         }
     }
 
-    pub(crate) fn intersect(&self, ray: &Ray) -> Vec<FUV> {
+    pub(crate) fn intersect(&self, ray: &Ray) -> Vec<UVt> {
         match self {
             Surface::UnitSphere => Sphere::intersect(ray)
-                .iter()
-                .map(|f| FUV::justF(*f))
+                .into_iter()
+                .map(|t| UVt::just_t(t))
                 .collect(),
             Surface::PlaneXZ => Plane::intersect(ray)
-                .iter()
-                .map(|f| FUV::justF(*f))
+                .into_iter()
+                .map(|t| UVt::just_t(t))
                 .collect(),
             Surface::UnitCube => Cube::intersect(ray)
-                .iter()
-                .map(|f| FUV::justF(*f))
+                .into_iter()
+                .map(|t| UVt::just_t(t))
                 .collect(),
             Surface::UnitCylinder(style) => Cylinder::intersect(ray, style)
-                .iter()
-                .map(|f| FUV::justF(*f))
+                .into_iter()
+                .map(|t| UVt::just_t(t))
                 .collect(),
-            &Surface::SingleTriangle(triangle) => triangle
+            Surface::SingleTriangle(triangle) => triangle
                 .intersect(ray)
-                .iter()
-                .map(|(f, uv)| FUV::new(*f, *uv))
+                .into_iter()
+                .map(|(uv, t)| UVt::new(uv, t))
                 .collect(),
         }
     }

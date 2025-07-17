@@ -1,4 +1,6 @@
 pub mod chapter7_scene;
+pub mod chess_pawn;
+pub mod chess_queen;
 pub mod cube_of_spheres;
 pub mod cubes;
 pub mod cylinders;
@@ -6,8 +8,6 @@ pub mod glass_sphere_with_air;
 pub mod grid;
 pub mod teapot;
 pub mod triangles;
-pub mod chess_pawn;
-pub mod chess_queen;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;

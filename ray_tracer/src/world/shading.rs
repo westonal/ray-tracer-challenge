@@ -6,9 +6,6 @@ use crate::rays::RayGeneration;
 use crate::render::RenderableWorld;
 use math::color;
 use math::tuple::color::Color;
-use crate::lighting::PointLight;
-use crate::lighting::surface_hit::SurfaceHit;
-use crate::ray;
 
 impl RenderableWorld<'_> {
     pub fn shade(&self, pre_calculations: PreCalculations) -> Color {
@@ -23,7 +20,8 @@ impl RenderableWorld<'_> {
         let mut result = color!(0, 0, 0, 0);
         let material = &pre_calculations.shape.material;
         for light in self.lights {
-            let shadow_factor = self.how_much_light_let_blocked(&pre_calculations.surface_hit, light);
+            let shadow_factor =
+                self.how_much_light_let_blocked(&pre_calculations.surface_hit, light);
             result = result
                 + material.light(
                     light,
@@ -71,20 +69,6 @@ impl RenderableWorld<'_> {
             self.shade_with_refraction(pre_calculations, refractions)
         } else {
             self.background
-        }
-    }
-
-    fn how_much_light_let_blocked(&self, point: &SurfaceHit, l: &PointLight) -> f32 {
-        let intersections = self.intersect(&ray!(point.point, l.position - point.point));
-        if let Some((hit, _)) = intersections.hit_excluding(point.shape_id) && hit.t < 1.{
-            // TODO: One limitation of this is it only considers the first blocking object.
-            //  What about the rest of the ray's path to the light?
-            // TODO: Secondly, what about refraction/reflection around inside the transparent object.
-            // TODO: Thirdly, the light let through an object should change color. 
-            hit.shape.material.shadow_opacity
-        } else {
-            // No hit, all light let though
-            0.
         }
     }
 }
