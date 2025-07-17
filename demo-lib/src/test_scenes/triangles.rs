@@ -34,7 +34,7 @@ impl TestScene for Triangles {
 
         world.add(Shape::new_triangle_transformed(
             Matrix4x4::identity().pre_translation(0., 1., 0.),
-            Triangle::new(point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)),
+            Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         ));
 
         let mut triangle = Shape::new_triangle_transformed(
@@ -42,7 +42,7 @@ impl TestScene for Triangles {
                 .pre_scale_all(3.5)
                 .pre_translation(2., 1., -3.)
                 .pre_rotation_y(degrees!(55)),
-            Triangle::new(point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)),
+            Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         );
         triangle.material = Material::glass();
         triangle.material.pattern = Pattern::Solid(color!(0.5, 0., 0.));
@@ -55,7 +55,7 @@ impl TestScene for Triangles {
                 .pre_translation(-8., 4., -3.)
                 .pre_scale_all(4.)
                 .pre_rotation_y(degrees!(0)),
-            Triangle::new(point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)),
+            Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         );
         triangle.material.pattern = Pattern::Gradient(
             gradient_stops!(

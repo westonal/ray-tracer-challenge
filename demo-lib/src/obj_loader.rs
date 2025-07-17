@@ -64,10 +64,8 @@ impl ObjLoader {
             aabb.push_points(&points);
 
             let mut triangle = match obj.normals.of(t) {
-                None => Shape::new_triangle(Triangle::new(points[0], points[1], points[2])),
-                Some(normals) => Shape::new_triangle(Triangle::new_smooth(
-                    points[0], points[1], points[2], normals[0], normals[1], normals[2],
-                )),
+                None => Shape::new_triangle(Triangle::new(points)),
+                Some(normals) => Shape::new_triangle(Triangle::new_smooth(points, normals)),
             };
 
             if let Some(m) = &self.material {

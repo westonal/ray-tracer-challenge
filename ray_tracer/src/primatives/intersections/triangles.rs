@@ -14,7 +14,8 @@ impl Triangle {
         };
 
         let f = det.recip();
-        let p1_to_origin = ray.origin - self.p1;
+        let p1 = self.vertices[0];
+        let p1_to_origin = ray.origin - p1;
         let u = f * p1_to_origin.dot(&dir_cross_e2);
 
         if u < 0. || u > 1. {
@@ -63,7 +64,7 @@ mod triangle_intersection_tests {
                 fn $name() {
                     let ray = ray!($point, $direction);
                     let triangle = Shape::new_triangle(
-                        Triangle::new(point!(0,1,0), point!(-1,0,0), point!(1,0,0))
+                        Triangle::new([point!(0,1,0), point!(-1,0,0), point!(1,0,0)])
                     ).to_intersectable();
                     let intersections = triangle.intersect(&ray);
                     assert_eq!(intersections.len(), 0);
@@ -88,7 +89,7 @@ mod triangle_intersection_tests {
                 fn $name() {
                     let ray = ray!($point, $direction);
                     let triangle = Shape::new_triangle(
-                        Triangle::new(point!(0,1,0), point!(-1,0,0), point!(1,0,0))
+                        Triangle::new([point!(0,1,0), point!(-1,0,0), point!(1,0,0)])
                     ).to_intersectable();
                     let intersections = triangle.intersect(&ray);
                     assert_eq!(intersections.len(), 1);
@@ -126,12 +127,8 @@ mod smooth_triangle_normal_interpolation_tests {
         let n2 = vector!(-1, 0, 0);
         let n3 = vector!(1, 0, 0);
         let triangle = Shape::new_triangle(Triangle::new_smooth(
-            point!(0, 1, 0),
-            point!(-1, 0, 0),
-            point!(1, 0, 0),
-            n1,
-            n2,
-            n3,
+            [point!(0, 1, 0), point!(-1, 0, 0), point!(1, 0, 0)],
+            [n1, n2, n3],
         ))
         .to_intersectable();
         let normal = triangle.normal_at(PointUv::point_with_some_uv(
@@ -150,12 +147,8 @@ mod smooth_triangle_normal_interpolation_tests {
         let n2 = vector!(-1, 0, 0);
         let n3 = vector!(1, 0, 0);
         let triangle = Shape::new_triangle(Triangle::new_smooth(
-            point!(0, 1, 0),
-            point!(-1, 0, 0),
-            point!(1, 0, 0),
-            n1,
-            n2,
-            n3,
+            [point!(0, 1, 0), point!(-1, 0, 0), point!(1, 0, 0)],
+            [n1, n2, n3],
         ))
         .to_intersectable();
 
