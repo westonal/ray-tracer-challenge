@@ -3,6 +3,7 @@ use ray_tracer::canvas::Canvas;
 use ray_tracer::material::Material;
 
 mod image_buffer_canvas;
+mod obj_loader;
 mod png_write;
 pub mod test_scenes;
 mod threaded_canvas;

@@ -1,4 +1,3 @@
-use crate::primatives::Shape;
 use crate::scene_tree::SceneTree;
 
 impl SceneTree {
@@ -20,6 +19,9 @@ impl SceneTree {
         }
     }
 }
+
+#[cfg(test)]
+use crate::primatives::Shape;
 
 #[cfg(test)]
 impl SceneTree {

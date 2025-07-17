@@ -18,11 +18,10 @@ impl RenderableWorld<'_> {
         refraction_medium_indexes: RefractionMediumIndexes,
     ) -> Color {
         let mut result = color!(0, 0, 0, 0);
-        let direct_lights = self.direct_lights_excluding_surface(&pre_calculations.surface_hit);
         let material = &pre_calculations.shape.material;
         for light in self.lights {
-            // TODO, multilight support would light each in turn if they were direct.
-            let shadow_factor = if direct_lights.is_empty() { 1. } else { 0. };
+            let shadow_factor =
+                self.how_much_light_let_blocked(&pre_calculations.surface_hit, light);
             result = result
                 + material.light(
                     light,
@@ -113,7 +112,7 @@ mod world_shading_tests {
         let world = World::default_world();
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.prepare_for_render().color_at(ray);
-        assert_eq!(color!(0., 0., 0., 0.), c);
+        assert_color!(color!(0., 0., 0., 0.), c);
     }
 
     #[test]
@@ -122,7 +121,7 @@ mod world_shading_tests {
         world.background = color!(0., 1., 0.);
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.prepare_for_render().color_at(ray);
-        assert_eq!(color!(0., 1., 0., 1.), c);
+        assert_color!(color!(0., 1., 0., 1.), c);
     }
 
     #[test]
@@ -143,7 +142,7 @@ mod world_shadow_shading_tests {
     use crate::ray_first_gen;
     use crate::world::World;
     use math::matrix::matrix_4x4::Matrix4x4;
-    use math::{point, vector};
+    use math::{assert_color, point, vector};
 
     #[test]
     fn shade_when_given_intersection_in_shadow() {
@@ -159,7 +158,30 @@ mod world_shadow_shading_tests {
         let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
         let pre_calculations = intersection.to_pre_calculation(ray);
         let color = world.shade(pre_calculations);
-        assert_eq!(color!(0.1, 0.1, 0.1), color);
+        assert_color!(color!(0.1, 0.1, 0.1), color);
+    }
+
+    /// This was added by me after the book, trying to have a lighter shadow automatically by
+    /// looking at the opacity of the object blocking the light.
+    #[test]
+    fn shade_when_given_intersection_in_shadow_of_transparent_object() {
+        let mut world = World::default();
+        world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+        let mut blocking_shape = Shape::new_sphere();
+        // The transparency doesn't control the shadow
+        blocking_shape.material.shadow_opacity = 0.2;
+        println!("Blocking is {}", blocking_shape.id);
+        world.add(blocking_shape);
+        world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
+            0., 0., 10.,
+        )));
+        let world = world.prepare_for_render();
+        let second = world.flat_scene.get(1).unwrap();
+        let intersection = Intersection::new(4., &second);
+        let ray = ray_first_gen!(point!(0, 0, 5), vector!(0, 0, 1));
+        let pre_calculations = intersection.to_pre_calculation(ray);
+        let color = world.shade(pre_calculations);
+        assert_color!(color!(1.54, 1.54, 1.54), color);
     }
 }
 

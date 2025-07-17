@@ -30,8 +30,8 @@ mod plane_normal_tests {
     #[test]
     fn plane_normal() {
         let plane = Shape::new_plane().to_intersectable();
-        assert_vector!(vector!(0, 1, 0), *plane.normal_at(Point::origin()));
-        assert_vector!(vector!(0, 1, 0), *plane.normal_at(point!(1, 2, 3)));
+        assert_vector!(vector!(0, 1, 0), *plane.normal_at(Point::origin().into()));
+        assert_vector!(vector!(0, 1, 0), *plane.normal_at(point!(1, 2, 3).into()));
     }
 
     #[test]
@@ -40,11 +40,11 @@ mod plane_normal_tests {
             .to_intersectable();
         assert_eq!(
             vector!(-1, -4.371139e-8, 0),
-            *plane.normal_at(Point::origin())
+            *plane.normal_at(Point::origin().into())
         );
         assert_eq!(
             vector!(-1, -4.371139e-8, 0),
-            *plane.normal_at(point!(1, 2, 3))
+            *plane.normal_at(point!(1, 2, 3).into())
         );
     }
 }
