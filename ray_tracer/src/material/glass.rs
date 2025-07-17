@@ -13,6 +13,7 @@ impl Material {
         glass.reflectivity = 0.5;
         glass.specular = 1.;
         glass.shininess = 300.;
+        glass.shadow_opacity = 0.15;
         glass
     }
 }

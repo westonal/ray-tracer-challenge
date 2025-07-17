@@ -16,6 +16,10 @@ pub struct Material {
     pub reflectivity: f32,
     pub transparency: f32,
     pub refractive_index: f32,
+
+    /// 1 - Blocks all light
+    /// 0 - Blocks no light (cast's no shadow)
+    pub shadow_opacity: f32,
     pub shadow_boost: f32,
 }
 
@@ -30,6 +34,7 @@ impl Default for Material {
             reflectivity: 0.,
             transparency: 0.,
             refractive_index: 1.,
+            shadow_opacity: 1.,
             shadow_boost: 0.,
         }
     }
@@ -47,6 +52,7 @@ impl Material {
             reflectivity: 0.,
             transparency: 0.,
             refractive_index: 1.,
+            shadow_opacity: 0.,
             shadow_boost: 0.,
         }
     }
