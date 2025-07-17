@@ -1,8 +1,8 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::color::{RED, WHITE};
-use math::{degrees, point, vector};
+use math::tuple::color::{BLUE, GREEN, RED, WHITE};
+use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -38,7 +38,9 @@ impl TestScene for Teapot {
 
         let mut world = World::default();
         world.add(world_scene);
-        world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
+        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 0.5, 0.5) * 0.5));
+        world.add_light(PointLight::new(point!(-2, 20, -10), color!(0.5, 1, 0.5) * 0.5));
+        world.add_light(PointLight::new(point!(-10, 20, -2), color!(0.5, 0.5, 1) * 0.5));
         world
     }
 
