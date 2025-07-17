@@ -1,6 +1,6 @@
 use criterion::{Criterion, criterion_group, criterion_main};
-use demo_lib::test_scenes::RenderTestScene;
-use demo_lib::test_scenes::cube_of_spheres::CubeOfSpheres;
+use demo::test_scenes::RenderTestScene;
+use demo::test_scenes::cube_of_spheres::CubeOfSpheres;
 use ray_tracer::canvas::Size;
 use std::hint::black_box;
 use std::time::Duration;

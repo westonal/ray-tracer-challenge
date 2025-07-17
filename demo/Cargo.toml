@@ -1,8 +1,18 @@
 [package]
-name = "ray_tracer_demo"
+name = "demo"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-demo-lib = { path = "../demo-lib" }
+image = "0.25.6"
+math = { path = "../math" }
 ray_tracer = { path = "../ray_tracer" }
+obj = { path = "../obj" }
+rayon = "1.10.0"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "scene_benchmark"
+harness = false
