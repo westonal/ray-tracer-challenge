@@ -1,6 +1,9 @@
-use crate::csg::CSGOperation;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
+use crate::csg::{CN, CSGOperation};
+use crate::material::Material;
+use crate::primatives::{IntersectableShape, Shape};
+use crate::transform::Transform;
 
 pub enum SideHit {
     /// The left hand side was hit
@@ -88,15 +91,37 @@ mod by_operation_intersection_filtering_tests {
     );
 }
 
-
-
+impl From<CN> for IntersectableShape {
+    fn from(value: CN) -> Self {
+        match value {
+            CN::Leaf(surface, shape_id, matrix) => {
+                IntersectableShape {
+                    id: shape_id,
+                    material: Material::default(), //todo
+                    transform: Transform::new(matrix),
+                    surface,
+                }
+            }
+            CN::Tree(_, _, _) => {
+                todo!()
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod filter_intersections_tests {
-    use crate::{csg_cube, csg_sphere};
-    use crate::intersection::Intersection;
-    use crate::primatives::Shape;
     use super::*;
+    use crate::intersection::Intersection;
+    use crate::primatives::{IntersectableShape, Shape};
+    use crate::{csg_cube, csg_sphere};
+
+    #[test]
+    fn single_csg_intersectable() {
+        let c = csg_sphere!();
+        let intersectable_shape: IntersectableShape = c.into();
+
+    }
 
     #[test]
     fn union() {
@@ -104,13 +129,11 @@ mod filter_intersections_tests {
         // todo problem, intersectons requires intersectable shapes, these are fake
         let sphere = Shape::new_sphere().to_intersectable();
         let cube = Shape::new_cube().to_intersectable();
-        let intersections = vec!(
+        let intersections = vec![
             Intersection::new(1., &sphere),
             Intersection::new(2., &cube),
             Intersection::new(3., &sphere),
             Intersection::new(4., &cube),
-        );
-
+        ];
     }
-
 }

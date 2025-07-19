@@ -3,22 +3,17 @@ mod intersection;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
+use crate::primatives::{ShapeId, Surface};
 
 #[macro_export]
 macro_rules! csg {
-    (base: $base:expr; $(matrix: $matrix:expr;)?) => {
+    (surface: $surface:expr; $(matrix: $matrix:expr;)?) => {
         {
             let mut _m = math::matrix::matrix_4x4::Matrix4x4::identity();
             $(_m = $matrix;)?
-            $crate::csg::CN::Leaf($base, _m)
+            $crate::csg::CN::Leaf($surface, $crate::primatives::ShapeId::default(), _m)
         }
     };
-}
-
-#[derive(Debug)]
-enum CSGBase {
-    Sphere,
-    Cube,
 }
 
 enum CSGOperation {
@@ -44,28 +39,28 @@ impl Debug for CSGOperation {
 }
 
 enum CN {
-    Leaf(CSGBase, Matrix4x4),
+    Leaf(Surface, ShapeId, Matrix4x4),
     Tree(Box<CN>, CSGOperation, Box<CN>),
 }
 
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!(base: $crate::csg::CSGBase::Sphere; $(matrix: $matrix;)?)
+        $crate::csg!(surface: $crate::primatives::Surface::UnitSphere; $(matrix: $matrix;)?)
     };
 }
 
 #[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!(base: $crate::csg::CSGBase::Cube; $(matrix: $matrix;)?)
+        $crate::csg!(surface: $crate::primatives::Surface::UnitCube; $(matrix: $matrix;)?)
     };
 }
 
 impl Debug for CN {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            CN::Leaf(ba, _) => {
+            CN::Leaf(ba, ..) => {
                 write!(f, "{:?}", ba)
             }
             CN::Tree(lhs, operation, rhs) => {
@@ -106,26 +101,26 @@ mod constructive_solid_geometry_dsl_tests {
     #[test]
     fn union() {
         let union = csg_sphere!() + csg_cube!();
-        assert_eq!("(Sphere ∪ Cube)", format!("{:?}", union))
+        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union))
     }
 
     #[test]
     fn intersection() {
         let intersection = csg_sphere!() ^ csg_cube!();
-        assert_eq!("(Sphere ∩ Cube)", format!("{:?}", intersection))
+        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection))
     }
 
     #[test]
     fn difference() {
         let difference = csg_sphere!() - csg_cube!();
-        assert_eq!("(Sphere - Cube)", format!("{:?}", difference))
+        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference))
     }
 
     #[test]
     fn complex() {
         let csg_tree = csg_sphere!() - (csg_cube!() + csg_cube!()) ^ csg_sphere!();
         assert_eq!(
-            "((Sphere - (Cube ∪ Cube)) ∩ Sphere)",
+            "((UnitSphere - (UnitCube ∪ UnitCube)) ∩ UnitSphere)",
             format!("{:?}", csg_tree)
         )
     }

@@ -24,17 +24,17 @@ impl Shape {
     }
 
     pub fn to_intersectable(self) -> IntersectableShape {
-        IntersectableShape {
-            id: self.id,
-            material: self.material,
-            transform: Transform::new(self.matrix),
-            surface: self.surface,
-        }
+        self.into()
     }
 }
 
 impl From<Shape> for IntersectableShape {
     fn from(value: Shape) -> Self {
-        value.to_intersectable()
+        IntersectableShape {
+            id: value.id,
+            material: value.material,
+            transform: Transform::new(value.matrix),
+            surface: value.surface,
+        }
     }
 }
