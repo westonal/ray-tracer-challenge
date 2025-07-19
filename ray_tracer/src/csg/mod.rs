@@ -4,6 +4,7 @@ use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
 
+#[macro_export]
 macro_rules! csg {
     (base: $base:expr; $(matrix: $matrix:expr;)?) => {
         {
@@ -47,15 +48,17 @@ enum CN {
     Tree(Box<CN>, CSGOperation, Box<CN>),
 }
 
+#[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        csg!(base: CSGBase::Sphere; $(matrix: $matrix;)?)
+        $crate::csg!(base: $crate::csg::CSGBase::Sphere; $(matrix: $matrix;)?)
     };
 }
 
+#[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        csg!(base: CSGBase::Cube; $(matrix: $matrix;)?)
+        $crate::csg!(base: $crate::csg::CSGBase::Cube; $(matrix: $matrix;)?)
     };
 }
 

@@ -40,7 +40,7 @@ fn intersection_allowed(
 }
 
 #[cfg(test)]
-mod union_intersection_filtering_tests {
+mod by_operation_intersection_filtering_tests {
     use super::*;
 
     macro_rules! is_allowed {
@@ -86,4 +86,31 @@ mod union_intersection_filtering_tests {
         difference_g; side: Right, left: Outside, right: Inside  => false
         difference_h; side: Right, left: Outside, right: Outside => false
     );
+}
+
+
+
+
+#[cfg(test)]
+mod filter_intersections_tests {
+    use crate::{csg_cube, csg_sphere};
+    use crate::intersection::Intersection;
+    use crate::primatives::Shape;
+    use super::*;
+
+    #[test]
+    fn union() {
+        let c = csg_sphere!() + csg_cube!();
+        // todo problem, intersectons requires intersectable shapes, these are fake
+        let sphere = Shape::new_sphere().to_intersectable();
+        let cube = Shape::new_cube().to_intersectable();
+        let intersections = vec!(
+            Intersection::new(1., &sphere),
+            Intersection::new(2., &cube),
+            Intersection::new(3., &sphere),
+            Intersection::new(4., &cube),
+        );
+
+    }
+
 }
