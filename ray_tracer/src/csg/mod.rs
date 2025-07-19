@@ -1,3 +1,5 @@
+mod intersection;
+
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
