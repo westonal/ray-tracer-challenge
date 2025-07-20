@@ -17,9 +17,11 @@ impl FlattenTree for CN {
                 chain.append(&mut scene.flatten());
             }
             CN::Tree(lhs, op, rhs) => {
-                chain.push(Chain::CSG(*op, 1, 1));
-                chain.append(&mut lhs.flatten());
-                chain.append(&mut rhs.flatten());
+                let mut lhs = lhs.flatten();
+                let mut rhs = rhs.flatten();
+                chain.push(Chain::CSG(*op, lhs.len(), rhs.len()));
+                chain.append(&mut lhs);
+                chain.append(&mut rhs);
             }
         }
         FlatScene::new(chain)
@@ -115,13 +117,45 @@ mod filter_intersections_tests {
     }
 
     #[test]
+    fn two_csg_union_in_a_scene_with_bounds() {
+        let scene = scene!(
+            bounding_volume: cube!();
+            +csg_sphere!() + csg_cube!();
+        );
+        assert_chain!(
+            actual: scene.flatten(),
+            expect: [
+                ("BV", Surface::UnitCube, 3),
+                (CSGOperation::Union, 1, 1),
+                Surface::UnitSphere,
+                Surface::UnitCube,
+            ]
+        );
+    }
+
+    #[test]
     fn single_csg_union() {
         let csg = csg_sphere!() + csg_cube!();
         assert_chain!(
             actual: csg.flatten(),
             expect: [
-                (CSGOperation::Union, 1, 2),
+                (CSGOperation::Union, 1, 1),
                 Surface::UnitSphere,
+                Surface::UnitCube,
+            ]
+        );
+    }
+
+    #[test]
+    fn single_csg_union_and_intersection() {
+        let csg = csg_sphere!() + (csg_cube!() ^ csg_cube!());
+        assert_chain!(
+            actual: csg.flatten(),
+            expect: [
+                (CSGOperation::Union, 1, 3),
+                Surface::UnitSphere,
+                (CSGOperation::Intersection, 1, 1),
+                Surface::UnitCube,
                 Surface::UnitCube,
             ]
         );
