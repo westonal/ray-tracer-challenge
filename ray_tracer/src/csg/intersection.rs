@@ -94,13 +94,8 @@ mod by_operation_intersection_filtering_tests {
 impl From<CN> for IntersectableShape {
     fn from(value: CN) -> Self {
         match value {
-            CN::Leaf(surface, shape_id, matrix) => {
-                IntersectableShape {
-                    id: shape_id,
-                    material: Material::default(), //todo
-                    transform: Transform::new(matrix),
-                    surface,
-                }
+            CN::Leaf(shape) => {
+                shape.to_intersectable()
             }
             CN::Tree(_, _, _) => {
                 todo!()

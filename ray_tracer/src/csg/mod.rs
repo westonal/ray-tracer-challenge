@@ -3,15 +3,13 @@ mod intersection;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
-use crate::primatives::{ShapeId, Surface};
+use crate::primatives::{Shape, ShapeId, Surface};
 
 #[macro_export]
 macro_rules! csg {
-    (surface: $surface:expr; $(matrix: $matrix:expr;)?) => {
+    ($shape:expr) => {
         {
-            let mut _m = math::matrix::matrix_4x4::Matrix4x4::identity();
-            $(_m = $matrix;)?
-            $crate::csg::CN::Leaf($surface, $crate::primatives::ShapeId::default(), _m)
+            $crate::csg::CN::Leaf($shape)
         }
     };
 }
@@ -39,29 +37,29 @@ impl Debug for CSGOperation {
 }
 
 enum CN {
-    Leaf(Surface, ShapeId, Matrix4x4),
+    Leaf(Shape),
     Tree(Box<CN>, CSGOperation, Box<CN>),
 }
 
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!(surface: $crate::primatives::Surface::UnitSphere; $(matrix: $matrix;)?)
+        $crate::csg!($crate::sphere!($(matrix: $matrix;)?))
     };
 }
 
 #[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!(surface: $crate::primatives::Surface::UnitCube; $(matrix: $matrix;)?)
+        $crate::csg!($crate::cube!($(matrix: $matrix;)?))
     };
 }
 
 impl Debug for CN {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            CN::Leaf(ba, ..) => {
-                write!(f, "{:?}", ba)
+            CN::Leaf(shape, ..) => {
+                write!(f, "{:?}", shape.surface)
             }
             CN::Tree(lhs, operation, rhs) => {
                 write!(f, "({:?} {:?} {:?})", lhs, operation, rhs)
