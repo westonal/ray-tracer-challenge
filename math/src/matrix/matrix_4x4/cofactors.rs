@@ -1,5 +1,5 @@
 use crate::matrix::matrix_3x3::Matrix3x3;
-use crate::matrix::matrix_4x4::Matrix4x4;
+use crate::matrix::matrix_4x4::*;
 use crate::matrix::{Cofactor, Determinant, Submatrix};
 
 impl Submatrix for Matrix4x4 {

@@ -155,7 +155,7 @@ mod non_solid_pattern_tests {
     use super::*;
     use crate::material::pattern::Pattern;
     use crate::transform::Transform;
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::tuple::color::{RED, WHITE};
     use math::{color, degrees, point, vector};
 
@@ -252,7 +252,7 @@ mod reflection_lighting_tests {
     use crate::world::World;
     use crate::{plane, ray, ray_first_gen, sphere};
     use math::color;
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::tuple::color::{GREEN, RED, WHITE};
 
     #[test]

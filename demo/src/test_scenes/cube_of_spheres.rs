@@ -1,5 +1,5 @@
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, GREEN, WHITE};
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
@@ -27,7 +27,7 @@ impl TestScene for CubeOfSpheres {
                 shape.material.pattern = Pattern::Checker(
                     *WHITE,
                     *BLACK,
-                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(2.)),
+                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).scale_all(2.)),
                 );
                 shape.material.reflectivity = 0.5;
                 shape
@@ -37,7 +37,7 @@ impl TestScene for CubeOfSpheres {
                 shape.material.pattern = Pattern::Checker(
                     *GREEN,
                     *BLACK,
-                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).pre_scale_all(10.)),
+                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).scale_all(10.)),
                 );
                 shape
             };
@@ -49,7 +49,7 @@ impl TestScene for CubeOfSpheres {
                     +Self::double(
                         |matrix| {
                             scene!(
-                                matrix: matrix.pre_scale_all(0.5);
+                                matrix: matrix.scale_all(0.5);
                                 bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
                                 +Self::double(
                                     |matrix| {

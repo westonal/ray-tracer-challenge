@@ -1,6 +1,6 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::color::{RED, WHITE};
 use math::{degrees, point, vector};
 use ray_tracer::camera::Camera;
@@ -34,7 +34,7 @@ impl TestScene for Pawn {
             +{
                 let mut plane = plane!();
                 plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::new(
-                    Matrix4x4::scale_all(2.6).pre_translation(0.5, 0., 0.5)
+                    Matrix4x4::scale_all(2.6).translation(0.5, 0., 0.5)
                 ));
                 plane
             };

@@ -1,6 +1,6 @@
 use crate::scene_tree::SceneTree;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 
 impl SceneTree {
     pub fn flatten(&self) -> FlatScene {

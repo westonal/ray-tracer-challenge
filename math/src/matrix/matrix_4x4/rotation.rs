@@ -1,5 +1,25 @@
 use crate::Angle;
-use crate::matrix::matrix_4x4::Matrix4x4;
+use crate::matrix::matrix_4x4::*;
+
+pub trait Matrix4x4Rotation {
+    fn rotation_x(self, angle: Angle) -> Matrix4x4;
+    fn rotation_y(self, angle: Angle) -> Matrix4x4;
+    fn rotation_z(self, angle: Angle) -> Matrix4x4;
+}
+
+impl Matrix4x4Rotation for Matrix4x4 {
+    fn rotation_x(self, angle: Angle) -> Matrix4x4 {
+        self * Matrix4x4::rotation_x(angle)
+    }
+
+    fn rotation_y(self, angle: Angle) -> Matrix4x4 {
+        self * Matrix4x4::rotation_y(angle)
+    }
+
+    fn rotation_z(self, angle: Angle) -> Matrix4x4 {
+        self * Matrix4x4::rotation_z(angle)
+    }
+}
 
 impl Matrix4x4 {
     pub fn rotation_x(angle: Angle) -> Matrix4x4 {
@@ -37,23 +57,11 @@ impl Matrix4x4 {
         m[3][3] = 1.;
         m
     }
-
-    pub fn pre_rotation_x(&self, angle: Angle) -> Matrix4x4 {
-        self.clone() * Self::rotation_x(angle)
-    }
-
-    pub fn pre_rotation_y(&self, angle: Angle) -> Matrix4x4 {
-        self.clone() * Self::rotation_y(angle)
-    }
-
-    pub fn pre_rotation_z(&self, angle: Angle) -> Matrix4x4 {
-        self.clone() * Self::rotation_z(angle)
-    }
 }
 
 #[cfg(test)]
 mod rotation_x_tests {
-    use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::matrix::matrix_4x4::*;
     use crate::tuple::Tuple;
 
     use crate::{assert_tuple, point, radians};
@@ -76,7 +84,7 @@ mod rotation_x_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_x(radians!(PI / 4.0));
+        let eighth = Matrix4x4::identity().rotation_x(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,
@@ -124,7 +132,7 @@ mod rotation_x_tests {
 
 #[cfg(test)]
 mod rotation_y_tests {
-    use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::matrix::matrix_4x4::*;
     use crate::tuple::Tuple;
 
     use crate::{point, radians};
@@ -147,7 +155,7 @@ mod rotation_y_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_y(radians!(PI / 4.0));
+        let eighth = Matrix4x4::identity().rotation_y(radians!(PI / 4.0));
         let p = point!(0., 0., 1.);
         assert_eq!(
             eighth * p,
@@ -201,7 +209,7 @@ mod rotation_y_tests {
 
 #[cfg(test)]
 mod rotation_z_tests {
-    use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::matrix::matrix_4x4::*;
     use crate::tuple::Tuple;
 
     use crate::{assert_tuple, point, radians};
@@ -224,7 +232,7 @@ mod rotation_z_tests {
 
     #[test]
     fn rotate_point_one_eighth_fluent() {
-        let eighth = Matrix4x4::identity().pre_rotation_z(radians!(PI / 4.0));
+        let eighth = Matrix4x4::identity().rotation_z(radians!(PI / 4.0));
         let p = point!(0., 1., 0.);
         assert_eq!(
             eighth * p,

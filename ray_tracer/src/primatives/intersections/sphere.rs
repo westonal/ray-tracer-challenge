@@ -153,7 +153,7 @@ mod sphere_intersection_of_transformed_sphere_tests {
     use crate::intersection::Intersect;
 
     use crate::{ray, sphere};
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
 
     #[test]
     fn intersect_scaled_sphere() {
@@ -180,7 +180,7 @@ mod sphere_intersection_of_transformed_sphere_tests {
 mod sphere_normal_tests {
 
     use crate::sphere;
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::{assert_vector, point, radians, vector};
     use std::f32::consts::PI;
 
@@ -198,7 +198,7 @@ mod sphere_normal_tests {
 
     #[test]
     fn normal_of_transformed_sphere() {
-        let transform = Matrix4x4::scale(1., 0.5, 1.).pre_rotation_z(radians!(PI / 5.));
+        let transform = Matrix4x4::scale(1., 0.5, 1.).rotation_z(radians!(PI / 5.));
         let sphere = sphere!(matrix: transform).to_intersectable();
         assert_vector!(
             vector!(0, 0.9701, -0.2425),

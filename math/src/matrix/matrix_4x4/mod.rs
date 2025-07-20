@@ -6,6 +6,11 @@ mod shearing;
 mod transformation_chain_tests;
 mod translation;
 
+pub use rotation::Matrix4x4Rotation;
+pub use scaling::Matrix4x4Scale;
+pub use shearing::Matrix4x4Shear;
+pub use translation::Matrix4x4Translate;
+
 use crate::tuple::Tuple;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut, Div, Mul};

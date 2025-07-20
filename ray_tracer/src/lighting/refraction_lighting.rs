@@ -49,7 +49,7 @@ mod refraction_lighting_tests {
     use crate::rays::RayGeneration;
     use crate::world::World;
     use crate::{plane, ray, ray_first_gen, sphere};
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use std::ops::Deref;
 
     use math::tuple::color::RED;

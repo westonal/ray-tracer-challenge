@@ -3,7 +3,7 @@ use crate::primatives::IntersectableShape;
 use crate::primatives::ShapeId;
 use crate::primatives::surface::Surface;
 use crate::transform::Transform;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Shape {

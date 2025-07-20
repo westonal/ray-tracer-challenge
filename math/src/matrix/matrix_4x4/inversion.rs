@@ -1,4 +1,4 @@
-use crate::matrix::matrix_4x4::Matrix4x4;
+use crate::matrix::matrix_4x4::*;
 use crate::matrix::{Cofactor, Determinant};
 
 impl Matrix4x4 {
@@ -24,7 +24,7 @@ impl Matrix4x4 {
 #[cfg(test)]
 mod invert_matrix4x4_tests {
     use crate::matrix::Determinant;
-    use crate::matrix::matrix_4x4::Matrix4x4;
+    use crate::matrix::matrix_4x4::*;
 
     #[test]
     fn non_invertible_matrix() {

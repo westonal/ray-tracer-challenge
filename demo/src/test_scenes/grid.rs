@@ -1,5 +1,5 @@
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::color::WHITE;
 use math::{color, degrees, point};
 use ray_tracer::camera::Camera;
@@ -38,7 +38,7 @@ impl TestScene for Grid {
                     color!(0., 0.5, 0.9)
                 });
                 let mut sphere =
-                    sphere!(matrix: Matrix4x4::translation(0., y as f32, 0.).pre_scale_all(scale));
+                    sphere!(matrix: Matrix4x4::translation(0., y as f32, 0.).scale_all(scale));
                 sphere.material = material;
                 column.add(sphere);
             }

@@ -2,7 +2,7 @@ use crate::canvas::Size;
 use crate::ray;
 use crate::rays::{Ray, RayGeneration};
 use crate::render::RenderableWorld;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::color::Color;
 use math::{Angle, point};
 
@@ -94,7 +94,7 @@ mod camera_tests {
     #[test]
     fn ray_for_transformed_view() {
         let mut camera = Camera::new(Size::new(101, 201), degrees!(90));
-        camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).pre_translation(0., -2., 5.));
+        camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).translation(0., -2., 5.));
         let ray = camera.ray_for_pixel((50, 100));
         assert_point!(ray.origin, point!(0, 2, -5));
         assert_vector!(ray.direction, vector!(0.7071, 0, -0.7071));

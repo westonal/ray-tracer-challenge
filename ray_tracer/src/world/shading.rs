@@ -141,7 +141,7 @@ mod world_shadow_shading_tests {
 
     use crate::world::World;
     use crate::{ray_first_gen, sphere};
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::{assert_color, point, vector};
 
     #[test]
@@ -193,7 +193,7 @@ mod world_pattern_shading_tests {
     use crate::transform::Transform;
     use crate::world::World;
     use crate::{plane, ray};
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::tuple::color::{BLUE, GREEN, RED};
     use math::{degrees, point, vector};
 

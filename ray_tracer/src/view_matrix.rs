@@ -1,4 +1,4 @@
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use std::ops::Deref;
@@ -17,7 +17,7 @@ impl ViewMatrix {
                 [-forward.x, -forward.y, -forward.z, 0.0],
                 [0., 0., 0., 1.],
             ])
-            .pre_translation(-eye.x, -eye.y, -eye.z),
+            .translation(-eye.x, -eye.y, -eye.z),
         )
     }
 }

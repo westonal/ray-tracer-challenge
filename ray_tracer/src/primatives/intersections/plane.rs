@@ -23,7 +23,7 @@ impl Plane {
 mod plane_normal_tests {
 
     use crate::plane;
-    use math::matrix::matrix_4x4::Matrix4x4;
+    use math::matrix::matrix_4x4::*;
     use math::tuple::point::Point;
     use math::{assert_vector, point, radians, vector};
     use std::f32::consts::PI;

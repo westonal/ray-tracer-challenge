@@ -1,6 +1,6 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix::matrix_4x4::*;
 use math::tuple::color::{RED, WHITE};
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
