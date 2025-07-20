@@ -151,13 +151,13 @@ mod sphere_multi_intersection_tests {
 #[cfg(test)]
 mod sphere_intersection_of_transformed_sphere_tests {
     use crate::intersection::Intersect;
+    use math::matrix4x4;
 
     use crate::{ray, sphere};
-    use math::matrix::matrix_4x4::*;
 
     #[test]
     fn intersect_scaled_sphere() {
-        let sphere = sphere!(matrix: Matrix4x4::scale(2., 2., 2.)).to_intersectable();
+        let sphere = sphere!(matrix: matrix4x4!(scale(2., 2., 2.))).to_intersectable();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(&ray);
         assert_eq!(intersections.len(), 2);
@@ -168,7 +168,7 @@ mod sphere_intersection_of_transformed_sphere_tests {
 
     #[test]
     fn miss_translated_sphere() {
-        let sphere = sphere!(matrix: Matrix4x4::translation(5., 0., 0.)).to_intersectable();
+        let sphere = sphere!(matrix: matrix4x4!(translation(5., 0., 0.))).to_intersectable();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = sphere.intersect(&ray);
         assert_eq!(intersections.len(), 0);
@@ -180,13 +180,13 @@ mod sphere_intersection_of_transformed_sphere_tests {
 mod sphere_normal_tests {
 
     use crate::sphere;
-    use math::matrix::matrix_4x4::*;
-    use math::{assert_vector, point, radians, vector};
+
+    use math::{assert_vector, matrix4x4, point, radians, vector};
     use std::f32::consts::PI;
 
     #[test]
     fn normal_of_translated_sphere() {
-        let transform = Matrix4x4::translation(0., 1., 0.);
+        let transform = matrix4x4!(translation(0., 1., 0.));
         let sphere = sphere!(matrix: transform).to_intersectable();
         assert_vector!(
             vector!(0., 0.7071, -0.7071),
@@ -198,7 +198,10 @@ mod sphere_normal_tests {
 
     #[test]
     fn normal_of_transformed_sphere() {
-        let transform = Matrix4x4::scale(1., 0.5, 1.).rotation_z(radians!(PI / 5.));
+        let transform = matrix4x4!(
+            scale(1., 0.5, 1.)
+            rotation_z(radians!(PI / 5.))
+        );
         let sphere = sphere!(matrix: transform).to_intersectable();
         assert_vector!(
             vector!(0, 0.9701, -0.2425),

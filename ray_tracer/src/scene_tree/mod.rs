@@ -4,7 +4,7 @@ mod manipulation;
 
 use crate::primatives::Shape;
 pub use flat_scene::FlatScene;
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::Matrix4x4;
 
 pub enum SceneTree {
     Leaf(Shape),

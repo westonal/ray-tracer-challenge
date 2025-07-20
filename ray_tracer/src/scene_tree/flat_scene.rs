@@ -73,7 +73,7 @@ mod chain_intersect_tests {
     use super::*;
 
     use crate::{ray, sphere};
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::{point, vector};
 
     #[test]
@@ -133,7 +133,7 @@ mod chain_build_from_tree_intersect_tests {
 
     use crate::scene_tree::SceneTree;
     use crate::{ray, scene, sphere};
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::{point, vector};
 
     #[test]

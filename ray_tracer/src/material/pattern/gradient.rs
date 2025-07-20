@@ -96,7 +96,7 @@ mod gradient_pattern_tests {
 
     use crate::material::pattern::Pattern::Gradient;
     use crate::transform::Transform;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLACK, BLUE, GREEN, WHITE};
     use math::{assert_color, color, degrees, point};
 

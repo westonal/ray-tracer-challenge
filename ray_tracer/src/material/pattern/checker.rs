@@ -28,7 +28,7 @@ impl Pattern {
 mod checker_pattern_tests {
     use super::*;
     use crate::material::pattern::Pattern::Checker;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::point;
     use math::tuple::color::{BLUE, RED};
 

@@ -1,5 +1,5 @@
 use crate::rays::Ray;
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::Matrix4x4;
 use std::ops::Mul;
 
 impl Mul<Ray> for Matrix4x4 {
@@ -20,7 +20,7 @@ impl Mul<Ray> for Matrix4x4 {
 mod ray_transform_tests {
 
     use crate::ray;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     #[test]
     fn translate_a_point_in_a_ray() {

@@ -1,7 +1,7 @@
 use crate::primatives::Shape;
 use crate::primatives::surface::Surface::SingleTriangle;
 use crate::primatives::triangle::Triangle;
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::Matrix4x4;
 
 impl Shape {
     pub fn new_triangle_transformed(transform: Matrix4x4, triangle: Triangle) -> Self {

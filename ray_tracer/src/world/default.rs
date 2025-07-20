@@ -6,7 +6,7 @@ pub mod test_world {
 
     use crate::sphere;
     use crate::world::World;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::{color, point};
 
     /// A test world

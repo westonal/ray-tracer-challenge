@@ -2,9 +2,9 @@ use crate::canvas::Size;
 use crate::ray;
 use crate::rays::{Ray, RayGeneration};
 use crate::render::RenderableWorld;
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::color::Color;
-use math::{Angle, point};
+use math::{Angle, matrix4x4, point};
 
 pub struct Camera {
     view_port: Size,
@@ -24,8 +24,8 @@ impl Camera {
             view_port,
             aspect_ratio,
             fov_y,
-            transform: Matrix4x4::identity(),
-            invert_transform: Matrix4x4::identity(),
+            transform: matrix4x4!(),
+            invert_transform: matrix4x4!(),
             canvas_size: (canvas_width, canvas_height),
         }
     }
@@ -65,7 +65,9 @@ mod camera_tests {
     use crate::view_matrix::ViewMatrix;
 
     use crate::world::World;
-    use math::{assert_color, assert_point, assert_vector, color, degrees, point, vector};
+    use math::{
+        assert_color, assert_point, assert_vector, color, degrees, matrix4x4, point, vector,
+    };
 
     #[test]
     fn new_camera() {
@@ -94,7 +96,7 @@ mod camera_tests {
     #[test]
     fn ray_for_transformed_view() {
         let mut camera = Camera::new(Size::new(101, 201), degrees!(90));
-        camera.set_transform(Matrix4x4::rotation_y(degrees!(45)).translation(0., -2., 5.));
+        camera.set_transform(matrix4x4!(rotation_y(degrees!(45)) translation(0., -2., 5.)));
         let ray = camera.ray_for_pixel((50, 100));
         assert_point!(ray.origin, point!(0, 2, -5));
         assert_vector!(ray.direction, vector!(0.7071, 0, -0.7071));

@@ -9,6 +9,7 @@ mod translation;
 
 pub use rotation::Matrix4x4Rotation;
 pub use scaling::Matrix4x4Scale;
+pub use scaling::Matrix4x4ScaleAll;
 pub use shearing::Matrix4x4Shear;
 pub use translation::Matrix4x4Translate;
 

@@ -48,7 +48,7 @@ macro_rules! cylinder_open {
 
 #[cfg(test)]
 mod cylinder_factory_tests {
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     use crate::primatives::CylinderCapStyle;
     use crate::primatives::Surface::UnitCylinder;

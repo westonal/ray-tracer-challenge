@@ -1,4 +1,4 @@
-use math::matrix::matrix_4x4::*;
+use math::matrix4x4;
 use math::tuple::point::Point;
 use obj::{Group, Obj};
 use ray_tracer::material::Material;
@@ -119,11 +119,12 @@ pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange, usi
 
 impl AABBBuilder {
     pub(crate) fn to_bounding(&self) -> Shape {
-        cube!(matrix: Matrix4x4::identity()
-            .translation(self.0.min, self.1.min, self.2.min)
-            .scale(self.0.width(), self.1.width(), self.2.width())
-            .translation(0.5, 0.5, 0.5)
-            .scale_all(0.5))
+        cube!(matrix: matrix4x4!(
+            translation(self.0.min, self.1.min, self.2.min)
+            scale(self.0.width(), self.1.width(), self.2.width())
+            translation(0.5, 0.5, 0.5)
+            scale_all(0.5))
+        )
     }
 }
 

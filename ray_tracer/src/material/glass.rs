@@ -34,10 +34,11 @@ mod glass_tests {
 mod glass_refractive_index_finding_tests {
     use super::*;
     use crate::intersection::{Intersection, Intersections};
+    use math::matrix4x4;
 
     use crate::primatives::IntersectableShape;
     use crate::sphere;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     fn glass_sphere(refractive_index: f32, transform: Matrix4x4) -> IntersectableShape {
         let mut sphere = sphere!(matrix: transform);
@@ -47,9 +48,9 @@ mod glass_refractive_index_finding_tests {
     }
 
     fn run_test(index: usize) -> (f32, f32) {
-        let sphere_a = glass_sphere(1.5, Matrix4x4::scale_all(2.));
-        let sphere_b = glass_sphere(2.0, Matrix4x4::translation(0., 0., -0.25));
-        let sphere_c = glass_sphere(2.5, Matrix4x4::translation(0., 0., 0.25));
+        let sphere_a = glass_sphere(1.5, matrix4x4!(scale_all(2.)));
+        let sphere_b = glass_sphere(2.0, matrix4x4!(translation(0., 0., -0.25)));
+        let sphere_c = glass_sphere(2.5, matrix4x4!(translation(0., 0., 0.25)));
         let index = index as f32;
         let intersections = Intersections::new(vec![
             Intersection::new(0. - index, &sphere_a),

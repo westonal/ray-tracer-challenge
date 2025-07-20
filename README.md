@@ -17,7 +17,7 @@ Matrices
 
 Patterns
 
-To Visit - couple of patterns left out, Ring and Perturbed. 
+To Visit - couple of patterns left out, Ring and Perturbed.
 
 # Chapter 12 - Cubes
 
@@ -29,10 +29,16 @@ To Visit - couple of patterns left out, Ring and Perturbed.
 
 # Running
 
-## Testing 
+## Testing
 
 ```shell
 cargo test
+```
+
+If doc tests are slow (and there isn't any to test as currently), run:
+
+```shell
+cargo test --lib --bins --tests
 ```
 
 ## Benchmarking:
@@ -52,5 +58,5 @@ cargo fix --allow-dirty && cargo fmt
 ## Pre commit recommendation
 
 ```shell
-cargo fix --allow-dirty && cargo fmt && cargo test && cargo run
+cargo fix --allow-dirty && cargo fmt && cargo test --lib --bins --tests && cargo run --release
 ```

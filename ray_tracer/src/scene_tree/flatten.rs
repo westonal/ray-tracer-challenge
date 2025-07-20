@@ -1,11 +1,12 @@
 use crate::scene_tree::SceneTree;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::Matrix4x4;
+use math::matrix4x4;
 
 impl SceneTree {
     pub fn flatten(&self) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, Matrix4x4::identity());
+        self.walk(&mut chain, matrix4x4!());
         FlatScene::new(chain)
     }
 
@@ -115,15 +116,15 @@ mod flatten_matrix_tests {
 
     use crate::transform::Transform;
     use crate::{cube, cylinder, sphere};
-    use math::degrees;
+    use math::{degrees, matrix4x4};
 
     #[test]
     fn combine_matrix_from_parent() {
-        let r = Matrix4x4::shear(2.0, 3.0, 4.0, 5.0, 6.0, 7.0);
-        let a = Matrix4x4::scale_all(2.0);
-        let b = Matrix4x4::translation(1.0, 2.0, 3.0);
-        let c = Matrix4x4::rotation_x(degrees!(90));
-        let d = Matrix4x4::rotation_y(degrees!(45));
+        let r = matrix4x4!(shear(2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
+        let a = matrix4x4!(scale_all(2.0));
+        let b = matrix4x4!(translation(1.0, 2.0, 3.0));
+        let c = matrix4x4!(rotation_x(degrees!(90)));
+        let d = matrix4x4!(rotation_y(degrees!(45)));
 
         let mut root = SceneTree::new(r);
         root.add(sphere!(matrix: a));

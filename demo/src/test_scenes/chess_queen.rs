@@ -1,6 +1,5 @@
 use crate::obj;
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
@@ -23,8 +22,10 @@ impl TestScene for Queen {
 
     fn build_world() -> World {
         let queen = scene!(
-            matrix: matrix4x4!(translation(0.75, 0., 0.))
-            .scale_all(0.22);
+            matrix: matrix4x4!(
+                translation(0.75, 0., 0.)
+                scale_all(0.22)
+            );
             +obj!(
                 path: "objs/chess/queen.obj";
                 material: {

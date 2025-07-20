@@ -264,7 +264,7 @@ mod smooth_triangle_normal_interpolation_tests {
 //     use crate::intersection::Intersect;
 //     use crate::primatives::Shape;
 //     use crate::ray;
-//     use math::matrix::matrix_4x4::*;
+//     use math::matrix::matrix_4x4::Matrix4x4;
 //
 //     #[test]
 //     fn intersect_scaled_triangle() {
@@ -291,7 +291,7 @@ mod smooth_triangle_normal_interpolation_tests {
 // #[cfg(test)]
 // mod triangle_normal_tests {
 //     use crate::primatives::Shape;
-//     use math::matrix::matrix_4x4::*;
+//     use math::matrix::matrix_4x4::Matrix4x4;
 //     use math::{assert_vector, point, radians, vector};
 //     use std::f32::consts::PI;
 //

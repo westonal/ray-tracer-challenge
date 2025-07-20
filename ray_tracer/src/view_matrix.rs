@@ -1,4 +1,4 @@
-use math::matrix::matrix_4x4::*;
+use math::matrix::matrix_4x4::{Matrix4x4, Matrix4x4Translate};
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use std::ops::Deref;

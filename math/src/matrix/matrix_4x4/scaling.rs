@@ -2,7 +2,9 @@ use crate::matrix::matrix_4x4::*;
 
 pub trait Matrix4x4Scale {
     fn scale(self, x: f32, y: f32, z: f32) -> Matrix4x4;
+}
 
+pub trait Matrix4x4ScaleAll {
     fn scale_all(self, scale: f32) -> Matrix4x4;
 }
 
@@ -10,9 +12,11 @@ impl Matrix4x4Scale for Matrix4x4 {
     fn scale(self, x: f32, y: f32, z: f32) -> Matrix4x4 {
         self * Matrix4x4::scale(x, y, z)
     }
+}
 
+impl Matrix4x4ScaleAll for Matrix4x4 {
     fn scale_all(self, scale: f32) -> Matrix4x4 {
-        self * Matrix4x4::scale_all(scale)
+        self.scale(scale, scale, scale)
     }
 }
 

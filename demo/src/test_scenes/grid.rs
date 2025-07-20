@@ -1,5 +1,4 @@
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::*;
 use math::tuple::color::WHITE;
 use math::{color, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;

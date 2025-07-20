@@ -24,7 +24,7 @@ impl Pattern {
 mod stripe_pattern_tests {
     use super::*;
     use crate::material::pattern::Pattern::Stripe;
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLACK, WHITE};
     use math::{degrees, point};
 

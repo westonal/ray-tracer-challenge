@@ -67,7 +67,7 @@ mod world_tests {
     use crate::lighting::PointLight;
 
     use crate::{ray, sphere};
-    use math::matrix::matrix_4x4::*;
+    use math::matrix::matrix_4x4::Matrix4x4;
 
     use crate::intersection::Intersect;
     use math::{color, point};

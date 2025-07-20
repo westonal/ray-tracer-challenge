@@ -1,5 +1,4 @@
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, WHITE};
 use math::tuple::point::Point;
 use math::{degrees, matrix4x4, point, vector};
