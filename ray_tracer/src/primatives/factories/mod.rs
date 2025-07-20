@@ -1,5 +1,77 @@
-mod cube;
-mod cylinder;
-mod plane;
-mod sphere;
 mod triangle;
+
+#[macro_export]
+macro_rules! shape {
+    (surface: $surface:expr; $(matrix: $matrix:expr)?) => {
+        {
+            let mut _m = math::matrix::matrix_4x4::Matrix4x4::identity();
+            $(_m = $matrix;)?
+            $crate::primatives::Shape::new(_m, $surface)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! sphere {
+    ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(surface: $crate::primatives::Surface::UnitSphere; $(matrix: $matrix)?)
+    };
+}
+
+#[macro_export]
+macro_rules! plane {
+    ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(surface: $crate::primatives::Surface::PlaneXZ; $(matrix: $matrix)?)
+    };
+}
+
+#[macro_export]
+macro_rules! cube {
+    ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(surface: $crate::primatives::Surface::UnitCube; $(matrix: $matrix)?)
+    };
+}
+
+#[macro_export]
+macro_rules! cylinder {
+    ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed); $(matrix: $matrix)?)
+    };
+}
+
+#[macro_export]
+macro_rules! cylinder_open {
+    ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Open); $(matrix: $matrix)?)
+    };
+}
+
+#[cfg(test)]
+mod cylinder_factory_tests {
+    use math::matrix::matrix_4x4::Matrix4x4;
+
+    use crate::primatives::CylinderCapStyle;
+    use crate::primatives::Surface::UnitCylinder;
+    use crate::{cylinder, cylinder_open};
+
+    #[test]
+    fn cylinders_are_closed_by_default() {
+        assert_eq!(UnitCylinder(CylinderCapStyle::Closed), cylinder!().surface);
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Closed),
+            cylinder!(matrix: Matrix4x4::identity()).surface
+        );
+    }
+
+    #[test]
+    fn open_cylinder() {
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Open),
+            cylinder_open!().surface
+        );
+        assert_eq!(
+            UnitCylinder(CylinderCapStyle::Open),
+            cylinder_open!(matrix: Matrix4x4::identity()).surface
+        );
+    }
+}

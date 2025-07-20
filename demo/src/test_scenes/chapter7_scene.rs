@@ -5,13 +5,13 @@ use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{Angle, color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{gradient_stops, plane, sphere};
 
 pub struct Chapter7Scene {}
 
@@ -42,7 +42,7 @@ impl TestScene for Chapter7Scene {
 }
 
 fn floor() -> Shape {
-    let mut floor = Shape::new_plane();
+    let mut floor = plane!();
     let mut material = Material::default();
     material.pattern = Pattern::Checker(
         color!(1, 0.9, 0.9),
@@ -56,11 +56,9 @@ fn floor() -> Shape {
 }
 
 fn wall(y: Angle) -> Shape {
-    let mut wall = Shape::new_plane_transformed(
-        Matrix4x4::translation(0., 0., 5.)
-            .pre_rotation_y(y)
-            .pre_rotation_x(degrees!(90)),
-    );
+    let mut wall = plane!(matrix: Matrix4x4::translation(0., 0., 5.)
+        .pre_rotation_y(y)
+        .pre_rotation_x(degrees!(90)));
     let mut material = Material::default();
     material.pattern = Pattern::Stripe(color!(1, 0.9, 0.9), color!(1, 0, 1), Transform::identity());
     material.specular = 0.;
@@ -69,7 +67,7 @@ fn wall(y: Angle) -> Shape {
 }
 
 fn green_sphere() -> Shape {
-    let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(-0.5, 1., 0.5));
+    let mut sphere = sphere!(matrix: Matrix4x4::translation(-0.5, 1., 0.5));
     let mut material = Material::default();
     material.reflectivity = 0.9;
     material.diffuse = 0.0;
@@ -80,12 +78,10 @@ fn green_sphere() -> Shape {
 }
 
 fn small_green_sphere() -> Shape {
-    let mut sphere = Shape::new_sphere_transformed(
-        Matrix4x4::translation(1.5, 0.5, -0.5)
-            .pre_scale_all(0.5)
-            .pre_rotation_y(degrees!(30))
-            .pre_rotation_x(degrees!(30)),
-    );
+    let mut sphere = sphere!(matrix: Matrix4x4::translation(1.5, 0.5, -0.5)
+        .pre_scale_all(0.5)
+        .pre_rotation_y(degrees!(30))
+        .pre_rotation_x(degrees!(30)));
     let mut material = Material::default();
     material.pattern = Pattern::Gradient(
         gradient_stops!(
@@ -107,12 +103,10 @@ fn small_green_sphere() -> Shape {
 }
 
 fn smallest_yellow_sphere() -> Shape {
-    let mut sphere = Shape::new_sphere_transformed(
-        Matrix4x4::translation(-1.5, 0.33, -0.75)
-            .pre_scale_all(0.33)
-            .pre_rotation_y(degrees!(30))
-            .pre_rotation_x(degrees!(-30)),
-    );
+    let mut sphere = sphere!(matrix: Matrix4x4::translation(-1.5, 0.33, -0.75)
+        .pre_scale_all(0.33)
+        .pre_rotation_y(degrees!(30))
+        .pre_rotation_x(degrees!(-30)));
     let mut material = Material::default();
     material.pattern = Pattern::Checker(color!(1, 0.8, 0.1), *WHITE, Transform::identity());
     material.diffuse = 0.7;

@@ -7,10 +7,9 @@ use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
-use ray_tracer::primatives::Shape;
-use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::world::World;
+use ray_tracer::{cube, scene, sphere};
 
 pub struct Grid {}
 
@@ -27,7 +26,7 @@ impl TestScene for Grid {
         for x in -x_count..(x_count + 1) {
             let mut column = SceneTree::new_bounded(
                 Matrix4x4::translation(x as f32, 0., 0.),
-                Shape::new_cube_transformed(Matrix4x4::scale(scale, y_count as f32 + 0.5, scale)),
+                cube!(matrix: Matrix4x4::scale(scale, y_count as f32 + 0.5, scale)),
             );
             for y in -y_count..(y_count + 1) {
                 let mut material = Material::default();
@@ -38,9 +37,8 @@ impl TestScene for Grid {
                 } else {
                     color!(0., 0.5, 0.9)
                 });
-                let mut sphere = Shape::new_sphere_transformed(
-                    Matrix4x4::translation(0., y as f32, 0.).pre_scale_all(scale),
-                );
+                let mut sphere =
+                    sphere!(matrix: Matrix4x4::translation(0., y as f32, 0.).pre_scale_all(scale));
                 sphere.material = material;
                 column.add(sphere);
             }

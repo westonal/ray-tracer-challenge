@@ -65,8 +65,8 @@ impl Default for World {
 mod world_tests {
     use super::*;
     use crate::lighting::PointLight;
-    use crate::primatives::Shape;
-    use crate::ray;
+
+    use crate::{ray, sphere};
     use math::matrix::matrix_4x4::Matrix4x4;
 
     use crate::intersection::Intersect;
@@ -80,8 +80,8 @@ mod world_tests {
     #[test]
     fn setup_world() {
         let mut world = World::default();
-        world.add(Shape::new_sphere());
-        world.add(Shape::new_sphere());
+        world.add(sphere!());
+        world.add(sphere!());
         assert_eq!(2, world.shape_count());
         assert!(world.lights.is_empty());
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
@@ -91,10 +91,8 @@ mod world_tests {
     #[test]
     fn intersecting_world() {
         let mut world = World::default();
-        world.add(Shape::new_sphere());
-        world.add(Shape::new_sphere_transformed(Matrix4x4::scale(
-            0.5, 0.5, 0.5,
-        )));
+        world.add(sphere!());
+        world.add(sphere!(matrix: Matrix4x4::scale(0.5, 0.5, 0.5)));
         let world = world.prepare_for_render();
         let ray = ray!((0., 0., -5.), (0., 0., 1.));
         let intersections = world.intersect(&ray);

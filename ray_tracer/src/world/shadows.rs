@@ -27,7 +27,8 @@ mod shadow_tests {
 
     use crate::lighting::PointLight;
     use crate::lighting::surface_hit::SurfaceHit;
-    use crate::primatives::{Shape, ShapeId};
+    use crate::primatives::ShapeId;
+    use crate::sphere;
     use crate::world::World;
     use math::point;
     use math::tuple::color::Color;
@@ -36,7 +37,7 @@ mod shadow_tests {
     fn there_is_no_shadow_when_nothing_is_collinear_with_point_and_light() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(Shape::new_sphere());
+        world.add(sphere!());
         let point = point!(0, 10, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -49,7 +50,7 @@ mod shadow_tests {
     fn the_shadow_when_an_object_is_between_the_light_and_the_object() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(Shape::new_sphere());
+        world.add(sphere!());
         let point = point!(5, -5, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -62,7 +63,7 @@ mod shadow_tests {
     fn less_than_total_shadow_by_changing_material_shadow_opacity() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        let mut shape = Shape::new_sphere();
+        let mut shape = sphere!();
         shape.material.shadow_opacity = 0.4;
         world.add(shape);
         let point = point!(5, -5, 0);
@@ -77,7 +78,7 @@ mod shadow_tests {
     fn no_shadow_when_point_is_colinear_but_beyond_the_light() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(Shape::new_sphere());
+        world.add(sphere!());
         let point = point!(-11, 11, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -92,7 +93,7 @@ mod shadow_tests {
     fn a_primitive_shape_does_not_cast_a_shadow_on_self() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        let shape = Shape::new_sphere();
+        let shape = sphere!();
         let id = shape.id.clone();
         world.add(shape);
         let point = point!(5, -5, 0);

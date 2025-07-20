@@ -3,8 +3,8 @@ use math::tuple::point::Point;
 use obj::{Group, Obj};
 use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
-use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
+use ray_tracer::{cube, scene};
 
 #[macro_export]
 macro_rules! obj {
@@ -119,13 +119,11 @@ pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange, usi
 
 impl AABBBuilder {
     pub(crate) fn to_bounding(&self) -> Shape {
-        Shape::new_cube_transformed(
-            Matrix4x4::identity()
-                .pre_translation(self.0.min, self.1.min, self.2.min)
-                .pre_scale(self.0.width(), self.1.width(), self.2.width())
-                .pre_translation(0.5, 0.5, 0.5)
-                .pre_scale_all(0.5),
-        )
+        cube!(matrix: Matrix4x4::identity()
+            .pre_translation(self.0.min, self.1.min, self.2.min)
+            .pre_scale(self.0.width(), self.1.width(), self.2.width())
+            .pre_translation(0.5, 0.5, 0.5)
+            .pre_scale_all(0.5))
     }
 }
 

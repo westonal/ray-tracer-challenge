@@ -7,11 +7,10 @@ use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
-use ray_tracer::primatives::Shape;
-use ray_tracer::scene;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{plane, scene};
 use std::default::Default;
 
 pub struct Teapot {}
@@ -29,7 +28,7 @@ impl TestScene for Teapot {
 
         let world_scene = scene!(
             +{
-                let mut plane = Shape::new_plane();
+                let mut plane = plane!();
                 plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::identity());
                 plane
             };

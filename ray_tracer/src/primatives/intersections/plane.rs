@@ -21,7 +21,8 @@ impl Plane {
 
 #[cfg(test)]
 mod plane_normal_tests {
-    use crate::primatives::Shape;
+
+    use crate::plane;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::point::Point;
     use math::{assert_vector, point, radians, vector};
@@ -29,15 +30,14 @@ mod plane_normal_tests {
 
     #[test]
     fn plane_normal() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         assert_vector!(vector!(0, 1, 0), *plane.normal_at(Point::origin().into()));
         assert_vector!(vector!(0, 1, 0), *plane.normal_at(point!(1, 2, 3).into()));
     }
 
     #[test]
     fn plane_normal_transformed() {
-        let plane = Shape::new_plane_transformed(Matrix4x4::rotation_z(radians!(PI / 2.)))
-            .to_intersectable();
+        let plane = plane!(matrix: Matrix4x4::rotation_z(radians!(PI / 2.))).to_intersectable();
         assert_eq!(
             vector!(-1, -4.371139e-8, 0),
             *plane.normal_at(Point::origin().into())
@@ -53,12 +53,12 @@ mod plane_normal_tests {
 mod plane_intersection_tests {
 
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
-    use crate::ray;
+
+    use crate::{plane, ray};
 
     #[test]
     fn parallel_ray_misses() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray!((0., 1., 0.), (1., 0., 0.));
         assert!(plane.intersect(&ray).is_empty());
         assert!(!plane.fast_hit(&ray))
@@ -66,7 +66,7 @@ mod plane_intersection_tests {
 
     #[test]
     fn coplanar_ray_misses() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray!((0., 0., 0.), (1., 0., 0.));
         assert!(plane.intersect(&ray).is_empty());
         assert!(!plane.fast_hit(&ray))
@@ -74,7 +74,7 @@ mod plane_intersection_tests {
 
     #[test]
     fn ray_intersect_from_above() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray!((0., 1., 0.), (0., -1., 0.));
         let intersections = plane.intersect(&ray);
         assert_eq!(1, intersections.len());
@@ -85,7 +85,7 @@ mod plane_intersection_tests {
 
     #[test]
     fn ray_intersect_from_below() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray!((0., -1., 0.), (0., 1., 0.));
         let intersections = plane.intersect(&ray);
         assert_eq!(1, intersections.len());
@@ -96,7 +96,7 @@ mod plane_intersection_tests {
 
     #[test]
     fn ray_intersect_from_above_behind() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray!((0., 2., 0.), (0., 1., 0.));
         let intersections = plane.intersect(&ray);
         assert_eq!(1, intersections.len());

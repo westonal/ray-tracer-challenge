@@ -45,10 +45,10 @@ mod refraction_lighting_tests {
     use crate::lighting::PointLight;
     use crate::material::Material;
     use crate::material::pattern::Pattern;
-    use crate::primatives::Shape;
+
     use crate::rays::RayGeneration;
     use crate::world::World;
-    use crate::{ray, ray_first_gen};
+    use crate::{plane, ray, ray_first_gen, sphere};
     use math::matrix::matrix_4x4::Matrix4x4;
     use std::ops::Deref;
 
@@ -57,7 +57,7 @@ mod refraction_lighting_tests {
 
     #[test]
     fn the_refracted_color_of_an_opaque_surface() {
-        let sphere = Shape::new_sphere();
+        let sphere = sphere!();
         let mut world = World::default();
         world.add(sphere);
         let world = world.prepare_for_render();
@@ -80,7 +80,7 @@ mod refraction_lighting_tests {
 
     #[test]
     fn the_refracted_color_under_total_internal_reflection() {
-        let mut sphere = Shape::new_sphere();
+        let mut sphere = sphere!();
         sphere.material = Material::glass();
         let mut world = World::default();
         world.add(sphere);
@@ -144,12 +144,12 @@ mod refraction_lighting_tests {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
-        let mut floor = Shape::new_plane_transformed(Matrix4x4::translation(0., -1., 0.));
+        let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.transparency = 0.5;
         floor.material.refractive_index = 1.5;
         world.add(floor);
 
-        let mut ball = Shape::new_sphere_transformed(Matrix4x4::translation(0., -3.5, -0.5));
+        let mut ball = sphere!(matrix: Matrix4x4::translation(0., -3.5, -0.5));
         ball.material.pattern = Pattern::Solid(*RED);
         ball.material.ambient = 0.5;
         world.add(ball);
@@ -167,13 +167,13 @@ mod refraction_lighting_tests {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
-        let mut floor = Shape::new_plane_transformed(Matrix4x4::translation(0., -1., 0.));
+        let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.reflectivity = 0.5;
         floor.material.transparency = 0.5;
         floor.material.refractive_index = 1.5;
         world.add(floor);
 
-        let mut ball = Shape::new_sphere_transformed(Matrix4x4::translation(0., -3.5, -0.5));
+        let mut ball = sphere!(matrix: Matrix4x4::translation(0., -3.5, -0.5));
         ball.material.pattern = Pattern::Solid(*RED);
         ball.material.ambient = 0.5;
         world.add(ball);
@@ -193,13 +193,13 @@ mod schlick_tests {
     use super::*;
     use crate::intersection::{Intersection, Intersections};
     use crate::material::Material;
-    use crate::primatives::Shape;
-    use crate::ray_first_gen;
+
+    use crate::{ray_first_gen, sphere};
     use math::tuple::point::Point;
 
     #[test]
     fn the_schlick_approximation_under_total_internal_reflection() {
-        let mut sphere = Shape::new_sphere().to_intersectable();
+        let mut sphere = sphere!().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-2.0_f32.sqrt() / 2., &sphere),
@@ -213,7 +213,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_a_perpendicular_viewing_angle() {
-        let mut sphere = Shape::new_sphere().to_intersectable();
+        let mut sphere = sphere!().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![
             Intersection::new(-1., &sphere),
@@ -227,7 +227,7 @@ mod schlick_tests {
 
     #[test]
     fn the_schlick_approximation_with_small_angle_and_n1_gt_n1() {
-        let mut sphere = Shape::new_sphere().to_intersectable();
+        let mut sphere = sphere!().to_intersectable();
         sphere.material = Material::glass();
         let intersections = Intersections::new(vec![Intersection::new(1.8589, &sphere)]);
         let (hit, refractions) = intersections.hit().unwrap();

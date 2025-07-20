@@ -14,7 +14,7 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub(crate) fn new(object_to_world_matrix: Matrix4x4, surface: Surface) -> Self {
+    pub fn new(object_to_world_matrix: Matrix4x4, surface: Surface) -> Self {
         Self {
             id: Default::default(),
             material: Default::default(),

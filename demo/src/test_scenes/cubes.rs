@@ -4,14 +4,13 @@ use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
-use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{cube, gradient_stops, plane};
 
 pub struct Cubes {}
 
@@ -23,7 +22,7 @@ impl TestScene for Cubes {
     fn build_world() -> World {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
-        let mut floor = Shape::new_plane();
+        let mut floor = plane!();
         floor.material.pattern = Pattern::Checker(
             *WHITE,
             *BLACK,
@@ -32,28 +31,22 @@ impl TestScene for Cubes {
         floor.material.reflectivity = 0.5;
         world.add(floor);
 
-        world.add(Shape::new_cube_transformed(
-            Matrix4x4::identity().pre_translation(0., 1., 0.),
-        ));
+        world.add(cube!(matrix: Matrix4x4::identity().pre_translation(0., 1., 0.)));
 
-        let mut cube = Shape::new_cube_transformed(
-            Matrix4x4::identity()
-                .pre_scale_all(3.5)
-                .pre_translation(2., 1., -3.)
-                .pre_rotation_y(degrees!(55)),
-        );
+        let mut cube = cube!(matrix: Matrix4x4::identity()
+            .pre_scale_all(3.5)
+            .pre_translation(2., 1., -3.)
+            .pre_rotation_y(degrees!(55)));
         cube.material = Material::glass();
         cube.material.pattern = Pattern::Solid(color!(0.5, 0., 0.));
         cube.material.ambient = 0.3;
 
         world.add(cube);
 
-        let mut cube = Shape::new_cube_transformed(
-            Matrix4x4::identity()
-                .pre_translation(-8., 4., -3.)
-                .pre_scale_all(4.)
-                .pre_rotation_y(degrees!(0)),
-        );
+        let mut cube = cube!(matrix: Matrix4x4::identity()
+            .pre_translation(-8., 4., -3.)
+            .pre_scale_all(4.)
+            .pre_rotation_y(degrees!(0)));
         cube.material.pattern = Pattern::Gradient(
             gradient_stops!(
                 0. => *RED,

@@ -128,12 +128,13 @@ impl<'s> Intersection<'s> {
 #[cfg(test)]
 mod sorting_tests {
     use super::*;
-    use crate::primatives::Shape;
+
+    use crate::sphere;
 
     #[test]
     fn intersections_are_sorted_in_create() {
-        let sphere1 = Shape::new_sphere().to_intersectable();
-        let sphere2 = Shape::new_sphere().to_intersectable();
+        let sphere1 = sphere!().to_intersectable();
+        let sphere2 = sphere!().to_intersectable();
         let intersections = Intersections::new(vec![
             Intersection::new(2., &sphere1),
             Intersection::new(1., &sphere2),
@@ -148,8 +149,8 @@ mod sorting_tests {
 
     #[test]
     fn intersections_are_sorted_when_joined() {
-        let sphere1 = Shape::new_sphere().to_intersectable();
-        let sphere2 = Shape::new_sphere().to_intersectable();
+        let sphere1 = sphere!().to_intersectable();
+        let sphere2 = sphere!().to_intersectable();
         let intersections1 = Intersections::new(vec![
             Intersection::new(1., &sphere1),
             Intersection::new(2., &sphere2),

@@ -69,11 +69,11 @@ impl Cube {
 mod cube_intersection_tests {
     use super::*;
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
-    use crate::ray;
+
+    use crate::{cube, ray};
 
     fn run_intersection_test(ray: &Ray) -> (f32, f32) {
-        let cube = Shape::new_cube().to_intersectable();
+        let cube = cube!().to_intersectable();
         let intersections = cube.intersect(ray);
         assert!(cube.fast_hit(ray));
         assert_eq!(2, intersections.len());
@@ -110,8 +110,8 @@ mod cube_intersection_tests {
 
 #[cfg(test)]
 mod cube_intersection_missing_tests {
+
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
     use crate::ray;
 
     macro_rules! intersection_miss_tests {
@@ -119,7 +119,7 @@ mod cube_intersection_missing_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cube = Shape::new_cube().to_intersectable();
+                    let cube = $crate::cube!().to_intersectable();
                     let intersections = cube.intersect(&$ray);
                     assert_eq!(0, intersections.len());
                     assert!(!cube.fast_hit(&$ray))
@@ -140,7 +140,6 @@ mod cube_intersection_missing_tests {
 
 #[cfg(test)]
 mod cube_normal_tests {
-    use crate::primatives::Shape;
 
     use math::{point, vector};
 
@@ -149,7 +148,7 @@ mod cube_normal_tests {
         $(
             #[test]
             fn $name(){
-                let cube = Shape::new_cube().to_intersectable();
+                let cube = $crate::cube!().to_intersectable();
                 assert_eq!($normal, *cube.normal_at($point.into()));
             }
         )*

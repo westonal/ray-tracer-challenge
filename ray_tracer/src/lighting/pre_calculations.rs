@@ -48,14 +48,14 @@ impl<'s> Deref for PreCalculations<'s> {
 #[cfg(test)]
 mod precalculation_tests {
     use crate::intersection::Intersection;
-    use crate::primatives::Shape;
-    use crate::ray_first_gen;
+
+    use crate::{ray_first_gen, sphere};
     use math::{assert_point, assert_vector, point, vector};
 
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
         let ray = ray_first_gen!((0., 0., -5.), (0., 0., 1.));
-        let sphere = Shape::new_sphere().to_intersectable();
+        let sphere = sphere!().to_intersectable();
         let intersection = Intersection::new(4., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(4., pre_calculations.t);
@@ -70,7 +70,7 @@ mod precalculation_tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_inside() {
         let ray = ray_first_gen!((0., 0., 0.), (0., 0., 1.));
-        let sphere = Shape::new_sphere().to_intersectable();
+        let sphere = sphere!().to_intersectable();
         let intersection = Intersection::new(1., &sphere);
         let pre_calculations = intersection.to_pre_calculation(ray);
         assert_eq!(1., pre_calculations.t);
@@ -85,13 +85,13 @@ mod precalculation_tests {
 #[cfg(test)]
 mod reflection_pre_calc_tests {
     use super::*;
-    use crate::primatives::Shape;
-    use crate::ray_first_gen;
+
+    use crate::{plane, ray_first_gen};
     use math::vector;
 
     #[test]
     fn precompute_the_reflection_vector() {
-        let plane = Shape::new_plane().to_intersectable();
+        let plane = plane!().to_intersectable();
         let ray = ray_first_gen!(
             (0., 1., -1.),
             (0., -(2.0_f32.sqrt() / 2.), 2.0_f32.sqrt() / 2.)

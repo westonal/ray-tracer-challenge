@@ -53,7 +53,8 @@ impl SceneTree {
 #[cfg(test)]
 mod build_tree_tests {
     use super::*;
-    use crate::primatives::Shape;
+
+    use crate::{cylinder, sphere};
 
     #[test]
     fn new_tree() {
@@ -64,25 +65,25 @@ mod build_tree_tests {
     #[test]
     fn add_one_leaf() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_cylinder());
+        tree.add(cylinder!());
         assert_eq!(1, tree.shape_count());
     }
 
     #[test]
     fn add_two_leafs() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_cylinder());
-        tree.add(Shape::new_sphere());
+        tree.add(cylinder!());
+        tree.add(sphere!());
         assert_eq!(2, tree.shape_count());
     }
 
     #[test]
     fn add_two_leafs_at_two_depths() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_cylinder());
+        tree.add(cylinder!());
         let mut branch = SceneTree::default();
-        branch.add(Shape::new_cylinder());
-        branch.add(Shape::new_sphere());
+        branch.add(cylinder!());
+        branch.add(sphere!());
         tree.add(branch);
         assert_eq!(3, tree.shape_count());
     }

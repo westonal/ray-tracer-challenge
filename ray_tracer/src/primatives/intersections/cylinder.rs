@@ -94,7 +94,7 @@ impl Cylinder {
 #[cfg(test)]
 mod cylinder_intersection_miss_tests {
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
+
     use crate::ray;
 
     macro_rules! miss {
@@ -102,7 +102,8 @@ mod cylinder_intersection_miss_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_open_cylinder().to_intersectable();
+
+                let cylinder = $crate::cylinder_open!().to_intersectable();
                 let intersections = cylinder.intersect(&$ray);
                 assert_eq!(intersections.len(), 0);
                 assert!(!cylinder.fast_hit(&$ray))
@@ -121,7 +122,7 @@ mod cylinder_intersection_miss_tests {
 #[cfg(test)]
 mod cylinder_intersection_hit_tests {
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
+
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
@@ -130,9 +131,7 @@ mod cylinder_intersection_hit_tests {
             $(
             #[test]
             fn $name() {
-                let cylinder = Shape::new_open_cylinder_transformed(
-                    Matrix4x4::scale(1., 8., 1.)
-                ).to_intersectable();
+                let cylinder = $crate::cylinder_open!(matrix: Matrix4x4::scale(1., 8., 1.)).to_intersectable();
                 let intersections = cylinder.intersect(&$ray.normalize());
                 assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
                 assert!(cylinder.fast_hit(&$ray))
@@ -152,7 +151,6 @@ mod cylinder_intersection_hit_tests {
 
 #[cfg(test)]
 mod cylinder_normal_tests {
-    use crate::primatives::Shape;
 
     use math::{point, vector};
 
@@ -161,7 +159,7 @@ mod cylinder_normal_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cylinder = Shape::new_open_cylinder().to_intersectable();
+                    let cylinder = $crate::cylinder_open!().to_intersectable();
                     math::assert_vector!(cylinder.normal_at($point.into()).to_vector(), $expect);
                 }
             )*
@@ -180,7 +178,7 @@ mod cylinder_normal_tests {
 mod cylinder_truncate_tests {
 
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
+
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
@@ -189,11 +187,9 @@ mod cylinder_truncate_tests {
             $(
                 #[test]
                 fn $name() {
-                    let cylinder = Shape::new_open_cylinder_transformed(
-                        Matrix4x4::translation(0., 1., 0.)
+                    let cylinder = $crate::cylinder_open!(matrix: Matrix4x4::translation(0., 1., 0.)
                         .pre_scale(1., 0.5, 1.)
-                        .pre_translation(0., 1., 0.)
-                    ).to_intersectable();
+                        .pre_translation(0., 1., 0.)).to_intersectable();
                     let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!($expect, intersections.len());
                     if $expect > 0 {
@@ -219,7 +215,7 @@ mod cylinder_truncate_tests {
 #[cfg(test)]
 mod cylinder_cap_intersection_tests {
     use crate::intersection::Intersect;
-    use crate::primatives::Shape;
+
     use crate::ray;
     use math::matrix::matrix_4x4::Matrix4x4;
 
@@ -229,12 +225,7 @@ mod cylinder_cap_intersection_tests {
                 #[test]
                 fn $name() {
                     // cylinder 1..2
-                    let cylinder = Shape::new_cylinder_transformed(
-                        Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
-                        // Matrix4x4::translation(0., 1., 0.)
-                        // .pre_scale(1., 0.5, 1.)
-                        // .pre_translation(0., 1., 0.)
-                    ).to_intersectable();
+                    let cylinder = $crate::cylinder!(matrix: Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)).to_intersectable();
                     let intersections = cylinder.intersect(&$ray.normalize());
                     assert_eq!(intersections.iter().map(|a|a.t).collect::<Vec<f32>>(), $t);
                     assert!(cylinder.fast_hit(&$ray))
@@ -255,8 +246,6 @@ mod cylinder_cap_intersection_tests {
 #[cfg(test)]
 mod cylinder_cap_normal_tests {
 
-    use crate::primatives::Shape;
-
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::{assert_vector, point, vector};
 
@@ -266,9 +255,7 @@ mod cylinder_cap_normal_tests {
                 #[test]
                 fn $name() {
                     // cylinder 1..2
-                    let cylinder = Shape::new_cylinder_transformed(
-                        Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)
-                    ).to_intersectable();
+                    let cylinder = $crate::cylinder!(matrix: Matrix4x4::translation(0.,1.5,0.).pre_scale(1.,0.5,1.)).to_intersectable();
                     assert_vector!(cylinder.normal_at($point.into()).to_vector(), $expected);
                 }
             )*

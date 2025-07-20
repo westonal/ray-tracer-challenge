@@ -57,12 +57,13 @@ impl SceneTree {
 #[cfg(test)]
 mod flatten_tests {
     use super::*;
-    use crate::primatives::Shape;
+
+    use crate::{cube, plane, sphere};
 
     #[test]
     fn flatten_one() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_sphere());
+        tree.add(sphere!());
 
         let vec = tree.flatten();
         assert_eq!(1, vec.len());
@@ -71,8 +72,8 @@ mod flatten_tests {
     #[test]
     fn flatten_two() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_sphere());
-        tree.add(Shape::new_cube());
+        tree.add(sphere!());
+        tree.add(cube!());
 
         let vec = tree.flatten();
         assert_eq!(2, vec.len());
@@ -81,10 +82,10 @@ mod flatten_tests {
     #[test]
     fn flatten_two_in_sub_tree() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_sphere());
+        tree.add(sphere!());
 
         let mut branch = SceneTree::default();
-        branch.add(Shape::new_cube());
+        branch.add(cube!());
 
         tree.add(branch);
 
@@ -95,11 +96,11 @@ mod flatten_tests {
     #[test]
     fn flatten_three_in_sub_tree() {
         let mut tree = SceneTree::default();
-        tree.add(Shape::new_sphere());
+        tree.add(sphere!());
 
         let mut branch = SceneTree::default();
-        branch.add(Shape::new_cube());
-        branch.add(Shape::new_plane());
+        branch.add(cube!());
+        branch.add(plane!());
 
         tree.add(branch);
 
@@ -111,8 +112,9 @@ mod flatten_tests {
 #[cfg(test)]
 mod flatten_matrix_tests {
     use super::*;
-    use crate::primatives::Shape;
+
     use crate::transform::Transform;
+    use crate::{cube, cylinder, sphere};
     use math::degrees;
 
     #[test]
@@ -124,13 +126,13 @@ mod flatten_matrix_tests {
         let d = Matrix4x4::rotation_y(degrees!(45));
 
         let mut root = SceneTree::new(r);
-        root.add(Shape::new_sphere_transformed(a));
+        root.add(sphere!(matrix: a));
 
         let mut branch = SceneTree::new(b);
-        branch.add(Shape::new_cube_transformed(c));
+        branch.add(cube!(matrix: c));
 
         root.add(branch);
-        root.add(Shape::new_cylinder_transformed(d));
+        root.add(cylinder!(matrix: d));
 
         let vec = root.flatten();
 

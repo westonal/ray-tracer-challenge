@@ -4,7 +4,6 @@ use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
 use math::{color, degrees, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::gradient_stops;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
@@ -12,6 +11,7 @@ use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{gradient_stops, plane};
 
 pub struct Triangles {}
 
@@ -23,7 +23,7 @@ impl TestScene for Triangles {
     fn build_world() -> World {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
-        let mut floor = Shape::new_plane();
+        let mut floor = plane!();
         floor.material.pattern = Pattern::Checker(
             *WHITE,
             *BLACK,

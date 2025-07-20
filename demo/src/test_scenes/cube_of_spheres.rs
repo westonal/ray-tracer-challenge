@@ -7,12 +7,11 @@ use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
-use ray_tracer::primatives::Shape;
-use ray_tracer::scene;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{cube, plane, scene, sphere};
 
 pub struct CubeOfSpheres {}
 
@@ -24,7 +23,7 @@ impl TestScene for CubeOfSpheres {
     fn build_world() -> World {
         let scene = scene!(
             +{
-                let mut shape = Shape::new_plane();
+                let mut shape = plane!();
                 shape.material.pattern = Pattern::Checker(
                     *WHITE,
                     *BLACK,
@@ -34,7 +33,7 @@ impl TestScene for CubeOfSpheres {
                 shape
             };
             +{
-                let mut shape = Shape::new_plane_transformed(Matrix4x4::translation(0., 45., 0.));
+                let mut shape = plane!(matrix: Matrix4x4::translation(0., 45., 0.));
                 shape.material.pattern = Pattern::Checker(
                     *GREEN,
                     *BLACK,
@@ -46,12 +45,12 @@ impl TestScene for CubeOfSpheres {
                 matrix: Matrix4x4::translation(3.5, 4., 3.5);
                 +scene!(
                     matrix: Matrix4x4::scale_all(2.);
-                    bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+                    bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
                     +Self::double(
                         |matrix| {
                             scene!(
                                 matrix: matrix.pre_scale_all(0.5);
-                                bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+                                bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
                                 +Self::double(
                                     |matrix| {
                                         scene!(
@@ -87,10 +86,10 @@ impl CubeOfSpheres {
     fn cubes() -> SceneTree {
         scene!(
             matrix: Matrix4x4::scale_all(0.5);
-            bounding_volume: Shape::new_cube_transformed(Matrix4x4::scale_all(2.));
+            bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
             +Self::double(
                 |matrix| {
-                    let mut sphere = Shape::new_sphere();
+                    let mut sphere = sphere!();
                     let mut material = Material::default();
                     material.reflectivity = 0.9;
                     material.specular = 1.;

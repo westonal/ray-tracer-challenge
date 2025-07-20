@@ -138,9 +138,9 @@ mod world_shadow_shading_tests {
     use super::*;
     use crate::intersection::Intersection;
     use crate::lighting::PointLight;
-    use crate::primatives::Shape;
-    use crate::ray_first_gen;
+
     use crate::world::World;
+    use crate::{ray_first_gen, sphere};
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::{assert_color, point, vector};
 
@@ -148,10 +148,8 @@ mod world_shadow_shading_tests {
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
-        world.add(Shape::new_sphere());
-        world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
-            0., 0., 10.,
-        )));
+        world.add(sphere!());
+        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -167,14 +165,12 @@ mod world_shadow_shading_tests {
     fn shade_when_given_intersection_in_shadow_of_transparent_object() {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
-        let mut blocking_shape = Shape::new_sphere();
+        let mut blocking_shape = sphere!();
         // The transparency doesn't control the shadow
         blocking_shape.material.shadow_opacity = 0.2;
         println!("Blocking is {}", blocking_shape.id);
         world.add(blocking_shape);
-        world.add(Shape::new_sphere_transformed(Matrix4x4::translation(
-            0., 0., 10.,
-        )));
+        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -192,11 +188,11 @@ mod world_pattern_shading_tests {
     use crate::lighting::PointLight;
     use crate::material::Material;
     use crate::material::pattern::Pattern;
-    use crate::primatives::Shape;
-    use crate::ray;
+
     use crate::rays::Ray;
     use crate::transform::Transform;
     use crate::world::World;
+    use crate::{plane, ray};
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{BLUE, GREEN, RED};
     use math::{degrees, point, vector};
@@ -221,7 +217,7 @@ mod world_pattern_shading_tests {
         fn given(stripe_transform: Matrix4x4, plane_transformation: Matrix4x4) -> TestScene {
             let mut world = World::default();
             world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
-            let mut plane = Shape::new_plane_transformed(plane_transformation);
+            let mut plane = plane!(matrix: plane_transformation);
             let mut material = Material::solid(*BLUE);
             material.pattern = Pattern::Stripe(*GREEN, *RED, Transform::new(stripe_transform));
             plane.material = material;

@@ -8,7 +8,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
-pub(crate) enum Surface {
+pub enum Surface {
     /// A sphere with center at origin and radius 1
     UnitSphere,
 

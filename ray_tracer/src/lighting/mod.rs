@@ -250,18 +250,18 @@ mod reflection_lighting_tests {
     use crate::primatives::Shape;
     use crate::rays::RayGeneration;
     use crate::world::World;
-    use crate::{ray, ray_first_gen};
+    use crate::{plane, ray, ray_first_gen, sphere};
     use math::color;
     use math::matrix::matrix_4x4::Matrix4x4;
     use math::tuple::color::{GREEN, RED, WHITE};
 
     #[test]
     fn reflect_color_off_a_plane() {
-        let mut sphere = Shape::new_sphere_transformed(Matrix4x4::translation(0., 10., 10.));
+        let mut sphere = sphere!(matrix: Matrix4x4::translation(0., 10., 10.));
         sphere.material = Material::solid(*RED);
         let mut material = Material::solid(*GREEN);
         material.reflectivity = 0.25;
-        let mut plane = Shape::new_plane();
+        let mut plane = plane!();
         plane.material = material;
         let mut world = World::default();
         world.set_light(PointLight::new(Point::origin(), *WHITE));
@@ -317,7 +317,7 @@ mod reflection_lighting_tests {
     fn solid_reflective_plane(color: Color, reflectivity: f32) -> Shape {
         let mut material = Material::solid(color);
         material.reflectivity = reflectivity;
-        let mut plane = Shape::new_plane();
+        let mut plane = plane!();
         plane.material = material;
         plane
     }
