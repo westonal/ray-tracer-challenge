@@ -1,12 +1,12 @@
-use std::iter::Flatten;
-use math::matrix4x4;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
 use crate::csg::{CN, CSGOperation};
 use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
-use crate::scene_tree::{FlatScene, FlattenTree, SceneTree};
+use crate::scene_tree::{Chain, FlatScene, FlattenTree, SceneTree};
 use crate::transform::Transform;
+use math::matrix4x4;
+use std::iter::Flatten;
 
 impl FlattenTree for CN {
     fn flatten(&self) -> FlatScene {
@@ -14,9 +14,13 @@ impl FlattenTree for CN {
         // TODO write left and right to the chain
         match self {
             CN::Leaf(scene) => {
-                chain.append(&mut scene.flatten())
+                chain.append(&mut scene.flatten());
             }
-            CN::Tree(_, _, _) => {}
+            CN::Tree(lhs, op, rhs) => {
+                chain.push(Chain::CSG(*op, 1, 1));
+                chain.append(&mut lhs.flatten());
+                chain.append(&mut rhs.flatten());
+            }
         }
         FlatScene::new(chain)
     }
@@ -37,6 +41,9 @@ macro_rules! assert_chain {
                 Chain::Shape(shape) => {
                     format!("{:?}", shape.surface)
                 }
+                Chain::CSG(op, skip_left, skip_right) => {
+                    format!("{:?}", (op, skip_left, skip_right))
+                }
             }
         ).collect::<Vec<_>>());
     };
@@ -47,8 +54,8 @@ mod filter_intersections_tests {
     use super::*;
     use crate::intersection::Intersection;
     use crate::primatives::{IntersectableShape, Shape, Surface};
-    use crate::{csg_cube, csg_sphere, cube, sphere};
     use crate::scene_tree::Chain;
+    use crate::{csg_cube, csg_sphere, cube, sphere};
 
     #[test]
     fn single_csg_intersectable() {
@@ -64,7 +71,11 @@ mod filter_intersections_tests {
         let csg = csg_sphere!() + csg_cube!();
         assert_chain!(
             actual: csg.flatten(),
-            expect: [Surface::UnitSphere]
+            expect: [
+                (CSGOperation::Union, 1, 2),
+                Surface::UnitSphere,
+                Surface::UnitCube,
+            ]
         );
     }
 
@@ -80,6 +91,5 @@ mod filter_intersections_tests {
             Intersection::new(3., &sphere),
             Intersection::new(4., &cube),
         ];
-
     }
 }

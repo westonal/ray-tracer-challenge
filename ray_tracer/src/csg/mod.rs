@@ -16,7 +16,9 @@ macro_rules! csg {
     };
 }
 
-enum CSGOperation {
+#[derive(Copy)]
+#[derive(Clone)]
+pub enum CSGOperation {
     Union,
     Intersection,
     Difference,
