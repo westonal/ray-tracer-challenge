@@ -23,6 +23,9 @@ impl SceneTree {
                 shape.matrix = tree_matrix * shape.matrix;
                 into.push(Chain::Shape(shape.to_intersectable()))
             }
+            SceneTree::CsgLeaf(csg) => {
+                into.append(&mut csg.flatten())
+            }
             SceneTree::Group {
                 children,
                 matrix,

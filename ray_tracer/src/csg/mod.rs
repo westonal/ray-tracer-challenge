@@ -40,7 +40,7 @@ impl Debug for CSGOperation {
     }
 }
 
-enum CN {
+pub enum CN {
     Leaf(SceneTree),
     Tree(Box<CN>, CSGOperation, Box<CN>),
 }

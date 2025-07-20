@@ -26,6 +26,12 @@ impl FlattenTree for CN {
     }
 }
 
+impl From<CN> for SceneTree {
+    fn from(value: CN) -> Self {
+        SceneTree::CsgLeaf(Box::new(value))
+    }
+}
+
 #[cfg(test)]
 macro_rules! assert_chain {
     (actual: $actual:expr, expect: [$($surface:expr$(,)?)*]) => {
@@ -36,7 +42,7 @@ macro_rules! assert_chain {
         .map(|f|
             match f {
                 Chain::BoundingVolume(shape, skip) => {
-                    format!("BV: {:?} :: {}", shape.surface, skip)
+                    format!("{:?}", ("BV", shape.surface, skip))
                 }
                 Chain::Shape(shape) => {
                     format!("{:?}", shape.surface)
@@ -55,7 +61,7 @@ mod filter_intersections_tests {
     use crate::intersection::Intersection;
     use crate::primatives::{IntersectableShape, Shape, Surface};
     use crate::scene_tree::Chain;
-    use crate::{csg_cube, csg_sphere, cube, sphere};
+    use crate::{csg_cube, csg_sphere, cube, scene, sphere};
 
     #[test]
     fn single_csg_intersectable() {
@@ -63,6 +69,48 @@ mod filter_intersections_tests {
         assert_chain!(
             actual: csg.flatten(),
             expect: [Surface::UnitSphere]
+        );
+    }
+
+    #[test]
+    fn single_csg_in_a_scene() {
+        let scene = scene!(+csg_sphere!(););
+        assert_chain!(
+            actual: scene.flatten(),
+            expect: [Surface::UnitSphere]
+        );
+    }
+
+    #[test]
+    fn single_csg_in_a_scene_with_bounds() {
+        let scene = scene!(
+            bounding_volume: cube!();
+            +csg_sphere!();
+        );
+        assert_chain!(
+            actual: scene.flatten(),
+            expect: [
+                ("BV", Surface::UnitCube, 1),
+                Surface::UnitSphere
+            ]
+        );
+    }
+
+    #[test]
+    fn two_csg_in_a_scene_with_bounds() {
+        let scene = scene!(
+            bounding_volume: cube!();
+            +csg_sphere!();
+            +csg_cube!();
+        );
+        assert_chain!(
+            actual: scene.flatten(),
+            expect: [
+                // TODO test is correct, walk is at fault probably
+                ("BV", Surface::UnitCube, 2),
+                Surface::UnitSphere,
+                Surface::UnitCube,
+            ]
         );
     }
 
