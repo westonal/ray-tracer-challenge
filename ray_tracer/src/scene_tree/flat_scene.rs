@@ -1,7 +1,8 @@
+use std::fmt::{Debug, Formatter};
 use crate::intersection::{Intersect, Intersections};
 use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
-use std::ops::Deref;
+use std::ops::{Deref, DerefMut};
 
 pub struct FlatScene {
     chain: Vec<Chain>,
@@ -17,6 +18,20 @@ pub enum Chain {
     BoundingVolume(IntersectableShape, usize),
     Shape(IntersectableShape),
 }
+
+impl Debug for Chain{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Chain::BoundingVolume(shape, skip) => {
+                write!(f, "BV: {:?} :: {}", shape.surface, skip)
+            }
+            Chain::Shape(shape) => {
+                write!(f, "{:?}", shape.surface)
+            }
+        }
+    }
+}
+
 
 impl Deref for Chain {
     type Target = IntersectableShape;
@@ -34,6 +49,12 @@ impl Deref for FlatScene {
 
     fn deref(&self) -> &Self::Target {
         &self.chain
+    }
+}
+
+impl DerefMut for FlatScene{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.chain
     }
 }
 
@@ -129,7 +150,8 @@ mod chain_intersect_tests {
 
 #[cfg(test)]
 mod chain_build_from_tree_intersect_tests {
-    use super::*;
+    use crate::scene_tree::flatten::FlattenTree;
+use super::*;
 
     use crate::scene_tree::SceneTree;
     use crate::{ray, scene, sphere};

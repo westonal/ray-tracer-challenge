@@ -3,13 +3,19 @@ use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
 
-impl SceneTree {
-    pub fn flatten(&self) -> FlatScene {
+pub trait FlattenTree {
+    fn flatten(&self) -> FlatScene;
+}
+
+impl FlattenTree for SceneTree {
+    fn flatten(&self) -> FlatScene {
         let mut chain = vec![];
         self.walk(&mut chain, matrix4x4!());
         FlatScene::new(chain)
     }
+}
 
+impl SceneTree {
     fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4) {
         match self {
             SceneTree::Leaf(shape) => {

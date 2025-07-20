@@ -1,3 +1,4 @@
+use crate::scene_tree::FlattenTree;
 mod default;
 pub mod shading;
 mod shadows;

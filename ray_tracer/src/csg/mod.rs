@@ -1,9 +1,11 @@
 mod intersection;
+mod build_chain;
 
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
 use crate::primatives::{Shape, ShapeId, Surface};
+use crate::scene_tree::SceneTree;
 
 #[macro_export]
 macro_rules! csg {
@@ -37,21 +39,21 @@ impl Debug for CSGOperation {
 }
 
 enum CN {
-    Leaf(Shape),
+    Leaf(SceneTree),
     Tree(Box<CN>, CSGOperation, Box<CN>),
 }
 
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::sphere!($(matrix: $matrix;)?))
+        $crate::csg!($crate::scene!(+$crate::sphere!($(matrix: $matrix;)?);))
     };
 }
 
 #[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::cube!($(matrix: $matrix;)?))
+        $crate::csg!($crate::scene!(+$crate::cube!($(matrix: $matrix;)?);))
     };
 }
 
@@ -59,7 +61,7 @@ impl Debug for CN {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             CN::Leaf(shape, ..) => {
-                write!(f, "{:?}", shape.surface)
+                write!(f, "{:?}", shape.shape_count())
             }
             CN::Tree(lhs, operation, rhs) => {
                 write!(f, "({:?} {:?} {:?})", lhs, operation, rhs)

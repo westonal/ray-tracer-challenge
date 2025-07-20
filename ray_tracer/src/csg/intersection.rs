@@ -1,8 +1,11 @@
+use std::iter::Flatten;
+use math::matrix4x4;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
 use crate::csg::{CN, CSGOperation};
 use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
+use crate::scene_tree::{FlatScene, FlattenTree, SceneTree};
 use crate::transform::Transform;
 
 pub enum SideHit {
@@ -89,46 +92,4 @@ mod by_operation_intersection_filtering_tests {
         difference_g; side: Right, left: Outside, right: Inside  => false
         difference_h; side: Right, left: Outside, right: Outside => false
     );
-}
-
-impl From<CN> for IntersectableShape {
-    fn from(value: CN) -> Self {
-        match value {
-            CN::Leaf(shape) => {
-                shape.to_intersectable()
-            }
-            CN::Tree(_, _, _) => {
-                todo!()
-            }
-        }
-    }
-}
-
-#[cfg(test)]
-mod filter_intersections_tests {
-    use super::*;
-    use crate::intersection::Intersection;
-    use crate::primatives::{IntersectableShape, Shape};
-    use crate::{csg_cube, csg_sphere, cube, sphere};
-
-    #[test]
-    fn single_csg_intersectable() {
-        let c = csg_sphere!();
-        let intersectable_shape: IntersectableShape = c.into();
-
-    }
-
-    #[test]
-    fn union() {
-        let c = csg_sphere!() + csg_cube!();
-        // todo problem, intersectons requires intersectable shapes, these are fake
-        let sphere = sphere!().to_intersectable();
-        let cube = cube!().to_intersectable();
-        let intersections = vec![
-            Intersection::new(1., &sphere),
-            Intersection::new(2., &cube),
-            Intersection::new(3., &sphere),
-            Intersection::new(4., &cube),
-        ];
-    }
 }
