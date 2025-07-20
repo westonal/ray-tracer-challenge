@@ -1,7 +1,6 @@
 use crate::test_scenes::TestScene;
-use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
-use math::{color, degrees, point, vector};
+use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -27,21 +26,22 @@ impl TestScene for Triangles {
         floor.material.pattern = Pattern::Checker(
             *WHITE,
             *BLACK,
-            Transform::new(Matrix4x4::rotation_y(degrees!(45)).scale_all(2.)),
+            Transform::new(matrix4x4!(rotation_y(degrees!(45)) scale_all(2.))),
         );
         floor.material.reflectivity = 0.5;
         world.add(floor);
 
         world.add(Shape::new_triangle_transformed(
-            Matrix4x4::translation(0., 1., 0.),
+            matrix4x4!(translation(0., 1., 0.)),
             Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         ));
 
         let mut triangle = Shape::new_triangle_transformed(
-            Matrix4x4::identity()
-                .scale_all(3.5)
-                .translation(2., 1., -3.)
-                .rotation_y(degrees!(55)),
+            matrix4x4!(
+                scale_all(3.5)
+                translation(2., 1., -3.)
+                rotation_y(degrees!(55))
+            ),
             Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         );
         triangle.material = Material::glass();
@@ -51,10 +51,11 @@ impl TestScene for Triangles {
         world.add(triangle);
 
         let mut triangle = Shape::new_triangle_transformed(
-            Matrix4x4::identity()
-                .translation(-8., 4., -3.)
-                .scale_all(4.)
-                .rotation_y(degrees!(0)),
+            matrix4x4!(
+                translation(-8., 4., -3.)
+                scale_all(4.)
+                rotation_y(degrees!(0))
+            ),
             Triangle::new([point!(0, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]),
         );
         triangle.material.pattern = Pattern::Gradient(
@@ -63,11 +64,11 @@ impl TestScene for Triangles {
                 0.5 => *BLUE,
                 1. => *GREEN
             ),
-            Transform::new(
-                Matrix4x4::rotation_y(degrees!(45))
-                    .translation(-1., 0., 0.)
-                    .scale_all(2.),
-            ),
+            Transform::new(matrix4x4!(
+                rotation_y(degrees!(45))
+                translation(-1., 0., 0.)
+                scale_all(2.)
+            )),
         );
         triangle.material.reflectivity = 0.1;
         world.add(triangle);

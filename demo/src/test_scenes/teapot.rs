@@ -2,7 +2,7 @@ use crate::obj;
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::*;
 use math::tuple::color::{RED, WHITE};
-use math::{color, degrees, point, vector};
+use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -22,7 +22,7 @@ impl TestScene for Teapot {
 
     fn build_world() -> World {
         let teapot = scene!(
-            matrix: Matrix4x4::rotation_y(degrees!(-60));
+            matrix: matrix4x4!(rotation_y(degrees!(-60)));
             +obj!(path: "objs/teapot.obj";);
         );
 

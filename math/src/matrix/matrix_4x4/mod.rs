@@ -1,3 +1,4 @@
+mod builder_macro;
 mod cofactors;
 mod inversion;
 mod rotation;

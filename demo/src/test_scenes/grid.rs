@@ -1,7 +1,7 @@
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::*;
 use math::tuple::color::WHITE;
-use math::{color, degrees, point};
+use math::{color, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -25,8 +25,8 @@ impl TestScene for Grid {
         let scale = 0.4;
         for x in -x_count..(x_count + 1) {
             let mut column = SceneTree::new_bounded(
-                Matrix4x4::translation(x as f32, 0., 0.),
-                cube!(matrix: Matrix4x4::scale(scale, y_count as f32 + 0.5, scale)),
+                matrix4x4!(translation(x as f32, 0., 0.)),
+                cube!(matrix: matrix4x4!(scale(scale, y_count as f32 + 0.5, scale))),
             );
             for y in -y_count..(y_count + 1) {
                 let mut material = Material::default();
@@ -38,7 +38,7 @@ impl TestScene for Grid {
                     color!(0., 0.5, 0.9)
                 });
                 let mut sphere =
-                    sphere!(matrix: Matrix4x4::translation(0., y as f32, 0.).scale_all(scale));
+                    sphere!(matrix: matrix4x4!(translation(0., y as f32, 0.) scale_all(scale)));
                 sphere.material = material;
                 column.add(sphere);
             }
@@ -47,7 +47,7 @@ impl TestScene for Grid {
 
         let mut world = World::default();
         world.add(scene!(
-            matrix:Matrix4x4::translation(0., 0., -5.3);
+            matrix: matrix4x4!(translation(0., 0., -5.3));
             +root;
         ));
         world.add_light(PointLight::new(point!(10, 10, 7), *WHITE));

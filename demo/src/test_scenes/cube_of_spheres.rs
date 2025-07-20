@@ -1,7 +1,7 @@
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, GREEN, WHITE};
-use math::{color, degrees, point, vector};
+use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -27,30 +27,30 @@ impl TestScene for CubeOfSpheres {
                 shape.material.pattern = Pattern::Checker(
                     *WHITE,
                     *BLACK,
-                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).scale_all(2.)),
+                    Transform::new(matrix4x4!(rotation_y(degrees!(45)) scale_all(2.))),
                 );
                 shape.material.reflectivity = 0.5;
                 shape
             };
             +{
-                let mut shape = plane!(matrix: Matrix4x4::translation(0., 45., 0.));
+                let mut shape = plane!(matrix: matrix4x4!(translation(0., 45., 0.)));
                 shape.material.pattern = Pattern::Checker(
                     *GREEN,
                     *BLACK,
-                    Transform::new(Matrix4x4::rotation_y(degrees!(45)).scale_all(10.)),
+                    Transform::new(matrix4x4!(rotation_y(degrees!(45)) scale_all(10.))),
                 );
                 shape
             };
             +scene!(
-                matrix: Matrix4x4::translation(3.5, 4., 3.5);
+                matrix: matrix4x4!(translation(3.5, 4., 3.5));
                 +scene!(
-                    matrix: Matrix4x4::scale_all(2.);
-                    bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
+                    matrix: matrix4x4!(scale_all(2.));
+                    bounding_volume: cube!(matrix: matrix4x4!(scale_all(2.)));
                     +Self::double(
                         |matrix| {
                             scene!(
                                 matrix: matrix.scale_all(0.5);
-                                bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
+                                bounding_volume: cube!(matrix: matrix4x4!(scale_all(2.)));
                                 +Self::double(
                                     |matrix| {
                                         scene!(
@@ -85,8 +85,8 @@ impl TestScene for CubeOfSpheres {
 impl CubeOfSpheres {
     fn cubes() -> SceneTree {
         scene!(
-            matrix: Matrix4x4::scale_all(0.5);
-            bounding_volume: cube!(matrix: Matrix4x4::scale_all(2.));
+            matrix: matrix4x4!(scale_all(0.5));
+            bounding_volume: cube!(matrix: matrix4x4!(scale_all(2.)));
             +Self::double(
                 |matrix| {
                     let mut sphere = sphere!();
@@ -110,11 +110,11 @@ impl CubeOfSpheres {
         for x in 0..2 {
             for y in 0..2 {
                 for z in 0..2 {
-                    tree.add(f(Matrix4x4::translation(
+                    tree.add(f(matrix4x4!(translation(
                         x as f32 * 2. - 1.,
                         y as f32 * 2. - 1.,
                         z as f32 * 2. - 1.,
-                    )));
+                    ))));
                 }
             }
         }

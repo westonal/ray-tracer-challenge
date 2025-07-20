@@ -2,7 +2,7 @@ use crate::obj;
 use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::*;
 use math::tuple::color::{RED, WHITE};
-use math::{degrees, point, vector};
+use math::{degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -23,7 +23,7 @@ impl TestScene for Pawn {
 
     fn build_world() -> World {
         let pawn = scene!(
-            matrix: Matrix4x4::rotation_y(degrees!(-60));
+            matrix: matrix4x4!(rotation_y(degrees!(-60)));
             +obj!(
                 path: "objs/chess/pawn.obj";
                 material: Material::glass();
@@ -34,7 +34,7 @@ impl TestScene for Pawn {
             +{
                 let mut plane = plane!();
                 plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::new(
-                    Matrix4x4::scale_all(2.6).translation(0.5, 0., 0.5)
+                    matrix4x4!(scale_all(2.6) translation(0.5, 0., 0.5))
                 ));
                 plane
             };

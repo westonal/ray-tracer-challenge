@@ -2,7 +2,7 @@ use crate::test_scenes::TestScene;
 use math::matrix::matrix_4x4::*;
 use math::tuple::color::{BLACK, WHITE};
 use math::tuple::point::Point;
-use math::{degrees, point, vector};
+use math::{degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -23,13 +23,13 @@ impl TestScene for GlassSphereWithAir {
     fn build_world() -> World {
         let mut world = World::default();
         world.add_light(PointLight::new(point!(-300, 200, 20), *WHITE));
-        let mut plane = plane!(matrix: Matrix4x4::translation(0., -32., 0.));
+        let mut plane = plane!(matrix: matrix4x4!(translation(0., -32., 0.)));
         plane.material.pattern =
-            Pattern::Checker(*BLACK, *WHITE, Transform::new(Matrix4x4::scale_all(3.)));
+            Pattern::Checker(*BLACK, *WHITE, Transform::new(matrix4x4!(scale_all(3.))));
         world.add(plane);
 
         let scene = scene!(
-            matrix: Matrix4x4::scale_all(5.);
+            matrix: matrix4x4!(scale_all(5.));
             bounding_volume: cube!();
             +{
                 let mut sphere = sphere!();
@@ -37,7 +37,7 @@ impl TestScene for GlassSphereWithAir {
                 sphere
             };
             +scene!(
-                matrix: Matrix4x4::scale_all(0.5);
+                matrix: matrix4x4!(scale_all(0.5));
                 +{
                     let mut sphere = sphere!();
                     sphere.material = Material::air();
