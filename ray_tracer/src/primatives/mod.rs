@@ -12,5 +12,4 @@ pub use intersections::CylinderCapStyle;
 pub use shape::Shape;
 pub use surface::Surface;
 pub use shape_id::ShapeId;
-pub use surface::Surface;
 pub use triangle::Triangle;

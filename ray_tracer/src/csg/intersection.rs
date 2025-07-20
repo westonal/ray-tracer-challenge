@@ -114,7 +114,7 @@ mod filter_intersections_tests {
     use super::*;
     use crate::intersection::Intersection;
     use crate::primatives::{IntersectableShape, Shape};
-    use crate::{csg_cube, csg_sphere};
+    use crate::{csg_cube, csg_sphere, cube, sphere};
 
     #[test]
     fn single_csg_intersectable() {
@@ -127,8 +127,8 @@ mod filter_intersections_tests {
     fn union() {
         let c = csg_sphere!() + csg_cube!();
         // todo problem, intersectons requires intersectable shapes, these are fake
-        let sphere = Shape::new_sphere().to_intersectable();
-        let cube = Shape::new_cube().to_intersectable();
+        let sphere = sphere!().to_intersectable();
+        let cube = cube!().to_intersectable();
         let intersections = vec![
             Intersection::new(1., &sphere),
             Intersection::new(2., &cube),
