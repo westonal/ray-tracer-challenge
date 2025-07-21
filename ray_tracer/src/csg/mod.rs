@@ -14,7 +14,7 @@ pub use filtering::Filter;
 macro_rules! csg {
     ($shape:expr) => {
         {
-            $crate::csg::CN::Leaf($shape)
+            $crate::csg::CN::Leaf($shape.into())
         }
     };
 }
@@ -51,14 +51,14 @@ pub enum CN {
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::scene!(+$crate::sphere!($(matrix: $matrix)?);))
+        $crate::csg!($crate::sphere!($(matrix: $matrix)?))
     };
 }
 
 #[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::scene!(+$crate::cube!($(matrix: $matrix)?);))
+        $crate::csg!($crate::cube!($(matrix: $matrix)?))
     };
 }
 

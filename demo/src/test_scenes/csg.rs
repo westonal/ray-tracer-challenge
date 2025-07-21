@@ -1,7 +1,7 @@
 use crate::test_scenes::TestScene;
+use math::matrix::matrix_4x4::Matrix4x4ScaleAll;
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
-use math::matrix::matrix_4x4::Matrix4x4ScaleAll;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -36,8 +36,8 @@ impl TestScene for Csg {
                 translation(0., 4., 0.)
                 scale_all(4.)
             );
-            +csg!(scene!(+cube!();)) - csg!(scene!(+sphere!(matrix: matrix4x4!(scale_all(1.3)));)) ^
-                csg!(scene!(+sphere!(matrix: matrix4x4!(scale_all(1.5)));));
+            +csg!(cube!()) - csg!(sphere!(matrix: matrix4x4!(scale_all(1.3)))) ^
+                csg!(sphere!(matrix: matrix4x4!(scale_all(1.5))));
             //+sphere!();
         ));
         world

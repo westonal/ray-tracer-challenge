@@ -60,7 +60,8 @@ macro_rules! assert_chain {
 
 #[cfg(test)]
 mod filter_intersections_tests {
-    use super::*;
+    use crate::scene_tree::FlattenTree;
+use super::*;
     use crate::intersection::Intersection;
     use crate::primatives::{IntersectableShape, Shape, Surface};
     use crate::scene_tree::Chain;
