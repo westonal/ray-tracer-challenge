@@ -110,7 +110,6 @@ mod by_operation_intersection_filtering_tests {
 mod intersection_in_flat_tree_tests {
     use super::*;
     use crate::intersection::Intersect;
-    use crate::{csg_sphere, ray, sphere};
     use math::{point, vector};
 
     macro_rules! operation_intersections {

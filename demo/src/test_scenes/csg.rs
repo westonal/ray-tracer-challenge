@@ -46,6 +46,19 @@ impl TestScene for Csg {
                     sphere
                 })
             };
+            // Glass core
+            // TODO investigate: cube casts shadow but only when above is uncommented
+            //   Possible failure to count correctly in the flat tree
+            +{
+                csg!({
+                    let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.25)));
+                    sphere.material = Material::glass();
+                    sphere
+                }) ^ csg!(
+                    {let mut cube = cube!();
+                        cube.material = Material::glass();
+                    cube})
+            };
         ));
         world
     }
