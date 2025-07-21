@@ -1,4 +1,4 @@
-use crate::scene_tree::FlattenTree;
+use crate::scene_tree::{Chain, FlatScene, FlattenTree};
 mod default;
 pub mod shading;
 mod shadows;
@@ -20,13 +20,23 @@ pub struct World {
 
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
+        let scene = self.scene_tree.flatten();
+        debug_print(&scene);
         RenderableWorld {
-            flat_scene: self.scene_tree.flatten(),
+            flat_scene: scene,
             lights: &self.lights,
             background: self.background,
             max_ray_generation: self.max_ray_generation,
         }
     }
+}
+
+fn debug_print(scene: &Vec<Chain>) {
+    println!("== SCENE ==");
+    for (i,s) in scene.iter().enumerate(){
+        println!("{}: {:?}", i, s);
+    }
+    println!("== END ==");
 }
 
 impl World {
