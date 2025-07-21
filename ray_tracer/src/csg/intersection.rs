@@ -1,5 +1,3 @@
-use std::iter::Flatten;
-use math::matrix4x4;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
 use crate::csg::{CN, CSGOperation};
@@ -7,6 +5,9 @@ use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
 use crate::scene_tree::{FlatScene, FlattenTree, SceneTree};
 use crate::transform::Transform;
+use math::matrix4x4;
+use std::iter::Flatten;
+use std::ops::Not;
 
 pub enum SideHit {
     /// The left hand side was hit
@@ -15,7 +16,7 @@ pub enum SideHit {
     Right,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum HitLocation {
     /// The hit occurs on the outside of the shape
     Outside,
@@ -23,7 +24,18 @@ pub enum HitLocation {
     Inside,
 }
 
-fn intersection_allowed(
+impl Not for HitLocation{
+    type Output = HitLocation;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Outside => Inside,
+            Inside => Outside,
+        }
+    }
+}
+
+pub(crate) fn intersection_allowed(
     csg_operation: CSGOperation,
     side_hit: SideHit,
     left_hit: HitLocation,
@@ -92,4 +104,36 @@ mod by_operation_intersection_filtering_tests {
         difference_g; side: Right, left: Outside, right: Inside  => false
         difference_h; side: Right, left: Outside, right: Outside => false
     );
+}
+
+#[cfg(test)]
+mod intersection_in_flat_tree_tests {
+    use super::*;
+    use crate::intersection::Intersect;
+    use crate::{csg_sphere, ray, sphere};
+    use math::{point, vector};
+
+    macro_rules! operation_intersections {
+        ($($name:ident; $operation:tt => $expect:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    let ray = $crate::ray!(point!(-2, 0, 0), vector!(1, 0, 0));
+                    let cn = $crate::csg_sphere!() $operation $crate::csg_sphere!(matrix: matrix4x4!(translation(0.5, 0., 0.)));
+                    let flat_scene = cn.flatten();
+                    let intersections = flat_scene.intersect(&ray);
+                    assert_eq!($expect, intersections.iter().map(|i| i.t).collect::<Vec<_>>());
+                    assert!(flat_scene.fast_hit(&ray))
+                }
+            )*
+        };
+    }
+
+    // All intersections are [1.0, 1.5, 3.0, 3.5]
+    operation_intersections!(
+        union;        + => vec![1., 3.5]
+        difference;   - => vec![1., 1.5]
+        intersection; ^ => vec![1.5, 3.0]
+    );
+
 }

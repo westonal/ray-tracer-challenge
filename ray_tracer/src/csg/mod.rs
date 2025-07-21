@@ -1,11 +1,14 @@
 mod intersection;
 mod build_chain;
+mod filtering;
 
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, BitXor, Sub};
 use crate::primatives::{Shape, ShapeId, Surface};
 use crate::scene_tree::SceneTree;
+pub use filtering::TProvider;
+pub use filtering::Filter;
 
 #[macro_export]
 macro_rules! csg {
@@ -48,14 +51,14 @@ pub enum CN {
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::scene!(+$crate::sphere!($(matrix: $matrix;)?);))
+        $crate::csg!($crate::scene!(+$crate::sphere!($(matrix: $matrix)?);))
     };
 }
 
 #[macro_export]
 macro_rules! csg_cube {
     ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::scene!(+$crate::cube!($(matrix: $matrix;)?);))
+        $crate::csg!($crate::scene!(+$crate::cube!($(matrix: $matrix)?);))
     };
 }
 

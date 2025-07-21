@@ -173,5 +173,6 @@ mod filter_intersections_tests {
             Intersection::new(3., &sphere),
             Intersection::new(4., &cube),
         ];
+        
     }
 }
