@@ -73,15 +73,19 @@ impl Intersect for [Chain] {
                     results += s.intersect(ray);
                 }
                 Chain::CSG(operation, lhs_length, rhs_length) => {
-                    i = i + 1;
-                    let lhs = &self[i..i + lhs_length];
-                    i = i + lhs_length;
-                    let rhs = &self[i..i + rhs_length];
-                    i = i + rhs_length;
+                    let lhs_start = i + 1;
+                    let lhs = &self[lhs_start..lhs_start + lhs_length];
+                    let rhs_start = lhs_start + lhs_length;
+                    let rhs = &self[rhs_start..rhs_start + rhs_length];
                     let lhs_intersections = lhs.intersect(ray);
                     let rhs_intersections = rhs.intersect(ray);
-                    let vec = Filter::filter::<Intersection<'_>>(*operation, lhs_intersections.into(), rhs_intersections.into());
+                    let vec = Filter::filter::<Intersection<'_>>(
+                        *operation,
+                        lhs_intersections.into(),
+                        rhs_intersections.into(),
+                    );
                     results += Intersections::new(vec);
+                    i = i + lhs_length + rhs_length;
                 }
             }
             i = i + 1;
