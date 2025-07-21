@@ -45,38 +45,54 @@ impl Deref for FlatScene {
     }
 }
 
-impl DerefMut for FlatScene{
+impl DerefMut for FlatScene {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.chain
     }
 }
 
+// }
+
 // impl Intersect for FlatScene {
 //     fn intersect(&self, ray: &Ray) -> Intersections {
 //         self.chain.intersect(ray)
 //     }
-// }
+macro_rules! next {
+    ($expr:expr) => {
+        {
+            let result = $expr.get(0).unwrap();
+            $expr = &$expr[1..];
+            result
+        }
+    };
+    ($expr:expr; count: $count:expr) => {
+        {
+            let count = $count + 0usize;
+            let result = &$expr[..count];
+            $expr = &$expr[count..];
+            result
+        }
+    };
+}
 
 impl Intersect for [Chain] {
     fn intersect(&self, ray: &Ray) -> Intersections {
         let mut results = Intersections::default();
-        let mut i = 0;
-        while i < self.len() {
-            let item = self.get(i).unwrap();
+        let mut data = self;
+        while !data.is_empty() {
+            let item = next!(data);
             match item {
                 Chain::BoundingVolume(b, skip) => {
                     if !b.fast_hit(ray) {
-                        i = i + skip;
+                        next!(data; count: skip);
                     }
                 }
                 Chain::Shape(s) => {
                     results += s.intersect(ray);
                 }
                 Chain::CSG(operation, lhs_length, rhs_length) => {
-                    let lhs_start = i + 1;
-                    let lhs = &self[lhs_start..lhs_start + lhs_length];
-                    let rhs_start = lhs_start + lhs_length;
-                    let rhs = &self[rhs_start..rhs_start + rhs_length];
+                    let lhs: &[Chain] = next!(data; count: lhs_length);
+                    let rhs: &[Chain] = next!(data; count: rhs_length);
                     let lhs_intersections = lhs.intersect(ray);
                     let rhs_intersections = rhs.intersect(ray);
                     let vec = Filter::filter::<Intersection<'_>>(
@@ -85,10 +101,8 @@ impl Intersect for [Chain] {
                         rhs_intersections.into(),
                     );
                     results += Intersections::new(vec);
-                    i = i + lhs_length + rhs_length;
                 }
             }
-            i = i + 1;
         }
         results
     }

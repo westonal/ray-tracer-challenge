@@ -36,6 +36,7 @@ impl TestScene for Csg {
                 translation(0., 4., 0.)
                 scale_all(4.)
             );
+            bounding_volume: cube!();
             +{
                 csg!(cube!()) - csg!({
                     let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.25)));
