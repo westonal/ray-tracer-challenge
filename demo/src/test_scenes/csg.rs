@@ -36,9 +36,16 @@ impl TestScene for Csg {
                 translation(0., 4., 0.)
                 scale_all(4.)
             );
-            +csg!(cube!()) - csg!(sphere!(matrix: matrix4x4!(scale_all(1.3)))) ^
-                csg!(sphere!(matrix: matrix4x4!(scale_all(1.5))));
-            //+sphere!();
+            +{
+                csg!(cube!()) - csg!({
+                    let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.25)));
+                    sphere.material.pattern = Pattern::Solid(*RED);
+                    sphere
+                }) ^ csg!({let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.45)));
+                    sphere.material.pattern = Pattern::Solid(*BLUE);
+                    sphere
+                })
+            };
         ));
         world
     }
