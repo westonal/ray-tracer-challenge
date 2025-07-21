@@ -3,14 +3,24 @@ use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
 
+pub trait FlattenTreeWithMatrix {
+    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene;
+}
+
 pub trait FlattenTree {
     fn flatten(&self) -> FlatScene;
 }
 
-impl FlattenTree for SceneTree {
+impl<T: FlattenTreeWithMatrix> FlattenTree for T {
     fn flatten(&self) -> FlatScene {
+        self.flatten_with_matrix(matrix4x4!())
+    }
+}
+
+impl FlattenTreeWithMatrix for SceneTree{
+    fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, matrix4x4!());
+        self.walk(&mut chain, matrix4x4);
         FlatScene::new(chain)
     }
 }
@@ -23,9 +33,7 @@ impl SceneTree {
                 shape.matrix = tree_matrix * shape.matrix;
                 into.push(Chain::Shape(shape.to_intersectable()))
             }
-            SceneTree::CsgLeaf(csg) => {
-                into.append(&mut csg.flatten())
-            }
+            SceneTree::CsgLeaf(csg) => into.append(&mut csg.flatten_with_matrix(tree_matrix)),
             SceneTree::Group {
                 children,
                 matrix,

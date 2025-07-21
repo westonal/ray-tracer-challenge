@@ -1,6 +1,6 @@
 pub mod camera;
 pub mod canvas;
-mod csg;
+pub mod csg;
 pub mod intersection;
 pub mod lighting;
 pub mod material;

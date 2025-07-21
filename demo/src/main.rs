@@ -2,6 +2,7 @@ use demo::test_scenes::RenderTestScene;
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
+use demo::test_scenes::csg::Csg;
 use demo::test_scenes::cube_of_spheres::CubeOfSpheres;
 use demo::test_scenes::cubes::Cubes;
 use demo::test_scenes::cylinders::Cylinders;
@@ -13,6 +14,8 @@ use ray_tracer::canvas::Size;
 
 fn main() {
     let size = Size::HD_720P;
+    Csg::render_scene(size);
+    return;
     Teapot::render_scene(size);
     Pawn::render_scene(size);
     Queen::render_scene(size);

@@ -6,6 +6,7 @@ use crate::primatives::Shape;
 pub use flat_scene:: FlatScene;
 pub(crate) use flat_scene:: Chain;
 pub use flatten::FlattenTree;
+pub use flatten::FlattenTreeWithMatrix;
 use math::matrix::matrix_4x4::Matrix4x4;
 use crate::csg::CN;
 

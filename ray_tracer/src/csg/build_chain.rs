@@ -3,22 +3,23 @@ use crate::csg::intersection::SideHit::*;
 use crate::csg::{CN, CSGOperation};
 use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
-use crate::scene_tree::{Chain, FlatScene, FlattenTree, SceneTree};
+use crate::scene_tree::{Chain, FlatScene, FlattenTreeWithMatrix, SceneTree};
 use crate::transform::Transform;
 use math::matrix4x4;
 use std::iter::Flatten;
+use math::matrix::matrix_4x4::Matrix4x4;
 
-impl FlattenTree for CN {
-    fn flatten(&self) -> FlatScene {
+impl FlattenTreeWithMatrix for CN {
+    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
         // TODO write left and right to the chain
         match self {
             CN::Leaf(scene) => {
-                chain.append(&mut scene.flatten());
+                chain.append(&mut scene.flatten_with_matrix(matrix));
             }
             CN::Tree(lhs, op, rhs) => {
-                let mut lhs = lhs.flatten();
-                let mut rhs = rhs.flatten();
+                let mut lhs = lhs.flatten_with_matrix(matrix);
+                let mut rhs = rhs.flatten_with_matrix(matrix);
                 chain.push(Chain::CSG(*op, lhs.len(), rhs.len()));
                 chain.append(&mut lhs);
                 chain.append(&mut rhs);
@@ -173,6 +174,6 @@ mod filter_intersections_tests {
             Intersection::new(3., &sphere),
             Intersection::new(4., &cube),
         ];
-        
+
     }
 }
