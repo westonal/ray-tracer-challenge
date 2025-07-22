@@ -46,14 +46,6 @@ impl SceneTree {
             children: Default::default(),
         }
     }
-
-    pub fn new_bounded_opt(matrix: Matrix4x4, bounding_shape: Option<Shape>) -> Self {
-        if let Some(b) = bounding_shape {
-            Self::new_bounded(matrix, b)
-        } else {
-            Self::new(matrix)
-        }
-    }
 }
 
 impl From<Shape> for SceneTree {
