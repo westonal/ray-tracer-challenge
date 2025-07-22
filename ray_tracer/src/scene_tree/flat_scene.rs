@@ -58,21 +58,17 @@ impl DerefMut for FlatScene {
 //         self.chain.intersect(ray)
 //     }
 macro_rules! next {
-    ($expr:expr) => {
-        {
-            let result = $expr.get(0).unwrap();
-            $expr = &$expr[1..];
-            result
-        }
-    };
-    ($expr:expr; count: $count:expr) => {
-        {
-            let count = $count + 0usize;
-            let result = &$expr[..count];
-            $expr = &$expr[count..];
-            result
-        }
-    };
+    ($expr:expr) => {{
+        let result = $expr.get(0).unwrap();
+        $expr = &$expr[1..];
+        result
+    }};
+    ($expr:expr; count: $count:expr) => {{
+        let count = $count + 0usize;
+        let result = &$expr[..count];
+        $expr = &$expr[count..];
+        result
+    }};
 }
 
 impl Intersect for [Chain] {

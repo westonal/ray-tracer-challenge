@@ -1,6 +1,6 @@
-mod intersection;
 mod build_chain;
 mod filtering;
+mod intersection;
 
 use crate::primatives::Shape;
 use crate::scene;
@@ -8,10 +8,9 @@ use crate::scene_tree::SceneTree;
 pub use filtering::Filter;
 pub use filtering::TProvider;
 use std::fmt::{Debug, Formatter};
-use std::ops::{Add, BitAnd, BitXor, Sub};
+use std::ops::{Add, BitAnd, Sub};
 
-#[derive(Copy)]
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub enum CSGOperation {
     Union,
     Intersection,
@@ -42,8 +41,8 @@ impl Debug for SceneTree {
             }
             SceneTree::CsgLeaf(lhs, operation, rhs) => {
                 write!(f, "({:?} {:?} {:?})", lhs, operation, rhs)
-            },
-            &SceneTree::Group { .. } => todo!()
+            }
+            &SceneTree::Group { .. } => todo!(),
         }
     }
 }
@@ -98,7 +97,7 @@ impl<T: Into<SceneTree>> BitAnd<T> for SceneTree {
 
 #[cfg(test)]
 mod constructive_solid_geometry_dsl_tests {
-    use super::*;
+
     use crate::{cube, scene, sphere};
 
     #[test]

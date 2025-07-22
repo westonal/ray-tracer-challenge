@@ -1,6 +1,5 @@
 use crate::csg::CSGOperation;
 use crate::csg::intersection::{HitLocation, SideHit, intersection_allowed};
-use crate::primatives::ShapeId;
 
 pub struct Filter {}
 
@@ -9,11 +8,7 @@ pub trait TProvider {
 }
 
 impl Filter {
-    pub fn filter<T: TProvider>(
-        csg_operation: CSGOperation,
-        lhs: Vec<T>,
-        rhs: Vec<T>,
-    ) -> Vec<T> {
+    pub fn filter<T: TProvider>(csg_operation: CSGOperation, lhs: Vec<T>, rhs: Vec<T>) -> Vec<T> {
         let mut annotated_lhs: Vec<(T, SideHit)> =
             lhs.into_iter().map(|f| (f, SideHit::Left)).collect();
         let mut annotated_rhs: Vec<(T, SideHit)> =
@@ -34,12 +29,7 @@ impl Filter {
                 SideHit::Left => left_location = !left_location,
                 SideHit::Right => right_location = !right_location,
             }
-            if intersection_allowed(
-                csg_operation,
-                side,
-                left_location,
-                right_location,
-            ) {
+            if intersection_allowed(csg_operation, side, left_location, right_location) {
                 filtered.push(t);
             }
         }
@@ -49,12 +39,7 @@ impl Filter {
 
 #[cfg(test)]
 mod filter_tests {
-    use super::*;
 
     #[test]
-    fn a() {
-        
-        
-        
-    }
+    fn a() {}
 }

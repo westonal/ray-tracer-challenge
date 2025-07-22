@@ -1,12 +1,8 @@
+use crate::csg::CSGOperation;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
-use crate::csg::{CSGOperation};
-use crate::material::Material;
-use crate::primatives::{IntersectableShape, Shape};
-use crate::scene_tree::{FlatScene, FlattenTree, SceneTree};
-use crate::transform::Transform;
+use crate::scene_tree::FlattenTree;
 use math::matrix4x4;
-use std::iter::Flatten;
 use std::ops::Not;
 
 pub enum SideHit {
@@ -24,7 +20,7 @@ pub enum HitLocation {
     Inside,
 }
 
-impl Not for HitLocation{
+impl Not for HitLocation {
     type Output = HitLocation;
 
     fn not(self) -> Self::Output {
@@ -134,5 +130,4 @@ mod intersection_in_flat_tree_tests {
         difference;   - => vec![1., 1.5]
         intersection; & => vec![1.5, 3.0]
     );
-
 }

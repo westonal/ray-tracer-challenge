@@ -4,10 +4,9 @@ use crate::primatives::ShapeId;
 use crate::primatives::surface::Surface;
 use crate::rays::Ray;
 use crate::transform::Transform;
-use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
-use std::fmt::{Debug, Formatter, write};
+use std::fmt::{Debug, Formatter};
 
 #[derive(PartialEq, Clone)]
 pub struct IntersectableShape {

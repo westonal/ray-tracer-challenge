@@ -2,13 +2,13 @@ mod flat_scene;
 mod flatten;
 mod manipulation;
 
+use crate::csg::CSGOperation;
 use crate::primatives::Shape;
-pub use flat_scene:: FlatScene;
-pub(crate) use flat_scene:: Chain;
+pub(crate) use flat_scene::Chain;
+pub use flat_scene::FlatScene;
 pub use flatten::FlattenTree;
 pub use flatten::FlattenTreeWithMatrix;
 use math::matrix::matrix_4x4::Matrix4x4;
-use crate::csg::{CSGOperation};
 
 pub enum SceneTree {
     Leaf(Shape),
@@ -70,7 +70,7 @@ macro_rules! scene {
             tree
         }
     };
-    
+
     ($(matrix:$matrix:expr;)?
      $(bounding_volume:$bounding_volume:expr;)?
      $(+$entry:expr;)*

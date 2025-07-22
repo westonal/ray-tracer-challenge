@@ -1,9 +1,9 @@
+use crate::csg::TProvider;
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::IntersectableShape;
 use crate::primatives::ShapeId;
 use crate::rays::Ray;
 use std::ops::{AddAssign, Deref};
-use crate::csg::TProvider;
 
 pub trait Intersect {
     fn intersect(&self, ray: &Ray) -> Intersections;
@@ -26,7 +26,7 @@ pub struct UVt {
     pub t: f32,
 }
 
-impl TProvider for UVt{
+impl TProvider for UVt {
     fn t(&self) -> f32 {
         self.t
     }
@@ -53,7 +53,7 @@ pub struct Intersection<'s> {
     pub shape: &'s IntersectableShape,
 }
 
-impl TProvider for Intersection<'_>{
+impl TProvider for Intersection<'_> {
     fn t(&self) -> f32 {
         self.t
     }
@@ -78,7 +78,7 @@ impl<'s> Intersections<'s> {
     }
 }
 
-impl<'s> From<Intersections<'s>> for Vec<Intersection<'s>>{
+impl<'s> From<Intersections<'s>> for Vec<Intersection<'s>> {
     fn from(value: Intersections<'s>) -> Self {
         value.0
     }

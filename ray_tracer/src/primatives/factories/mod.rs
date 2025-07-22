@@ -2,11 +2,24 @@ mod triangle;
 
 #[macro_export]
 macro_rules! shape {
-    (surface: $surface:expr; $(matrix: $matrix:expr)?) => {
+    (
+        surface: $surface:expr;
+    ) => {
+        $crate::primatives::Shape::new(math::matrix::matrix_4x4::Matrix4x4::identity(), $surface)
+    };
+    (
+        surface: $surface:expr;
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr;)?
+    ) => {
         {
             let mut _m = math::matrix::matrix_4x4::Matrix4x4::identity();
             $(_m = $matrix;)?
-            $crate::primatives::Shape::new(_m, $surface)
+            let mut shape = $crate::primatives::Shape::new(_m, $surface);
+            $(shape.material = $material;)?
+            $(shape.material.pattern = $pattern;)?
+            shape
         }
     };
 }
@@ -14,35 +27,83 @@ macro_rules! shape {
 #[macro_export]
 macro_rules! sphere {
     ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::UnitSphere; $(matrix: $matrix)?)
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitSphere;
+            $(matrix: $matrix;)?
+        )
+    };
+
+    (
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr$(;)?)?
+    ) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitSphere;
+            $(matrix: $matrix;)?
+            $(material: $material;)?
+            $(pattern: $pattern;)?
+        )
     };
 }
 
 #[macro_export]
 macro_rules! plane {
-    ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::PlaneXZ; $(matrix: $matrix)?)
+   ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::PlaneXZ;
+            $(matrix: $matrix;)?
+        )
+    };
+
+    (
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr$(;)?)?
+    ) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::PlaneXZ;
+            $(matrix: $matrix;)?
+            $(material: $material;)?
+            $(pattern: $pattern;)?
+        )
     };
 }
 
 #[macro_export]
 macro_rules! cube {
-    ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::UnitCube; $(matrix: $matrix)?)
+        ($(matrix: $matrix:expr)?) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitCube;
+            $(matrix: $matrix;)?
+        )
+    };
+
+    (
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr$(;)?)?
+    ) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitCube;
+            $(matrix: $matrix;)?
+            $(material: $material;)?
+            $($pattern: $pattern;)?
+        )
     };
 }
 
 #[macro_export]
 macro_rules! cylinder {
     ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed); $(matrix: $matrix)?)
+        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed); $(matrix: $matrix;)?)
     };
 }
 
 #[macro_export]
 macro_rules! cylinder_open {
     ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Open); $(matrix: $matrix)?)
+        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Open); $(matrix: $matrix;)?)
     };
 }
 

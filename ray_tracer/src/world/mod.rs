@@ -1,4 +1,4 @@
-use crate::scene_tree::{Chain, FlatScene, FlattenTree};
+use crate::scene_tree::{Chain, FlattenTree};
 mod default;
 pub mod shading;
 mod shadows;
@@ -33,7 +33,7 @@ impl<'w> World {
 
 fn debug_print(scene: &Vec<Chain>) {
     println!("== SCENE ==");
-    for (i,s) in scene.iter().enumerate(){
+    for (i, s) in scene.iter().enumerate() {
         println!("{}: {:?}", i, s);
     }
     println!("== END ==");

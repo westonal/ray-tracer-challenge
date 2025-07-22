@@ -17,7 +17,7 @@ impl<T: FlattenTreeWithMatrix> FlattenTree for T {
     }
 }
 
-impl FlattenTreeWithMatrix for SceneTree{
+impl FlattenTreeWithMatrix for SceneTree {
     fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
         self.walk(&mut chain, matrix4x4);

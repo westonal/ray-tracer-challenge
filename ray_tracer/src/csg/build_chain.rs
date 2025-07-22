@@ -1,13 +1,4 @@
-use crate::csg::intersection::HitLocation::*;
-use crate::csg::intersection::SideHit::*;
-use crate::csg::{CSGOperation};
-use crate::material::Material;
-use crate::primatives::{IntersectableShape, Shape};
-use crate::scene_tree::{Chain, FlatScene, FlattenTreeWithMatrix, SceneTree};
-use crate::transform::Transform;
-use math::matrix4x4;
-use std::iter::Flatten;
-use math::matrix::matrix_4x4::Matrix4x4;
+use crate::csg::CSGOperation;
 
 #[cfg(test)]
 macro_rules! assert_chain {
@@ -34,10 +25,10 @@ macro_rules! assert_chain {
 
 #[cfg(test)]
 mod filter_intersections_tests {
+    use super::*;
     use crate::scene_tree::FlattenTree;
-use super::*;
-    use crate::intersection::Intersection;
-    use crate::primatives::{IntersectableShape, Shape, Surface};
+
+    use crate::primatives::Surface;
     use crate::scene_tree::Chain;
     use crate::{cube, scene, sphere};
 
