@@ -33,7 +33,13 @@ impl SceneTree {
                 shape.matrix = tree_matrix * shape.matrix;
                 into.push(Chain::Shape(shape.to_intersectable()))
             }
-            SceneTree::CsgLeaf(csg) => into.append(&mut csg.flatten_with_matrix(tree_matrix)),
+            SceneTree::CsgLeaf(lhs, operation, rhs) => {
+                let mut lhs = lhs.flatten_with_matrix(tree_matrix);
+                let mut rhs = rhs.flatten_with_matrix(tree_matrix);
+                into.push(Chain::CSG(*operation, lhs.len(), rhs.len()));
+                into.append(&mut lhs);
+                into.append(&mut rhs);
+            }
             SceneTree::Group {
                 children,
                 matrix,

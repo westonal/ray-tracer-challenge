@@ -1,6 +1,6 @@
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
-use crate::csg::{CN, CSGOperation};
+use crate::csg::{CSGOperation};
 use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
 use crate::scene_tree::{FlatScene, FlattenTree, SceneTree};

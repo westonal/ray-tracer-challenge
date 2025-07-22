@@ -8,11 +8,11 @@ pub(crate) use flat_scene:: Chain;
 pub use flatten::FlattenTree;
 pub use flatten::FlattenTreeWithMatrix;
 use math::matrix::matrix_4x4::Matrix4x4;
-use crate::csg::CN;
+use crate::csg::{CSGOperation};
 
 pub enum SceneTree {
     Leaf(Shape),
-    CsgLeaf(Box<CN>),
+    CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
     Group {
         matrix: Matrix4x4,
         bounding_shape: Option<Shape>,

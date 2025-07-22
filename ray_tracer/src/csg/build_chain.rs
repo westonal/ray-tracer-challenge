@@ -1,6 +1,6 @@
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
-use crate::csg::{CN, CSGOperation};
+use crate::csg::{CSGOperation};
 use crate::material::Material;
 use crate::primatives::{IntersectableShape, Shape};
 use crate::scene_tree::{Chain, FlatScene, FlattenTreeWithMatrix, SceneTree};
@@ -9,31 +9,31 @@ use math::matrix4x4;
 use std::iter::Flatten;
 use math::matrix::matrix_4x4::Matrix4x4;
 
-impl FlattenTreeWithMatrix for CN {
-    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene {
-        let mut chain = vec![];
-        // TODO write left and right to the chain
-        match self {
-            CN::Leaf(scene) => {
-                chain.append(&mut scene.flatten_with_matrix(matrix));
-            }
-            CN::Tree(lhs, op, rhs) => {
-                let mut lhs = lhs.flatten_with_matrix(matrix);
-                let mut rhs = rhs.flatten_with_matrix(matrix);
-                chain.push(Chain::CSG(*op, lhs.len(), rhs.len()));
-                chain.append(&mut lhs);
-                chain.append(&mut rhs);
-            }
-        }
-        FlatScene::new(chain)
-    }
-}
-
-impl From<CN> for SceneTree {
-    fn from(value: CN) -> Self {
-        SceneTree::CsgLeaf(Box::new(value))
-    }
-}
+// impl FlattenTreeWithMatrix for CN {
+//     fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene {
+//         let mut chain = vec![];
+//         // TODO write left and right to the chain
+//         match self {
+//             CN::Leaf(scene) => {
+//                 chain.append(&mut scene.flatten_with_matrix(matrix));
+//             }
+//             CN::Tree(lhs, op, rhs) => {
+//                 let mut lhs = lhs.flatten_with_matrix(matrix);
+//                 let mut rhs = rhs.flatten_with_matrix(matrix);
+//                 chain.push(Chain::CSG(*op, lhs.len(), rhs.len()));
+//                 chain.append(&mut lhs);
+//                 chain.append(&mut rhs);
+//             }
+//         }
+//         FlatScene::new(chain)
+//     }
+// }
+//
+// impl From<CN> for SceneTree {
+//     fn from(value: CN) -> Self {
+//         SceneTree::CsgLeaf(Box::new(value))
+//     }
+// }
 
 #[cfg(test)]
 macro_rules! assert_chain {
@@ -161,20 +161,5 @@ use super::*;
                 Surface::UnitCube,
             ]
         );
-    }
-
-    #[test]
-    fn union() {
-        let c = csg_sphere!() + csg_cube!();
-        // todo problem, intersectons requires intersectable shapes, these are fake
-        let sphere = sphere!().to_intersectable();
-        let cube = cube!().to_intersectable();
-        let intersections = vec![
-            Intersection::new(1., &sphere),
-            Intersection::new(2., &cube),
-            Intersection::new(3., &sphere),
-            Intersection::new(4., &cube),
-        ];
-
     }
 }

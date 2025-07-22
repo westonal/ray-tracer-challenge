@@ -14,7 +14,8 @@ pub use filtering::Filter;
 macro_rules! csg {
     ($shape:expr) => {
         {
-            $crate::csg::CN::Leaf($shape.into())
+            let scene: $crate::scene_tree::SceneTree = $shape.into();
+            scene
         }
     };
 }
@@ -43,11 +44,6 @@ impl Debug for CSGOperation {
     }
 }
 
-pub enum CN {
-    Leaf(SceneTree),
-    Tree(Box<CN>, CSGOperation, Box<CN>),
-}
-
 #[macro_export]
 macro_rules! csg_sphere {
     ($(matrix: $matrix:expr)?) => {
@@ -62,40 +58,41 @@ macro_rules! csg_cube {
     };
 }
 
-impl Debug for CN {
+impl Debug for SceneTree {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            CN::Leaf(shape, ..) => {
-                write!(f, "{:?}", shape.shape_count())
+            SceneTree::Leaf(shape, ..) => {
+                write!(f, "{:?}", shape.surface)
             }
-            CN::Tree(lhs, operation, rhs) => {
+            SceneTree::CsgLeaf(lhs, operation, rhs) => {
                 write!(f, "({:?} {:?} {:?})", lhs, operation, rhs)
-            }
+            },
+            &SceneTree::Group { .. } => todo!()
         }
     }
 }
 
-impl Add for CN {
-    type Output = CN;
+impl Add for SceneTree {
+    type Output = SceneTree;
 
     fn add(self, rhs: Self) -> Self::Output {
-        CN::Tree(self.into(), CSGOperation::Union, rhs.into())
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Union, rhs.into())
     }
 }
 
-impl Sub for CN {
-    type Output = CN;
+impl Sub for SceneTree {
+    type Output = SceneTree;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        CN::Tree(self.into(), CSGOperation::Difference, rhs.into())
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Difference, rhs.into())
     }
 }
 
-impl BitXor for CN {
-    type Output = CN;
+impl BitXor for SceneTree {
+    type Output = SceneTree;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
-        CN::Tree(self.into(), CSGOperation::Intersection, rhs.into())
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Intersection, rhs.into())
     }
 }
 

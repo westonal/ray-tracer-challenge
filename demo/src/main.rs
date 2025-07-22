@@ -15,6 +15,7 @@ use ray_tracer::canvas::Size;
 fn main() {
     let size = Size::HD_720P;
     Csg::render_scene(size);
+    return;
     Teapot::render_scene(size);
     Pawn::render_scene(size);
     Queen::render_scene(size);
