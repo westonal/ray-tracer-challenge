@@ -38,25 +38,23 @@ impl TestScene for Csg {
             );
             bounding_volume: cube!();
             +{
-                csg!(cube!()) - csg!({
+                cube!() - {
                     let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.25)));
                     sphere.material.pattern = Pattern::Solid(*RED);
                     sphere
-                }) ^ csg!({let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.45)));
+                } & {let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.45)));
                     sphere.material.pattern = Pattern::Solid(*BLUE);
                     sphere
-                })
+                }
             };
             // Glass core
             +{
-                csg!({
-                    let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.2499)));
-                    sphere.material = Material::glass();
-                    sphere
-                }) ^ csg!(
-                {let mut cube = cube!();
-                    cube.material = Material::glass();
-                cube})
+                let mut sphere = sphere!(matrix: matrix4x4!(scale_all(1.2499)));
+                sphere.material = Material::glass();
+                sphere
+            } & { let mut cube = cube!();
+                cube.material = Material::glass();
+                cube
             };
         ));
         world

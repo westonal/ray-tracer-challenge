@@ -2,23 +2,13 @@ mod intersection;
 mod build_chain;
 mod filtering;
 
-use math::matrix::matrix_4x4::Matrix4x4;
-use std::fmt::{Debug, Formatter};
-use std::ops::{Add, BitXor, Sub};
-use crate::primatives::{Shape, ShapeId, Surface};
+use crate::primatives::Shape;
+use crate::scene;
 use crate::scene_tree::SceneTree;
-pub use filtering::TProvider;
 pub use filtering::Filter;
-
-#[macro_export]
-macro_rules! csg {
-    ($shape:expr) => {
-        {
-            let scene: $crate::scene_tree::SceneTree = $shape.into();
-            scene
-        }
-    };
-}
+pub use filtering::TProvider;
+use std::fmt::{Debug, Formatter};
+use std::ops::{Add, BitAnd, BitXor, Sub};
 
 #[derive(Copy)]
 #[derive(Clone)]
@@ -44,20 +34,6 @@ impl Debug for CSGOperation {
     }
 }
 
-#[macro_export]
-macro_rules! csg_sphere {
-    ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::sphere!($(matrix: $matrix)?))
-    };
-}
-
-#[macro_export]
-macro_rules! csg_cube {
-    ($(matrix: $matrix:expr)?) => {
-        $crate::csg!($crate::cube!($(matrix: $matrix)?))
-    };
-}
-
 impl Debug for SceneTree {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -72,55 +48,134 @@ impl Debug for SceneTree {
     }
 }
 
-impl Add for SceneTree {
+impl<T: Into<SceneTree>> Add<T> for Shape {
     type Output = SceneTree;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        SceneTree::CsgLeaf(self.into(), CSGOperation::Union, rhs.into())
+    fn add(self, rhs: T) -> Self::Output {
+        scene!(self) + rhs
     }
 }
 
-impl Sub for SceneTree {
+impl<T: Into<SceneTree>> Add<T> for SceneTree {
     type Output = SceneTree;
 
-    fn sub(self, rhs: Self) -> Self::Output {
-        SceneTree::CsgLeaf(self.into(), CSGOperation::Difference, rhs.into())
+    fn add(self, rhs: T) -> Self::Output {
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Union, rhs.into().into())
     }
 }
 
-impl BitXor for SceneTree {
+impl<T: Into<SceneTree>> Sub<T> for Shape {
     type Output = SceneTree;
 
-    fn bitxor(self, rhs: Self) -> Self::Output {
-        SceneTree::CsgLeaf(self.into(), CSGOperation::Intersection, rhs.into())
+    fn sub(self, rhs: T) -> Self::Output {
+        scene!(self) - rhs
+    }
+}
+
+impl<T: Into<SceneTree>> Sub<T> for SceneTree {
+    type Output = SceneTree;
+
+    fn sub(self, rhs: T) -> Self::Output {
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Difference, rhs.into().into())
+    }
+}
+
+impl<T: Into<SceneTree>> BitAnd<T> for Shape {
+    type Output = SceneTree;
+
+    fn bitand(self, rhs: T) -> Self::Output {
+        scene!(self) & rhs
+    }
+}
+
+impl<T: Into<SceneTree>> BitAnd<T> for SceneTree {
+    type Output = SceneTree;
+
+    fn bitand(self, rhs: T) -> Self::Output {
+        SceneTree::CsgLeaf(self.into(), CSGOperation::Intersection, rhs.into().into())
     }
 }
 
 #[cfg(test)]
 mod constructive_solid_geometry_dsl_tests {
     use super::*;
+    use crate::{cube, scene, sphere};
 
     #[test]
-    fn union() {
-        let union = csg_sphere!() + csg_cube!();
-        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union))
+    fn union_scene_and_scene() {
+        let union = scene!(sphere!()) + scene!(cube!());
+        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union));
     }
 
     #[test]
-    fn intersection() {
-        let intersection = csg_sphere!() ^ csg_cube!();
-        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection))
+    fn union_scene_and_shape() {
+        let union = scene!(sphere!()) + cube!();
+        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union));
     }
 
     #[test]
-    fn difference() {
-        let difference = csg_sphere!() - csg_cube!();
-        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference))
+    fn union_shape_and_scene() {
+        let union = sphere!() + scene!(cube!());
+        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union));
+    }
+
+    #[test]
+    fn union_shape_and_shape() {
+        let union = sphere!() + cube!();
+        assert_eq!("(UnitSphere ∪ UnitCube)", format!("{:?}", union));
+    }
+
+    #[test]
+    fn intersection_scene_and_scene() {
+        let intersection = scene!(sphere!()) & scene!(cube!());
+        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection));
+    }
+
+    #[test]
+    fn intersection_scene_and_shape() {
+        let intersection = scene!(sphere!()) & cube!();
+        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection));
+    }
+
+    #[test]
+    fn intersection_shape_and_scene() {
+        let intersection = sphere!() & scene!(cube!());
+        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection));
+    }
+
+    #[test]
+    fn intersection_shape_and_shape() {
+        let intersection = sphere!() & cube!();
+        assert_eq!("(UnitSphere ∩ UnitCube)", format!("{:?}", intersection));
+    }
+
+    #[test]
+    fn difference_scene_and_scene() {
+        let difference = scene!(sphere!()) - scene!(cube!());
+        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference));
+    }
+
+    #[test]
+    fn difference_shape_and_scene() {
+        let difference = sphere!() - scene!(cube!());
+        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference));
+    }
+
+    #[test]
+    fn difference_scene_and_shape() {
+        let difference = scene!(sphere!()) - cube!();
+        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference));
+    }
+
+    #[test]
+    fn difference_shape_and_shape() {
+        let difference = sphere!() - cube!();
+        assert_eq!("(UnitSphere - UnitCube)", format!("{:?}", difference));
     }
 
     #[test]
     fn complex() {
-        let csg_tree = csg_sphere!() - (csg_cube!() + csg_cube!()) ^ csg_sphere!();
+        let csg_tree = sphere!() - (cube!() + cube!()) & sphere!();
         assert_eq!(
             "((UnitSphere - (UnitCube ∪ UnitCube)) ∩ UnitSphere)",
             format!("{:?}", csg_tree)

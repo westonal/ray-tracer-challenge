@@ -64,6 +64,13 @@ impl From<Shape> for SceneTree {
 
 #[macro_export]
 macro_rules! scene {
+    ($shape:expr) => {
+        {
+            let tree: $crate::scene_tree::SceneTree = $shape.into();
+            tree
+        }
+    };
+    
     ($(matrix:$matrix:expr;)?
      $(bounding_volume:$bounding_volume:expr;)?
      $(+$entry:expr;)*

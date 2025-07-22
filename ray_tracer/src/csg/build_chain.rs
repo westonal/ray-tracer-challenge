@@ -9,32 +9,6 @@ use math::matrix4x4;
 use std::iter::Flatten;
 use math::matrix::matrix_4x4::Matrix4x4;
 
-// impl FlattenTreeWithMatrix for CN {
-//     fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene {
-//         let mut chain = vec![];
-//         // TODO write left and right to the chain
-//         match self {
-//             CN::Leaf(scene) => {
-//                 chain.append(&mut scene.flatten_with_matrix(matrix));
-//             }
-//             CN::Tree(lhs, op, rhs) => {
-//                 let mut lhs = lhs.flatten_with_matrix(matrix);
-//                 let mut rhs = rhs.flatten_with_matrix(matrix);
-//                 chain.push(Chain::CSG(*op, lhs.len(), rhs.len()));
-//                 chain.append(&mut lhs);
-//                 chain.append(&mut rhs);
-//             }
-//         }
-//         FlatScene::new(chain)
-//     }
-// }
-//
-// impl From<CN> for SceneTree {
-//     fn from(value: CN) -> Self {
-//         SceneTree::CsgLeaf(Box::new(value))
-//     }
-// }
-
 #[cfg(test)]
 macro_rules! assert_chain {
     (actual: $actual:expr, expect: [$($surface:expr$(,)?)*]) => {
@@ -65,20 +39,11 @@ use super::*;
     use crate::intersection::Intersection;
     use crate::primatives::{IntersectableShape, Shape, Surface};
     use crate::scene_tree::Chain;
-    use crate::{csg_cube, csg_sphere, cube, scene, sphere};
-
-    #[test]
-    fn single_csg_intersectable() {
-        let csg = csg_sphere!();
-        assert_chain!(
-            actual: csg.flatten(),
-            expect: [Surface::UnitSphere]
-        );
-    }
+    use crate::{cube, scene, sphere};
 
     #[test]
     fn single_csg_in_a_scene() {
-        let scene = scene!(+csg_sphere!(););
+        let scene = scene!(+sphere!(););
         assert_chain!(
             actual: scene.flatten(),
             expect: [Surface::UnitSphere]
@@ -89,7 +54,7 @@ use super::*;
     fn single_csg_in_a_scene_with_bounds() {
         let scene = scene!(
             bounding_volume: cube!();
-            +csg_sphere!();
+            +sphere!();
         );
         assert_chain!(
             actual: scene.flatten(),
@@ -104,8 +69,8 @@ use super::*;
     fn two_csg_in_a_scene_with_bounds() {
         let scene = scene!(
             bounding_volume: cube!();
-            +csg_sphere!();
-            +csg_cube!();
+            +sphere!();
+            +cube!();
         );
         assert_chain!(
             actual: scene.flatten(),
@@ -122,7 +87,7 @@ use super::*;
     fn two_csg_union_in_a_scene_with_bounds() {
         let scene = scene!(
             bounding_volume: cube!();
-            +csg_sphere!() + csg_cube!();
+            +sphere!() + cube!();
         );
         assert_chain!(
             actual: scene.flatten(),
@@ -137,7 +102,7 @@ use super::*;
 
     #[test]
     fn single_csg_union() {
-        let csg = csg_sphere!() + csg_cube!();
+        let csg = sphere!() + cube!();
         assert_chain!(
             actual: csg.flatten(),
             expect: [
@@ -150,7 +115,7 @@ use super::*;
 
     #[test]
     fn single_csg_union_and_intersection() {
-        let csg = csg_sphere!() + (csg_cube!() ^ csg_cube!());
+        let csg = sphere!() + (cube!() & cube!());
         assert_chain!(
             actual: csg.flatten(),
             expect: [

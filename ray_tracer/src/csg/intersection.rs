@@ -118,7 +118,7 @@ mod intersection_in_flat_tree_tests {
                 #[test]
                 fn $name() {
                     let ray = $crate::ray!(point!(-2, 0, 0), vector!(1, 0, 0));
-                    let cn = $crate::csg_sphere!() $operation $crate::csg_sphere!(matrix: matrix4x4!(translation(0.5, 0., 0.)));
+                    let cn = $crate::sphere!() $operation $crate::sphere!(matrix: matrix4x4!(translation(0.5, 0., 0.)));
                     let flat_scene = cn.flatten();
                     let intersections = flat_scene.intersect(&ray);
                     assert_eq!($expect, intersections.iter().map(|i| i.t).collect::<Vec<_>>());
@@ -132,7 +132,7 @@ mod intersection_in_flat_tree_tests {
     operation_intersections!(
         union;        + => vec![1., 3.5]
         difference;   - => vec![1., 1.5]
-        intersection; ^ => vec![1.5, 3.0]
+        intersection; & => vec![1.5, 3.0]
     );
 
 }
