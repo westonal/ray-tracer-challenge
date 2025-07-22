@@ -1,8 +1,6 @@
 use crate::csg::CSGOperation;
 use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
-use crate::scene_tree::FlattenTree;
-use math::matrix4x4;
 use std::ops::Not;
 
 pub enum SideHit {
@@ -104,17 +102,17 @@ mod by_operation_intersection_filtering_tests {
 
 #[cfg(test)]
 mod intersection_in_flat_tree_tests {
-    use super::*;
+
     use crate::intersection::Intersect;
-    use math::{point, vector};
+    use crate::scene_tree::FlattenTree;
 
     macro_rules! operation_intersections {
         ($($name:ident; $operation:tt => $expect:expr)*) => {
             $(
                 #[test]
                 fn $name() {
-                    let ray = $crate::ray!(point!(-2, 0, 0), vector!(1, 0, 0));
-                    let cn = $crate::sphere!() $operation $crate::sphere!(matrix: matrix4x4!(translation(0.5, 0., 0.)));
+                    let ray = $crate::ray!(math::point!(-2, 0, 0), math::vector!(1, 0, 0));
+                    let cn = $crate::sphere!() $operation $crate::sphere!(matrix: math::matrix4x4!(translation(0.5, 0., 0.)));
                     let flat_scene = cn.flatten();
                     let intersections = flat_scene.intersect(&ray);
                     assert_eq!($expect, intersections.iter().map(|i| i.t).collect::<Vec<_>>());

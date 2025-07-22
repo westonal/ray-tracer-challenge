@@ -14,9 +14,8 @@ macro_rules! shape {
         $(pattern: $pattern:expr;)?
     ) => {
         {
-            let mut _m = math::matrix::matrix_4x4::Matrix4x4::identity();
-            $(_m = $matrix;)?
-            let mut shape = $crate::primatives::Shape::new(_m, $surface);
+            let mut shape = $crate::shape!(surface: $surface;);
+            $(shape.matrix = $matrix;)?
             $(shape.material = $material;)?
             $(shape.material.pattern = $pattern;)?
             shape

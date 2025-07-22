@@ -9,7 +9,7 @@ use math::matrix::matrix_4x4::Matrix4x4;
 pub struct Shape {
     pub id: ShapeId,
     pub material: Material,
-    pub(crate) matrix: Matrix4x4,
+    pub matrix: Matrix4x4,
     pub(crate) surface: Surface,
 }
 

@@ -1,5 +1,3 @@
-use crate::csg::CSGOperation;
-
 #[cfg(test)]
 macro_rules! assert_chain {
     (actual: $actual:expr, expect: [$($surface:expr$(,)?)*]) => {
@@ -25,9 +23,10 @@ macro_rules! assert_chain {
 
 #[cfg(test)]
 mod filter_intersections_tests {
-    use super::*;
+
     use crate::scene_tree::FlattenTree;
 
+    use crate::csg::CSGOperation;
     use crate::primatives::Surface;
     use crate::scene_tree::Chain;
     use crate::{cube, scene, sphere};

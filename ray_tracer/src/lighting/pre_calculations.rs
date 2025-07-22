@@ -13,7 +13,6 @@ pub struct PreCalculations<'s> {
     pub normal: Normal,
     pub reflection: Vector,
     pub ray_generation: u32,
-    inside: bool,
 }
 
 impl<'s> Intersection<'s> {
@@ -32,7 +31,6 @@ impl<'s> Intersection<'s> {
             normal,
             reflection: ray.direction.reflect(normal_as_vector),
             ray_generation: ray.generation,
-            inside,
         }
     }
 }
@@ -64,7 +62,6 @@ mod precalculation_tests {
         assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
         assert_eq!(1, pre_calculations.ray_generation);
-        assert!(!pre_calculations.inside);
     }
 
     #[test]
@@ -78,7 +75,6 @@ mod precalculation_tests {
         assert_eq!(point!(0, 0, 1), pre_calculations.surface_hit.point);
         assert_vector!(vector!(0, 0, -1), pre_calculations.eye.clone_vector());
         assert_vector!(vector!(0, 0, -1), pre_calculations.normal.clone_vector());
-        assert!(pre_calculations.inside);
     }
 }
 
