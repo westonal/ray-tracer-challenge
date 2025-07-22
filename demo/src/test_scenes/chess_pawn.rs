@@ -30,13 +30,12 @@ impl TestScene for Pawn {
         );
 
         let world_scene = scene!(
-            +{
-                let mut plane = plane!();
-                plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::new(
-                    matrix4x4!(scale_all(2.6) translation(0.5, 0., 0.5))
-                ));
-                plane
-            };
+            +plane!(pattern: Pattern::Checker(
+                                *WHITE,
+                                *RED,
+                                Transform::new(matrix4x4!(scale_all(2.6) translation(0.5, 0., 0.5)))
+                             );
+            );
             +pawn;
         );
 

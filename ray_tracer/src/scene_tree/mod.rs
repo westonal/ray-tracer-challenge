@@ -71,8 +71,8 @@ macro_rules! scene {
         }
     };
 
-    ($(matrix:$matrix:expr;)?
-     $(bounding_volume:$bounding_volume:expr;)?
+    ($(matrix: $matrix:expr;)?
+     $(bounding_volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {
