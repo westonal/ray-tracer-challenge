@@ -1,3 +1,4 @@
+use crate::csg::TProvider;
 use crate::material::refraction::{RefractionMediumIndexes, RefractionStack};
 use crate::primatives::IntersectableShape;
 use crate::primatives::ShapeId;
@@ -25,6 +26,12 @@ pub struct UVt {
     pub t: f32,
 }
 
+impl TProvider for UVt {
+    fn t(&self) -> f32 {
+        self.t
+    }
+}
+
 impl UVt {
     pub(crate) fn new(uv: UV, t: f32) -> Self {
         Self { uv: Some(uv), t }
@@ -46,6 +53,12 @@ pub struct Intersection<'s> {
     pub shape: &'s IntersectableShape,
 }
 
+impl TProvider for Intersection<'_> {
+    fn t(&self) -> f32 {
+        self.t
+    }
+}
+
 impl Deref for Intersection<'_> {
     type Target = UVt;
 
@@ -62,6 +75,12 @@ impl<'s> Intersections<'s> {
         let mut intersections = Self(vec);
         intersections.sort_by_t();
         intersections
+    }
+}
+
+impl<'s> From<Intersections<'s>> for Vec<Intersection<'s>> {
+    fn from(value: Intersections<'s>) -> Self {
+        value.0
     }
 }
 

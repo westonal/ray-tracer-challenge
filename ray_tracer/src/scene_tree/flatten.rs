@@ -3,19 +3,42 @@ use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
 
-impl SceneTree {
-    pub fn flatten(&self) -> FlatScene {
+pub trait FlattenTreeWithMatrix {
+    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene;
+}
+
+pub trait FlattenTree {
+    fn flatten(&self) -> FlatScene;
+}
+
+impl<T: FlattenTreeWithMatrix> FlattenTree for T {
+    fn flatten(&self) -> FlatScene {
+        self.flatten_with_matrix(matrix4x4!())
+    }
+}
+
+impl FlattenTreeWithMatrix for SceneTree {
+    fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, matrix4x4!());
+        self.walk(&mut chain, matrix4x4);
         FlatScene::new(chain)
     }
+}
 
+impl SceneTree {
     fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
                 into.push(Chain::Shape(shape.to_intersectable()))
+            }
+            SceneTree::CsgLeaf(lhs, operation, rhs) => {
+                let mut lhs = lhs.flatten_with_matrix(tree_matrix);
+                let mut rhs = rhs.flatten_with_matrix(tree_matrix);
+                into.push(Chain::CSG(*operation, lhs.len(), rhs.len()));
+                into.append(&mut lhs);
+                into.append(&mut rhs);
             }
             SceneTree::Group {
                 children,
@@ -31,23 +54,23 @@ impl SceneTree {
                         }
                     }
                     Some(bounds) => {
+                        let mut subtree = vec![];
                         for child in children {
-                            let mut subtree = vec![];
                             child.walk(&mut subtree, matrix);
-                            let mut bounds = bounds.clone();
-                            // let mut bounds2 = bounds.clone();
-                            bounds.matrix = matrix * bounds.matrix;
-                            into.push(Chain::BoundingVolume(
-                                bounds.to_intersectable(),
-                                subtree.len(), // + 1,
-                            ));
-                            // bounds2.material.transparency = 0.9;
-                            // into.push(Chain::Shape(
-                            //     bounds2.to_intersectable(),
-                            //     //subtree.len(),
-                            // ));
-                            into.append(&mut subtree);
                         }
+
+                        let mut bounds = bounds.clone();
+                        bounds.matrix = matrix * bounds.matrix;
+                        into.push(Chain::BoundingVolume(
+                            bounds.to_intersectable(),
+                            subtree.len(), // + 1,
+                        ));
+                        // bounds2.material.transparency = 0.9;
+                        // into.push(Chain::Shape(
+                        //     bounds2.to_intersectable(),
+                        //     //subtree.len(),
+                        // ));
+                        into.append(&mut subtree);
                     }
                 }
             }

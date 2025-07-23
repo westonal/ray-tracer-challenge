@@ -5,12 +5,18 @@ impl SceneTree {
         match self {
             SceneTree::Leaf(_) => 1,
             SceneTree::Group { children, .. } => children.iter().map(|a| a.shape_count()).sum(),
+            SceneTree::CsgLeaf(..) => {
+                todo!()
+            }
         }
     }
 
     pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
         match self {
-            SceneTree::Leaf(_) => {
+            SceneTree::Leaf(..) => {
+                panic!("Can't add to another leaf")
+            }
+            SceneTree::CsgLeaf(..) => {
                 panic!("Can't add to another leaf")
             }
             SceneTree::Group { children, .. } => {
@@ -45,6 +51,9 @@ impl SceneTree {
                     }
                 }
                 panic!()
+            }
+            SceneTree::CsgLeaf(..) => {
+                panic!("Not permitted")
             }
         }
     }

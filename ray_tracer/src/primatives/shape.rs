@@ -9,7 +9,7 @@ use math::matrix::matrix_4x4::Matrix4x4;
 pub struct Shape {
     pub id: ShapeId,
     pub material: Material,
-    pub(crate) matrix: Matrix4x4,
+    pub matrix: Matrix4x4,
     pub(crate) surface: Surface,
 }
 
@@ -24,17 +24,17 @@ impl Shape {
     }
 
     pub fn to_intersectable(self) -> IntersectableShape {
-        IntersectableShape {
-            id: self.id,
-            material: self.material,
-            transform: Transform::new(self.matrix),
-            surface: self.surface,
-        }
+        self.into()
     }
 }
 
 impl From<Shape> for IntersectableShape {
     fn from(value: Shape) -> Self {
-        value.to_intersectable()
+        IntersectableShape {
+            id: value.id,
+            material: value.material,
+            transform: Transform::new(value.matrix),
+            surface: value.surface,
+        }
     }
 }

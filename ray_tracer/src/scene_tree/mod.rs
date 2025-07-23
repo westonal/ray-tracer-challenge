@@ -2,12 +2,17 @@ mod flat_scene;
 mod flatten;
 mod manipulation;
 
+use crate::csg::CSGOperation;
 use crate::primatives::Shape;
+pub(crate) use flat_scene::Chain;
 pub use flat_scene::FlatScene;
+pub use flatten::FlattenTree;
+pub use flatten::FlattenTreeWithMatrix;
 use math::matrix::matrix_4x4::Matrix4x4;
 
 pub enum SceneTree {
     Leaf(Shape),
+    CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
     Group {
         matrix: Matrix4x4,
         bounding_shape: Option<Shape>,
@@ -41,14 +46,6 @@ impl SceneTree {
             children: Default::default(),
         }
     }
-
-    pub fn new_bounded_opt(matrix: Matrix4x4, bounding_shape: Option<Shape>) -> Self {
-        if let Some(b) = bounding_shape {
-            Self::new_bounded(matrix, b)
-        } else {
-            Self::new(matrix)
-        }
-    }
 }
 
 impl From<Shape> for SceneTree {
@@ -59,8 +56,15 @@ impl From<Shape> for SceneTree {
 
 #[macro_export]
 macro_rules! scene {
-    ($(matrix:$matrix:expr;)?
-     $(bounding_volume:$bounding_volume:expr;)?
+    ($shape:expr) => {
+        {
+            let tree: $crate::scene_tree::SceneTree = $shape.into();
+            tree
+        }
+    };
+
+    ($(matrix: $matrix:expr;)?
+     $(bounding_volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {

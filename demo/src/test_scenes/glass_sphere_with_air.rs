@@ -22,26 +22,18 @@ impl TestScene for GlassSphereWithAir {
     fn build_world() -> World {
         let mut world = World::default();
         world.add_light(PointLight::new(point!(-300, 200, 20), *WHITE));
-        let mut plane = plane!(matrix: matrix4x4!(translation(0., -32., 0.)));
-        plane.material.pattern =
-            Pattern::Checker(*BLACK, *WHITE, Transform::new(matrix4x4!(scale_all(3.))));
-        world.add(plane);
+        world.add(plane!(
+            matrix: matrix4x4!(translation(0., -32., 0.));
+            pattern: Pattern::Checker(*BLACK, *WHITE, Transform::new(matrix4x4!(scale_all(3.))));
+        ));
 
         let scene = scene!(
             matrix: matrix4x4!(scale_all(5.));
             bounding_volume: cube!();
-            +{
-                let mut sphere = sphere!();
-                sphere.material = Material::glass();
-                sphere
-            };
+            +sphere!(material: Material::glass(););
             +scene!(
                 matrix: matrix4x4!(scale_all(0.5));
-                +{
-                    let mut sphere = sphere!();
-                    sphere.material = Material::air();
-                    sphere
-                };
+                +sphere!(material: Material::air(););
             );
         );
 

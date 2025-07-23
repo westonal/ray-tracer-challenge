@@ -10,7 +10,7 @@ use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
-use ray_tracer::{gradient_stops, plane, sphere};
+use ray_tracer::{gradient_stops, plane, scene, sphere};
 
 pub struct Chapter7Scene {}
 
@@ -21,12 +21,14 @@ impl TestScene for Chapter7Scene {
 
     fn build_world() -> World {
         let mut world = World::default();
-        world.add(floor());
-        world.add(wall(degrees!(-45))); // left wall
-        world.add(wall(degrees!(45))); // right wall
-        world.add(green_sphere());
-        world.add(small_green_sphere());
-        world.add(smallest_yellow_sphere());
+        world.add(scene!(
+            +floor();
+            +wall(degrees!(-45)); // left wall
+            +wall(degrees!(45)); // right wall
+            +green_sphere();
+            +small_green_sphere();
+            +smallest_yellow_sphere();
+        ));
         world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
         world
     }

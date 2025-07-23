@@ -26,11 +26,7 @@ impl TestScene for Teapot {
         );
 
         let world_scene = scene!(
-            +{
-                let mut plane = plane!();
-                plane.material.pattern = Pattern::Checker(*WHITE, *RED, Transform::identity());
-                plane
-            };
+            +plane!(pattern: Pattern::Checker(*WHITE, *RED, Transform::identity()););
             +teapot;
         );
 

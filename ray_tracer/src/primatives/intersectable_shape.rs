@@ -6,13 +6,20 @@ use crate::rays::Ray;
 use crate::transform::Transform;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
+use std::fmt::{Debug, Formatter};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct IntersectableShape {
     pub id: ShapeId,
     pub material: Material,
     pub(crate) transform: Transform,
     pub(crate) surface: Surface,
+}
+
+impl Debug for IntersectableShape {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}({})", self.surface, self.id)
+    }
 }
 
 pub struct PointUv {

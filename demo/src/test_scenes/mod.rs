@@ -1,6 +1,7 @@
 pub mod chapter7_scene;
 pub mod chess_pawn;
 pub mod chess_queen;
+pub mod csg;
 pub mod cube_of_spheres;
 pub mod cubes;
 pub mod cylinders;

@@ -1,7 +1,9 @@
-use crate::intersection::{Intersect, Intersections};
+use crate::csg::{CSGOperation, Filter};
+use crate::intersection::{Intersect, Intersection, Intersections};
 use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
-use std::ops::Deref;
+use std::fmt::Debug;
+use std::ops::{Deref, DerefMut};
 
 pub struct FlatScene {
     chain: Vec<Chain>,
@@ -13,11 +15,14 @@ impl FlatScene {
     }
 }
 
+#[derive(Debug)]
 pub enum Chain {
     BoundingVolume(IntersectableShape, usize),
     Shape(IntersectableShape),
+    CSG(CSGOperation, usize, usize),
 }
 
+#[cfg(test)]
 impl Deref for Chain {
     type Target = IntersectableShape;
 
@@ -25,6 +30,9 @@ impl Deref for Chain {
         match self {
             Chain::BoundingVolume(s, _) => s,
             Chain::Shape(s) => s,
+            Chain::CSG(_, _, _) => {
+                panic!("Not permitted")
+            }
         }
     }
 }
@@ -37,23 +45,54 @@ impl Deref for FlatScene {
     }
 }
 
-impl Intersect for FlatScene {
+impl DerefMut for FlatScene {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.chain
+    }
+}
+
+macro_rules! next {
+    ($expr:expr) => {{
+        let result = $expr.get(0).unwrap();
+        $expr = &$expr[1..];
+        result
+    }};
+    ($expr:expr; count: $count:expr) => {{
+        let count = $count + 0usize;
+        let result = &$expr[..count];
+        $expr = &$expr[count..];
+        result
+    }};
+}
+
+impl Intersect for [Chain] {
     fn intersect(&self, ray: &Ray) -> Intersections {
         let mut results = Intersections::default();
-        let mut i = 0;
-        while i < self.chain.len() {
-            let item = self.chain.get(i).unwrap();
+        let mut data = self;
+        while !data.is_empty() {
+            let item = next!(data);
             match item {
                 Chain::BoundingVolume(b, skip) => {
                     if !b.fast_hit(ray) {
-                        i = i + *skip;
+                        next!(data; count: skip);
                     }
                 }
                 Chain::Shape(s) => {
                     results += s.intersect(ray);
                 }
+                Chain::CSG(operation, lhs_length, rhs_length) => {
+                    let lhs: &[Chain] = next!(data; count: lhs_length);
+                    let rhs: &[Chain] = next!(data; count: rhs_length);
+                    let lhs_intersections = lhs.intersect(ray);
+                    let rhs_intersections = rhs.intersect(ray);
+                    let vec = Filter::filter::<Intersection<'_>>(
+                        *operation,
+                        lhs_intersections.into(),
+                        rhs_intersections.into(),
+                    );
+                    results += Intersections::new(vec);
+                }
             }
-            i = i + 1;
         }
         results
     }
@@ -130,6 +169,7 @@ mod chain_intersect_tests {
 #[cfg(test)]
 mod chain_build_from_tree_intersect_tests {
     use super::*;
+    use crate::scene_tree::flatten::FlattenTree;
 
     use crate::scene_tree::SceneTree;
     use crate::{ray, scene, sphere};
@@ -210,9 +250,8 @@ mod chain_build_from_tree_intersect_tests {
     fn bounding_volume_missed_skip_one_two_due_to_bounding_volume_translation() {
         let mut scene = SceneTree::default();
         scene.add(sphere!());
-        let mut sub_scene = SceneTree::new_bounded(
-            Matrix4x4::identity(),
-            sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.)),
+        let mut sub_scene = scene!(
+            bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
         );
         sub_scene.add(sphere!()); // skipped
         sub_scene.add(sphere!()); // skipped
