@@ -9,31 +9,40 @@ pub trait TProvider {
 
 impl Filter {
     pub fn filter<T: TProvider>(csg_operation: CSGOperation, lhs: Vec<T>, rhs: Vec<T>) -> Vec<T> {
-        let mut annotated_lhs: Vec<(T, SideHit)> =
-            lhs.into_iter().map(|f| (f, SideHit::Left)).collect();
-        let mut annotated_rhs: Vec<(T, SideHit)> =
-            rhs.into_iter().map(|f| (f, SideHit::Right)).collect();
-        let mut result: Vec<(T, SideHit)> =
-            Vec::with_capacity(annotated_lhs.len() + annotated_rhs.len());
-        result.append(&mut annotated_lhs);
-        result.append(&mut annotated_rhs);
-        result.sort_by(|(a, _), (b, _)| a.t().partial_cmp(&b.t()).unwrap());
-
+        let mut lhs: Vec<T> = lhs.into_iter().rev().collect();
+        let mut rhs: Vec<T> = rhs.into_iter().rev().collect();
+        let mut result = Vec::with_capacity(lhs.len() + rhs.len());
         let mut left_location = HitLocation::Outside;
         let mut right_location = HitLocation::Outside;
 
-        let mut filtered: Vec<T> = Vec::with_capacity(result.len());
-        // consider each intersection in distance order
-        for (t, side) in result {
+        loop {
+            let l = lhs.pop();
+            let r = rhs.pop();
+            let (t, side) = match (l, r) {
+                (None, None) => break,
+                (Some(t), None) => (t, SideHit::Left),
+                (None, Some(t)) => (t, SideHit::Right),
+                (Some(left_t), Some(right_t)) => {
+                    if left_t.t() < right_t.t() {
+                        rhs.push(right_t);
+                        (left_t, SideHit::Left)
+                    } else {
+                        lhs.push(left_t);
+                        (right_t, SideHit::Right)
+                    }
+                }
+            };
+
             match side {
                 SideHit::Left => left_location = !left_location,
                 SideHit::Right => right_location = !right_location,
             }
             if intersection_allowed(csg_operation, side, left_location, right_location) {
-                filtered.push(t);
+                result.push(t);
             }
         }
-        filtered
+
+        result
     }
 }
 
@@ -123,5 +132,13 @@ mod filter_tests {
         multipart_union;        Union        => [l!(1), l!(2), l!(3), r!(6), r!(7), r!(8), l!(9), l!(10)]
         multipart_intersection; Intersection => [r!(4), l!(5)]
         multipart_difference;   Difference   => [l!(1), l!(2), l!(3), r!(4), l!(9), l!(10)]
+    );
+
+    // Overlaps and non-overlaps - rhs longer than lhs
+    filter_test!(
+        lhs: [1, 2, 3, 5, 9, 11], rhs: [4, 6, 7, 8, 10, 12, 13, 14];
+        multipart_union_2;        Union        => [l!(1), l!(2), l!(3), r!(6), r!(7), r!(8), l!(9), r!(12), r!(13), r!(14)]
+        multipart_intersection_2; Intersection => [r!(4), l!(5), r!(10), l!(11)]
+        multipart_difference_2;   Difference   => [l!(1), l!(2), l!(3), r!(4), l!(9), r!(10)]
     );
 }

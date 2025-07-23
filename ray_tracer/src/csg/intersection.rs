@@ -3,6 +3,7 @@ use crate::csg::intersection::HitLocation::*;
 use crate::csg::intersection::SideHit::*;
 use std::ops::Not;
 
+#[derive(Clone)]
 pub enum SideHit {
     /// The left hand side was hit
     Left,
