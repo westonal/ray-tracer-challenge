@@ -1,5 +1,5 @@
 use clap::builder::Str;
-use clap::{Arg, arg, command};
+use clap::{Arg, arg, command, ArgAction};
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -23,6 +23,16 @@ struct BuiltScene {
     file_name: &'static str,
     world_factory: Box<dyn Fn() -> World + Send + Sync>,
     camera_factory: Box<dyn Fn(Size) -> Camera + Send + Sync>,
+}
+
+impl RenderTestScene<BuiltScene> for BuiltScene{
+    fn render_scene(size: Size) {
+        todo!()
+    }
+
+    fn render_scene_to(size: Size, path: Option<&str>) {
+        todo!()
+    }
 }
 
 macro_rules! scenes {
@@ -69,11 +79,12 @@ fn main() {
     let mut matches = command!().arg(arg!([x] "s"));
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
-        // TODO: HOW MAKE OPTION?
         let arg = Arg::default()
             .id(format!("{}", scene.name))
+            .required(false)
             .long(format!("{}", scene.name.to_lowercase()))
             .alias(format!("{}", n + 1))
+            .action(ArgAction::SetTrue)
             .help(format!("{}", scene.file_name));
         matches = matches.arg(arg);
     }
@@ -85,5 +96,12 @@ fn main() {
     }
     for scene in ALL_SCENES.iter() {
         println!("{}", scene.file_name);
+    }
+
+    for scene in ALL_SCENES.iter() {
+        if matches.get_flag(scene.name) {
+            println!("Render {} TODO", scene.file_name);
+            //TODO
+        }
     }
 }
