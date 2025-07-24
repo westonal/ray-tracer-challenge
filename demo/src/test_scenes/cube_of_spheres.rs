@@ -13,7 +13,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, plane, scene, sphere};
 
-pub struct CubeOfSpheres {}
+pub struct CubeOfSpheres;
 
 impl TestScene for CubeOfSpheres {
     fn name() -> &'static str {

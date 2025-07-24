@@ -9,6 +9,7 @@ math = { path = "../math" }
 ray_tracer = { path = "../ray_tracer" }
 obj = { path = "../obj" }
 rayon = "1.10.0"
+clap = { version = "4.5.41" , features = ["cargo", "string"]}
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }

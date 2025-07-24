@@ -11,7 +11,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cylinder, gradient_stops, plane};
 
-pub struct Cylinders {}
+pub struct Cylinders;
 
 impl TestScene for Cylinders {
     fn name() -> &'static str {

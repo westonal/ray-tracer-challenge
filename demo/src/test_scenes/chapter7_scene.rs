@@ -12,7 +12,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{gradient_stops, plane, scene, sphere};
 
-pub struct Chapter7Scene {}
+pub struct Chapter7Scene;
 
 impl TestScene for Chapter7Scene {
     fn name() -> &'static str {

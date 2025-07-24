@@ -9,7 +9,7 @@ use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::world::World;
 use ray_tracer::{cube, scene, sphere};
 
-pub struct Grid {}
+pub struct Grid;
 
 impl TestScene for Grid {
     fn name() -> &'static str {

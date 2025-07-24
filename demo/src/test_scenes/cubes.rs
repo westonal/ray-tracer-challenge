@@ -11,7 +11,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, gradient_stops, plane};
 
-pub struct Cubes {}
+pub struct Cubes;
 
 impl TestScene for Cubes {
     fn name() -> &'static str {

@@ -13,7 +13,7 @@ use ray_tracer::world::World;
 use ray_tracer::{plane, scene};
 use std::default::Default;
 
-pub struct Queen {}
+pub struct Queen;
 
 impl TestScene for Queen {
     fn name() -> &'static str {

@@ -12,7 +12,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, plane, scene, sphere};
 
-pub struct GlassSphereWithAir {}
+pub struct GlassSphereWithAir;
 
 impl TestScene for GlassSphereWithAir {
     fn name() -> &'static str {

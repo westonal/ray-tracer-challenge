@@ -12,7 +12,7 @@ use ray_tracer::world::World;
 use ray_tracer::{plane, scene};
 use std::default::Default;
 
-pub struct Teapot {}
+pub struct Teapot;
 
 impl TestScene for Teapot {
     fn name() -> &'static str {

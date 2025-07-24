@@ -12,7 +12,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{gradient_stops, plane};
 
-pub struct Triangles {}
+pub struct Triangles;
 
 impl TestScene for Triangles {
     fn name() -> &'static str {
