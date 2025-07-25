@@ -3,7 +3,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::vector;
 
-pub struct Cylinder {}
+pub struct Cylinder;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum CylinderCapStyle {

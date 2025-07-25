@@ -3,7 +3,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::vector;
 
-pub struct Plane {}
+pub struct Plane;
 
 impl Plane {
     pub(crate) fn intersect(&ray: &Ray) -> Vec<f32> {

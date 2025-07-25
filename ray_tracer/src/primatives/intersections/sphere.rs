@@ -2,7 +2,7 @@ use crate::rays::Ray;
 use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 
-pub struct Sphere {}
+pub struct Sphere;
 
 impl Sphere {
     pub(crate) fn intersect(ray: &Ray) -> Vec<f32> {

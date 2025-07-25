@@ -12,14 +12,14 @@ use ray_tracer::world::World;
 use ray_tracer::{plane, scene};
 use std::default::Default;
 
-pub struct Teapot {}
+pub struct Teapot;
 
 impl TestScene for Teapot {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "utah_teapot"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let teapot = scene!(
             matrix: matrix4x4!(rotation_y(degrees!(-60)));
             +obj!(path: "objs/teapot.obj";);
@@ -47,7 +47,7 @@ impl TestScene for Teapot {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0.8, 0), vector!(0, 1, 0)).into(),

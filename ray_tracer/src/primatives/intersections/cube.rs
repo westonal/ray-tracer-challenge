@@ -3,7 +3,7 @@ use math::tuple::point::Point;
 use math::tuple::vector::Vector;
 use math::{max, min, vector};
 
-pub struct Cube {}
+pub struct Cube;
 
 impl Cube {
     pub(crate) fn fast_hit(ray: &Ray) -> bool {

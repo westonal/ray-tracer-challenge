@@ -9,7 +9,7 @@ fn scenes_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Scenes");
     group.measurement_time(Duration::from_secs(10));
     group.bench_function("CubeOfSpheres", |b| {
-        b.iter(|| black_box(CubeOfSpheres::render_scene_to(Size::new(100, 100), None)))
+        b.iter(|| black_box(CubeOfSpheres.render_scene_to(Size::new(100, 100), None)))
     });
     group.finish()
 }

@@ -1,7 +1,7 @@
 use crate::csg::CSGOperation;
 use crate::csg::intersection::{HitLocation, SideHit, intersection_allowed};
 
-pub struct Filter {}
+pub struct Filter;
 
 pub trait TProvider {
     fn t(&self) -> f32;

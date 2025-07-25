@@ -1,4 +1,4 @@
-use demo::test_scenes::RenderTestScene;
+use clap::{Arg, ArgAction, command};
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -10,19 +10,99 @@ use demo::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use demo::test_scenes::grid::Grid;
 use demo::test_scenes::teapot::Teapot;
 use demo::test_scenes::triangles::Triangles;
+use demo::test_scenes::{RenderTestScene, TestScene};
 use ray_tracer::canvas::Size;
+use std::ops::Deref;
+use std::process::exit;
+use std::sync::LazyLock;
+
+struct BuiltScene {
+    name: &'static str,
+    file_name: String,
+    test_scene: Box<dyn TestScene + Send + Sync>,
+}
+
+impl Deref for BuiltScene {
+    type Target = dyn TestScene;
+
+    fn deref(&self) -> &Self::Target {
+        self.test_scene.as_ref()
+    }
+}
+
+macro_rules! scenes {
+    ($($name:ident)+) => {
+        vec!(
+            $(
+                BuiltScene {
+                    name: stringify!($name),
+                    file_name: format!("{}.png", $name.name()),
+                    test_scene: Box::new($name),
+                },
+            )+
+        )
+    };
+}
+
+static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
+    let mut scenes = scenes!(
+       Csg
+       Teapot
+       Pawn
+       Queen
+       Triangles
+       Chapter7Scene
+       GlassSphereWithAir
+       Cubes
+       Cylinders
+       CubeOfSpheres
+       Grid
+    );
+    scenes.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
+    scenes
+});
 
 fn main() {
-    let size = Size::HD_720P;
-    Csg::render_scene(size);
-    Teapot::render_scene(size);
-    Pawn::render_scene(size);
-    Queen::render_scene(size);
-    Triangles::render_scene(size);
-    Chapter7Scene::render_scene(size);
-    GlassSphereWithAir::render_scene(size);
-    Cubes::render_scene(size);
-    Cylinders::render_scene(size);
-    CubeOfSpheres::render_scene(size);
-    Grid::render_scene(size);
+    let mut command = command!().arg(
+        Arg::default()
+            .id("all")
+            .required(false)
+            .long("all")
+            .short('a')
+            .action(ArgAction::SetTrue)
+            .help("Render all scenes"),
+    );
+
+    for (n, scene) in ALL_SCENES.iter().enumerate() {
+        let arg = Arg::default()
+            .id(format!("{}", scene.name))
+            .required(false)
+            .long(format!("{}", scene.name.to_lowercase()))
+            .alias(format!("{}", n + 1))
+            .action(ArgAction::SetTrue)
+            .help(format!("{}", scene.file_name));
+        command = command.arg(arg);
+    }
+
+    let matches = command.get_matches();
+
+    let all = matches.get_flag("all");
+    let mut count = 0;
+    for scene in ALL_SCENES.iter() {
+        if all || matches.get_flag(scene.name) {
+            scene.test_scene.as_ref().render_scene(Size::HD_720P);
+            count += 1;
+        }
+    }
+
+    if count == 0 {
+        println!("Specify a test scene to render, --all for all, or --help for more options");
+        exit(1);
+    } else {
+        println!(
+            "{} scene{} rendered",
+            count,
+            if count == 1 { "" } else { "s" }
+        );
+    }
 }
