@@ -14,11 +14,11 @@ use ray_tracer::{cube, gradient_stops, plane};
 pub struct Cubes;
 
 impl TestScene for Cubes {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "cubes"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let mut world = World::default();
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
         let mut floor = plane!();
@@ -64,7 +64,7 @@ impl TestScene for Cubes {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(30));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(17, 19, 23), point!(1, 2, -3), vector!(0, 1, 0)).into(),

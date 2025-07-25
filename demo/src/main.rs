@@ -1,5 +1,4 @@
-use clap::builder::Str;
-use clap::{Arg, arg, command, ArgAction};
+use clap::{Arg, ArgAction, command};
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -12,26 +11,22 @@ use demo::test_scenes::grid::Grid;
 use demo::test_scenes::teapot::Teapot;
 use demo::test_scenes::triangles::Triangles;
 use demo::test_scenes::{RenderTestScene, TestScene};
-use math::pub_static_color;
-use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::world::World;
+use std::ops::Deref;
+use std::process::exit;
 use std::sync::LazyLock;
 
 struct BuiltScene {
     name: &'static str,
-    file_name: &'static str,
-    world_factory: Box<dyn Fn() -> World + Send + Sync>,
-    camera_factory: Box<dyn Fn(Size) -> Camera + Send + Sync>,
+    file_name: String,
+    test_scene: Box<dyn TestScene + Send + Sync>,
 }
 
-impl RenderTestScene<BuiltScene> for BuiltScene{
-    fn render_scene(size: Size) {
-        todo!()
-    }
+impl Deref for BuiltScene {
+    type Target = dyn TestScene;
 
-    fn render_scene_to(size: Size, path: Option<&str>) {
-        todo!()
+    fn deref(&self) -> &Self::Target {
+        self.test_scene.as_ref()
     }
 }
 
@@ -41,9 +36,8 @@ macro_rules! scenes {
             $(
                 BuiltScene {
                     name: stringify!($name),
-                    file_name: $name::name(),
-                    world_factory: Box::new(|| $name::build_world()),
-                    camera_factory: Box::new(|size| $name::build_camera(size)),
+                    file_name: format!("{}.png", $name.name()),
+                    test_scene: Box::new($name),
                 },
             )+
         )
@@ -68,15 +62,16 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
     scenes
 });
 
-fn main2() {
-    let size = Size::HD_720P;
-    for scene in ALL_SCENES.iter() {
-        println!("{}", scene.file_name);
-    }
-}
-
 fn main() {
-    let mut matches = command!().arg(arg!([x] "s"));
+    let mut command = command!().arg(
+        Arg::default()
+            .id("all")
+            .required(false)
+            .long("all")
+            .short('a')
+            .action(ArgAction::SetTrue)
+            .help("Render all scenes"),
+    );
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
         let arg = Arg::default()
@@ -86,22 +81,28 @@ fn main() {
             .alias(format!("{}", n + 1))
             .action(ArgAction::SetTrue)
             .help(format!("{}", scene.file_name));
-        matches = matches.arg(arg);
+        command = command.arg(arg);
     }
 
-    let matches = matches.get_matches();
+    let matches = command.get_matches();
 
-    if let Some(x) = matches.get_one::<String>("x") {
-        println!("Value for name: {x}");
-    }
+    let all = matches.get_flag("all");
+    let mut count = 0;
     for scene in ALL_SCENES.iter() {
-        println!("{}", scene.file_name);
-    }
-
-    for scene in ALL_SCENES.iter() {
-        if matches.get_flag(scene.name) {
-            println!("Render {} TODO", scene.file_name);
-            //TODO
+        if all || matches.get_flag(scene.name) {
+            scene.test_scene.as_ref().render_scene(Size::HD_720P);
+            count += 1;
         }
+    }
+
+    if count == 0 {
+        println!("Specify a test scene to render, --all for all, or --help for more options");
+        exit(1);
+    } else {
+        println!(
+            "{} scene{} rendered",
+            count,
+            if count == 1 { "" } else { "s" }
+        );
     }
 }

@@ -16,11 +16,11 @@ use ray_tracer::{cube, plane, scene, sphere};
 pub struct CubeOfSpheres;
 
 impl TestScene for CubeOfSpheres {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "cube_of_spheres"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let scene = scene!(
             +{
                 let mut shape = plane!();
@@ -73,7 +73,7 @@ impl TestScene for CubeOfSpheres {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(30));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(17, 19, 23), point!(4, 2, 4), vector!(0, 1, 0)).into(),

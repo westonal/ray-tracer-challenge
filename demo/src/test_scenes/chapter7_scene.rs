@@ -15,11 +15,11 @@ use ray_tracer::{gradient_stops, plane, scene, sphere};
 pub struct Chapter7Scene;
 
 impl TestScene for Chapter7Scene {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "Chapter 7 Scene"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let mut world = World::default();
         world.add(scene!(
             +floor();
@@ -33,7 +33,7 @@ impl TestScene for Chapter7Scene {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(60));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(0, 1.5, -5), point!(0, 1, 0), vector!(0, 1, 0)).into(),

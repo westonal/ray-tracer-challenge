@@ -16,11 +16,11 @@ use std::default::Default;
 pub struct Queen;
 
 impl TestScene for Queen {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "chess_queen"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let queen = scene!(
             matrix: matrix4x4!(
                 translation(0.75, 0., 0.)
@@ -55,7 +55,7 @@ impl TestScene for Queen {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
             ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.8, 0), vector!(0, 1, 0)).into(),

@@ -19,34 +19,34 @@ use ray_tracer::world::World;
 use std::time::Instant;
 
 pub trait TestScene {
-    fn name() -> &'static str;
+    fn name(&self) -> &'static str;
 
-    fn build_world() -> World;
+    fn build_world(&self) -> World;
 
-    fn build_camera(size: Size) -> Camera;
+    fn build_camera(&self, size: Size) -> Camera;
 }
 
-pub trait RenderTestScene<T> {
-    fn render_scene(size: Size);
-    fn render_scene_to(size: Size, path: Option<&str>);
+pub trait RenderTestScene<T: ?Sized> {
+    fn render_scene(&self, size: Size);
+    fn render_scene_to(&self, size: Size, path: Option<&str>);
 }
 
-impl<T: TestScene> RenderTestScene<T> for T {
-    fn render_scene(size: Size) {
-        let name = T::name();
+impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
+    fn render_scene(&self, size: Size) {
+        let name = self.name();
         let file_name = format!("test_scenes/{}.png", name);
-        Self::render_scene_to(size, Some(&file_name));
+        self.render_scene_to(size, Some(&file_name));
     }
 
-    fn render_scene_to(size: Size, path: Option<&str>) {
-        let name = T::name();
+    fn render_scene_to(&self, size: Size, path: Option<&str>) {
+        let name = self.name();
         if path.is_some() {
             println!("=== Rendering: {} at {} ===", name, size);
         }
         const BLOCK_SIZE: u32 = 32;
         let mut canvas = ThreadedCanvas::new(size, BLOCK_SIZE);
-        let world = T::build_world();
-        let camera = T::build_camera(size);
+        let world = self.build_world();
+        let camera = self.build_camera(size);
 
         let now = Instant::now();
 

@@ -15,11 +15,11 @@ use ray_tracer::{cube, plane, scene, sphere};
 pub struct GlassSphereWithAir;
 
 impl TestScene for GlassSphereWithAir {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "glass_sphere_with_air"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let mut world = World::default();
         world.add_light(PointLight::new(point!(-300, 200, 20), *WHITE));
         world.add(plane!(
@@ -41,7 +41,7 @@ impl TestScene for GlassSphereWithAir {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(20));
         camera.set_transform(*ViewMatrix::new_look_at(
             point!(0, 40, 0),

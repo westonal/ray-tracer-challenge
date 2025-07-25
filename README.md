@@ -58,5 +58,5 @@ cargo fix --allow-dirty && cargo fmt
 ## Pre commit recommendation
 
 ```shell
-cargo fix --allow-dirty && cargo fmt && cargo test --lib --bins --tests && cargo run --release
+cargo fix --allow-dirty && cargo fmt && cargo test --lib --bins --tests && cargo run --release -- --all
 ```

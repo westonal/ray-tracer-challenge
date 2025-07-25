@@ -12,11 +12,11 @@ use ray_tracer::{cube, scene, sphere};
 pub struct Grid;
 
 impl TestScene for Grid {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "grid_of_spheres"
     }
 
-    fn build_world() -> World {
+    fn build_world(&self) -> World {
         let mut root = SceneTree::default();
         let x_count: i32 = 11;
         let y_count: i32 = 7;
@@ -51,7 +51,7 @@ impl TestScene for Grid {
         world
     }
 
-    fn build_camera(size: Size) -> Camera {
+    fn build_camera(&self, size: Size) -> Camera {
         Camera::new(size, degrees!(120))
     }
 }
