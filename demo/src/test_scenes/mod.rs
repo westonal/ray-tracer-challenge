@@ -10,6 +10,7 @@ pub mod grid;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
+pub mod chess_queen_material_animated;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;

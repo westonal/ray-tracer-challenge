@@ -16,6 +16,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
+use demo::test_scenes::chess_queen_material_animated::QueenMaterialAnimation;
 
 struct BuiltScene {
     name: &'static str,
@@ -52,6 +53,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
        TeapotAnimated
        Pawn
        Queen
+       QueenMaterialAnimation
        Triangles
        Chapter7Scene
        GlassSphereWithAir
