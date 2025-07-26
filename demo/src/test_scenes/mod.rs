@@ -8,6 +8,7 @@ pub mod cylinders;
 pub mod glass_sphere_with_air;
 pub mod grid;
 pub mod teapot;
+pub mod teapot_animated;
 pub mod triangles;
 
 use crate::png_write::PngWrite;
@@ -15,37 +16,117 @@ use crate::threaded_canvas::ThreadedCanvas;
 use ray_tracer::RenderWorld;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Size, ViewPort};
+use ray_tracer::csg::CSGOperation::Difference;
 use ray_tracer::world::World;
-use std::time::Instant;
+use std::time::{Duration, Instant};
+
+pub struct SceneTiming {
+    duration: Duration,
+    fps: f32,
+}
+
+pub struct AnimationFrame {
+    /// One-based frame number
+    pub number: usize,
+
+    /// Current time starting at 0 for frame #1
+    pub time: Duration,
+
+    /// Frame position in animation
+    pub progress: f32,
+
+    /// How long each frame takes, for motion blur etc
+    pub exposure: Duration,
+}
+
+impl Default for AnimationFrame {
+    fn default() -> Self {
+        Self {
+            number: 0,
+            time: Duration::from_secs(0),
+            progress: 1.0,
+            exposure: Duration::from_secs(0),
+        }
+    }
+}
 
 pub trait TestScene {
     fn name(&self) -> &'static str;
 
-    fn build_world(&self) -> World;
+    fn animation(&self) -> Option<SceneTiming> {
+        None
+    }
+
+    fn build_world_at_time(&self, frame: &AnimationFrame) -> World {
+        self.build_world()
+    }
+
+    fn build_world(&self) -> World {
+        self.build_world_at_time(&AnimationFrame::default())
+    }
 
     fn build_camera(&self, size: Size) -> Camera;
 }
 
 pub trait RenderTestScene<T: ?Sized> {
     fn render_scene(&self, size: Size);
-    fn render_scene_to(&self, size: Size, path: Option<&str>);
+    fn render_scene_to_at_time(&self, size: Size, path: Option<&str>, frame: Option<&AnimationFrame>);
+    fn render_scene_to(&self, size: Size, path: Option<&str>) {
+        self.render_scene_to_at_time(size, path, None);
+    }
+}
+
+pub trait RenderTestSceneAnimated<T: ?Sized> {
+    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming);
+}
+
+impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
+    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming) {
+        let time_step_per_frame = Duration::from_millis((1000.0 / spec.fps) as u64);
+        let mut animation_frame = AnimationFrame{
+            number: 1,
+            time: Duration::from_secs(0),
+            progress: 0.0,
+            exposure: time_step_per_frame,
+        };
+        while animation_frame.time <= spec.duration {
+            let file_name = format!("{}{}.png", path, animation_frame.number);            
+            self.render_scene_to_at_time(size, Some(&file_name), Some(&animation_frame));
+            animation_frame.time += time_step_per_frame;
+            animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32(); 
+            animation_frame.number += 1;
+        }
+    }
 }
 
 impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
     fn render_scene(&self, size: Size) {
         let name = self.name();
-        let file_name = format!("test_scenes/{}.png", name);
-        self.render_scene_to(size, Some(&file_name));
+        let animation_spec = self.animation();
+        if let Some(animation_spec) = animation_spec {
+            let path = format!("test_scenes/{}/", name);
+            let _ = std::fs::create_dir_all(&path);
+            self.render_animation_scene_to(size, &path, &animation_spec);
+        } else {
+            let file_name = format!("test_scenes/{}.png", name);
+            self.render_scene_to(size, Some(&file_name));
+        }
     }
 
-    fn render_scene_to(&self, size: Size, path: Option<&str>) {
+    fn render_scene_to_at_time(&self, size: Size, path: Option<&str>, frame: Option<&AnimationFrame>) {
         let name = self.name();
         if path.is_some() {
-            println!("=== Rendering: {} at {} ===", name, size);
+            match frame {
+                None => println!("=== Rendering: {} at {} ===", name, size),
+                Some(time) => println!("=== Rendering: {} at {} : Frame #{} ===", name, size, time.number),
+            };
         }
         const BLOCK_SIZE: u32 = 32;
         let mut canvas = ThreadedCanvas::new(size, BLOCK_SIZE);
-        let world = self.build_world();
+        let world = match frame {
+            None => self.build_world(),
+            Some(time) => self.build_world_at_time(time),
+        };
         let camera = self.build_camera(size);
 
         let now = Instant::now();

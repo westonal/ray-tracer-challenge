@@ -9,6 +9,7 @@ use demo::test_scenes::cylinders::Cylinders;
 use demo::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use demo::test_scenes::grid::Grid;
 use demo::test_scenes::teapot::Teapot;
+use demo::test_scenes::teapot_animated::TeapotAnimated;
 use demo::test_scenes::triangles::Triangles;
 use demo::test_scenes::{RenderTestScene, TestScene};
 use ray_tracer::canvas::Size;
@@ -48,6 +49,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
     let mut scenes = scenes!(
        Csg
        Teapot
+       TeapotAnimated
        Pawn
        Queen
        Triangles
