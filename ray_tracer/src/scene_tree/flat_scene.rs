@@ -169,7 +169,7 @@ mod chain_intersect_tests {
 #[cfg(test)]
 mod chain_build_from_tree_intersect_tests {
     use super::*;
-    use crate::scene_tree::flatten::FlattenTree;
+    use crate::scene_tree::flatten::FlattenScene;
 
     use crate::scene_tree::SceneTree;
     use crate::{ray, scene, sphere};
@@ -181,7 +181,7 @@ mod chain_build_from_tree_intersect_tests {
         let scene = scene!(
             +sphere!();
         );
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(2, intersections.len());
     }
@@ -192,7 +192,7 @@ mod chain_build_from_tree_intersect_tests {
             +sphere!();
             +sphere!();
         );
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(4, intersections.len());
     }
@@ -207,7 +207,7 @@ mod chain_build_from_tree_intersect_tests {
             );
         );
 
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(4, intersections.len());
     }
@@ -223,7 +223,7 @@ mod chain_build_from_tree_intersect_tests {
             +sphere!();
         );
 
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(4, intersections.len());
     }
@@ -241,7 +241,7 @@ mod chain_build_from_tree_intersect_tests {
             +sphere!();
         );
 
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(4, intersections.len());
     }
@@ -259,7 +259,7 @@ mod chain_build_from_tree_intersect_tests {
         scene.add(sphere!());
         scene.add(sphere!());
 
-        let scene = scene.flatten();
+        let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));
         assert_eq!(6, intersections.len());
     }

@@ -24,7 +24,7 @@ macro_rules! assert_chain {
 #[cfg(test)]
 mod filter_intersections_tests {
 
-    use crate::scene_tree::FlattenTree;
+    use crate::scene_tree::FlattenScene;
 
     use crate::csg::CSGOperation;
     use crate::primatives::Surface;
@@ -35,7 +35,7 @@ mod filter_intersections_tests {
     fn single_csg_in_a_scene() {
         let scene = scene!(+sphere!(););
         assert_chain!(
-            actual: scene.flatten(),
+            actual: scene.flatten_scene(),
             expect: [Surface::UnitSphere]
         );
     }
@@ -47,7 +47,7 @@ mod filter_intersections_tests {
             +sphere!();
         );
         assert_chain!(
-            actual: scene.flatten(),
+            actual: scene.flatten_scene(),
             expect: [
                 ("BV", Surface::UnitCube, 1),
                 Surface::UnitSphere
@@ -63,7 +63,7 @@ mod filter_intersections_tests {
             +cube!();
         );
         assert_chain!(
-            actual: scene.flatten(),
+            actual: scene.flatten_scene(),
             expect: [
                 // TODO test is correct, walk is at fault probably
                 ("BV", Surface::UnitCube, 2),
@@ -80,7 +80,7 @@ mod filter_intersections_tests {
             +sphere!() + cube!();
         );
         assert_chain!(
-            actual: scene.flatten(),
+            actual: scene.flatten_scene(),
             expect: [
                 ("BV", Surface::UnitCube, 3),
                 (CSGOperation::Union, 1, 1),
@@ -94,7 +94,7 @@ mod filter_intersections_tests {
     fn single_csg_union() {
         let csg = sphere!() + cube!();
         assert_chain!(
-            actual: csg.flatten(),
+            actual: csg.flatten_scene(),
             expect: [
                 (CSGOperation::Union, 1, 1),
                 Surface::UnitSphere,
@@ -107,7 +107,7 @@ mod filter_intersections_tests {
     fn single_csg_union_and_intersection() {
         let csg = sphere!() + (cube!() & cube!());
         assert_chain!(
-            actual: csg.flatten(),
+            actual: csg.flatten_scene(),
             expect: [
                 (CSGOperation::Union, 1, 3),
                 Surface::UnitSphere,

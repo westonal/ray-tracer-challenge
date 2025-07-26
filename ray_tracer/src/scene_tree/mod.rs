@@ -6,8 +6,7 @@ use crate::csg::CSGOperation;
 use crate::primatives::Shape;
 pub(crate) use flat_scene::Chain;
 pub use flat_scene::FlatScene;
-pub use flatten::FlattenTree;
-pub use flatten::FlattenTreeWithMatrix;
+pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 
 pub enum SceneTree {
@@ -68,10 +67,10 @@ macro_rules! scene {
      $(+$entry:expr;)*
     ) => {
         {
-            let _matrix = math::matrix::matrix_4x4::Matrix4x4::identity();
+            let _matrix = math::matrix4x4!();
             $(let _matrix = $matrix;)?
-            let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new(_matrix);
-            $(let mut _tree: $crate::scene_tree::SceneTree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
+            let mut _tree = $crate::scene_tree::SceneTree::new(_matrix);
+            $(let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
             $(
             _tree.add($entry);
             )*

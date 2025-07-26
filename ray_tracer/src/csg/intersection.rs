@@ -105,7 +105,7 @@ mod by_operation_intersection_filtering_tests {
 mod intersection_in_flat_tree_tests {
 
     use crate::intersection::Intersect;
-    use crate::scene_tree::FlattenTree;
+    use crate::scene_tree::FlattenScene;
 
     macro_rules! operation_intersections {
         ($($name:ident; $operation:tt => $expect:expr)*) => {
@@ -114,7 +114,7 @@ mod intersection_in_flat_tree_tests {
                 fn $name() {
                     let ray = $crate::ray!(math::point!(-2, 0, 0), math::vector!(1, 0, 0));
                     let cn = $crate::sphere!() $operation $crate::sphere!(matrix: math::matrix4x4!(translation(0.5, 0., 0.)));
-                    let flat_scene = cn.flatten();
+                    let flat_scene = cn.flatten_scene();
                     let intersections = flat_scene.intersect(&ray);
                     assert_eq!($expect, intersections.iter().map(|i| i.t).collect::<Vec<_>>());
                     assert!(flat_scene.fast_hit(&ray))

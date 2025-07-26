@@ -3,21 +3,21 @@ use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
 
-pub trait FlattenTreeWithMatrix {
+pub trait FlattenScene {
+    fn flatten_scene(&self) -> FlatScene;
+}
+
+pub(crate) trait FlattenSceneWithMatrix {
     fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene;
 }
 
-pub trait FlattenTree {
-    fn flatten(&self) -> FlatScene;
-}
-
-impl<T: FlattenTreeWithMatrix> FlattenTree for T {
-    fn flatten(&self) -> FlatScene {
+impl<T: FlattenSceneWithMatrix> FlattenScene for T {
+    fn flatten_scene(&self) -> FlatScene {
         self.flatten_with_matrix(matrix4x4!())
     }
 }
 
-impl FlattenTreeWithMatrix for SceneTree {
+impl FlattenSceneWithMatrix for SceneTree {
     fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
         self.walk(&mut chain, matrix4x4);
@@ -89,7 +89,7 @@ mod flatten_tests {
         let mut tree = SceneTree::default();
         tree.add(sphere!());
 
-        let vec = tree.flatten();
+        let vec = tree.flatten_scene();
         assert_eq!(1, vec.len());
     }
 
@@ -99,7 +99,7 @@ mod flatten_tests {
         tree.add(sphere!());
         tree.add(cube!());
 
-        let vec = tree.flatten();
+        let vec = tree.flatten_scene();
         assert_eq!(2, vec.len());
     }
 
@@ -113,7 +113,7 @@ mod flatten_tests {
 
         tree.add(branch);
 
-        let vec = tree.flatten();
+        let vec = tree.flatten_scene();
         assert_eq!(2, vec.len());
     }
 
@@ -128,7 +128,7 @@ mod flatten_tests {
 
         tree.add(branch);
 
-        let vec = tree.flatten();
+        let vec = tree.flatten_scene();
         assert_eq!(3, vec.len());
     }
 }
@@ -158,7 +158,7 @@ mod flatten_matrix_tests {
         root.add(branch);
         root.add(cylinder!(matrix: d));
 
-        let vec = root.flatten();
+        let vec = root.flatten_scene();
 
         // root (r)
         //   - tree (i)

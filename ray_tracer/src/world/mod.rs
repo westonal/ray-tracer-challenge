@@ -1,4 +1,4 @@
-use crate::scene_tree::{Chain, FlattenTree};
+use crate::scene_tree::{Chain, FlattenScene};
 mod default;
 pub mod shading;
 mod shadows;
@@ -20,7 +20,7 @@ pub struct World {
 
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
-        let scene = self.scene_tree.flatten();
+        let scene = self.scene_tree.flatten_scene();
         //debug_print(&scene);
         RenderableWorld {
             flat_scene: scene,
