@@ -50,7 +50,7 @@ impl Material {
             let diffuse = effective_color * self.diffuse * light_dot_normal;
             result = result + diffuse * anti_shadow;
 
-            let reflect_v = -light_v.reflect(normal.clone_vector());
+            let reflect_v = -light_v.reflect(&normal);
             let reflect_dot_eye = reflect_v.dot(&eye);
             if reflect_dot_eye > 0.0 {
                 // compute the specular contribution

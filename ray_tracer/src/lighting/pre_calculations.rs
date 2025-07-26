@@ -22,14 +22,14 @@ impl<'s> Intersection<'s> {
         let eye = (-ray.direction).normalize();
         let inside = normal.dot(&eye) < 0.;
         let normal = if inside { -normal } else { normal };
-        let normal_as_vector = normal.clone_vector();
+        let reflection = ray.direction.reflect(&normal);
         let under = SurfaceHit::new(&self.shape.id, point);
         PreCalculations {
             intersection: self,
             surface_hit: under,
             eye,
             normal,
-            reflection: ray.direction.reflect(normal_as_vector),
+            reflection,
             ray_generation: ray.generation,
         }
     }
