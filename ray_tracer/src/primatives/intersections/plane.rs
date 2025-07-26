@@ -6,7 +6,7 @@ use math::vector;
 pub struct Plane;
 
 impl Plane {
-    pub(crate) fn intersect(&ray: &Ray) -> Vec<f32> {
+    pub(crate) fn intersect(ray: &Ray) -> Vec<f32> {
         if ray.direction.y.abs() < f32::EPSILON {
             vec![]
         } else {

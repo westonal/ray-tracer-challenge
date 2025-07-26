@@ -41,8 +41,8 @@ impl Vector {
         self.dot(self).sqrt()
     }
 
-    pub fn normalize(&self) -> Normal {
-        Normal::new(self.clone())
+    pub fn normalize(self) -> Normal {
+        Normal::new(self)
     }
 }
 

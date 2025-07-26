@@ -10,7 +10,7 @@ pub struct Block {
 
 impl ViewPort for Block {
     fn size(&self) -> Size {
-        self.size.clone()
+        self.size
     }
 }
 

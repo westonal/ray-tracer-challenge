@@ -5,7 +5,7 @@ use math::tuple::vector::Vector;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::Deref;
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone)]
 pub struct RayGeneration {
     ray: Ray,
 
@@ -31,7 +31,7 @@ impl Deref for RayGeneration {
     }
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone)]
 pub struct Ray {
     pub origin: Point,
     pub direction: Vector,
