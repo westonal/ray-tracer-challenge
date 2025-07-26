@@ -60,3 +60,12 @@ cargo fix --allow-dirty && cargo fmt
 ```shell
 cargo fix --allow-dirty && cargo fmt && cargo test --lib --bins --tests && cargo run --release -- --all
 ```
+
+# Animations
+
+Install ffmpeg anyway you like, for example on mac:
+
+```shell
+brew install ffmpeg
+```
+

@@ -21,7 +21,7 @@ impl TestScene for TeapotAnimated {
     }
 
     fn animation(&self) -> Option<SceneTiming> {
-        Some(SceneTiming{
+        Some(SceneTiming {
             duration: Duration::from_secs(4),
             fps: 25.0,
         })
@@ -42,10 +42,7 @@ impl TestScene for TeapotAnimated {
 
         let mut world = World::default();
         world.add(world_scene);
-        world.add_light(PointLight::new(
-            point!(2, 20, 10),
-            color!(1, 1, 1),
-        ));
+        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 

@@ -16,8 +16,8 @@ use crate::threaded_canvas::ThreadedCanvas;
 use ray_tracer::RenderWorld;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Size, ViewPort};
-use ray_tracer::csg::CSGOperation::Difference;
 use ray_tracer::world::World;
+use std::process::Command;
 use std::time::{Duration, Instant};
 
 pub struct SceneTiming {
@@ -70,7 +70,12 @@ pub trait TestScene {
 
 pub trait RenderTestScene<T: ?Sized> {
     fn render_scene(&self, size: Size);
-    fn render_scene_to_at_time(&self, size: Size, path: Option<&str>, frame: Option<&AnimationFrame>);
+    fn render_scene_to_at_time(
+        &self,
+        size: Size,
+        path: Option<&str>,
+        frame: Option<&AnimationFrame>,
+    );
     fn render_scene_to(&self, size: Size, path: Option<&str>) {
         self.render_scene_to_at_time(size, path, None);
     }
@@ -83,19 +88,40 @@ pub trait RenderTestSceneAnimated<T: ?Sized> {
 impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming) {
         let time_step_per_frame = Duration::from_millis((1000.0 / spec.fps) as u64);
-        let mut animation_frame = AnimationFrame{
+        let mut animation_frame = AnimationFrame {
             number: 1,
             time: Duration::from_secs(0),
             progress: 0.0,
             exposure: time_step_per_frame,
         };
         let name = self.name();
+        let frame_path = format!("{}{}_frames/", path, name);
+        let path_prefix = format!("{}{}_", frame_path, name);
+        let _ = std::fs::create_dir_all(&frame_path);
         while animation_frame.time <= spec.duration {
-            let file_name = format!("{}{}_{:04}.png", path, name, animation_frame.number);
+            let file_name = format!("{}{:04}.png", path_prefix, animation_frame.number);
             self.render_scene_to_at_time(size, Some(&file_name), Some(&animation_frame));
             animation_frame.time += time_step_per_frame;
-            animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
+            animation_frame.progress =
+                animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
             animation_frame.number += 1;
+        }
+        println!("Creating animation");
+        let filename = format!("{}{}.mp4", path, name);
+        let command = format!(
+            "ffmpeg -y -f image2 -framerate \"{}\" -i \"{}%04d.png\" -vcodec libx264 -crf 23 -pix_fmt yuv420p -f mp4 \"{}\"",
+            spec.fps, path_prefix, filename,
+        );
+        println!("{}", command);
+        let result = Command::new("sh")
+            .arg("-c")
+            .arg(command)
+            .output()
+            .expect("failed to execute process");
+        if result.status.success() {
+            println!("Created animation file {}", filename);
+        } else {
+            panic!("Failed to create animation from frames")
         }
     }
 }
@@ -105,21 +131,27 @@ impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
         let name = self.name();
         let animation_spec = self.animation();
         if let Some(animation_spec) = animation_spec {
-            let path = format!("test_scenes/{}/", name);
-            let _ = std::fs::create_dir_all(&path);
-            self.render_animation_scene_to(size, &path, &animation_spec);
+            self.render_animation_scene_to(size, "test_scenes/", &animation_spec);
         } else {
             let file_name = format!("test_scenes/{}.png", name);
             self.render_scene_to(size, Some(&file_name));
         }
     }
 
-    fn render_scene_to_at_time(&self, size: Size, path: Option<&str>, frame: Option<&AnimationFrame>) {
+    fn render_scene_to_at_time(
+        &self,
+        size: Size,
+        path: Option<&str>,
+        frame: Option<&AnimationFrame>,
+    ) {
         let name = self.name();
         if path.is_some() {
             match frame {
                 None => println!("=== Rendering: {} at {} ===", name, size),
-                Some(time) => println!("=== Rendering: {} at {} : Frame #{} ===", name, size, time.number),
+                Some(time) => println!(
+                    "=== Rendering: {} at {} : Frame #{} ===",
+                    name, size, time.number
+                ),
             };
         }
         const BLOCK_SIZE: u32 = 32;
