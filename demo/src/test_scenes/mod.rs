@@ -89,11 +89,12 @@ impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
             progress: 0.0,
             exposure: time_step_per_frame,
         };
+        let name = self.name();
         while animation_frame.time <= spec.duration {
-            let file_name = format!("{}{}.png", path, animation_frame.number);            
+            let file_name = format!("{}{}_{:04}.png", path, name, animation_frame.number);
             self.render_scene_to_at_time(size, Some(&file_name), Some(&animation_frame));
             animation_frame.time += time_step_per_frame;
-            animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32(); 
+            animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
             animation_frame.number += 1;
         }
     }
