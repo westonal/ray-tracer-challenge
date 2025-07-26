@@ -1,8 +1,8 @@
 use crate::tuple::vector::Vector;
 
 impl Vector {
-    pub fn reflect(&self, normal: Vector) -> Vector {
-        self.clone() - normal * 2. * self.dot(&normal)
+    pub fn reflect(self, normal: Vector) -> Vector {
+        self - normal * 2. * self.dot(&normal)
     }
 }
 
