@@ -3,7 +3,7 @@
 # See https://blog.pkh.me/p/21-high-quality-gif-with-ffmpeg.html
 
 palette="/tmp/palette.png"
-filters="fps=29.97,scale=320:-1:flags=lanczos"
+filters="fps=29.97,scale=360:-1:flags=lanczos"
 
 input="test_scenes/chess_queen_material_animation.mp4"
 output="test_scenes/chess_queen_material_animation_palette.gif"
@@ -14,8 +14,10 @@ output="test_scenes/chess_queen_material_animation_palette.gif"
 #ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -vf "$filters,palettegen" $palette
 #ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
 
-input="test_scenes/utah_teapot_animated_frames/utah_teapot_animated_%04d.png"
-output="test_scenes/utah_teapot_animated.gif"
+# name="utah_teapot_animated"
+name="chess_queen_material_animation"
+input="test_scenes/${name}_frames/${name}_%04d.png"
+output="test_scenes/${name}.gif"
 
 ffmpeg -y -f image2 -i $input -vf "$filters,palettegen" $palette
 ffmpeg -y -f image2 -i $input -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output

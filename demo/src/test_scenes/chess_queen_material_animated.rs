@@ -34,18 +34,13 @@ impl TestScene for QueenMaterialAnimation {
             );
             +obj!(
                 path: "objs/chess/queen.obj";
-                // material: {
-                //     let mut clay = Material::default();
-                //     clay.pattern = Pattern::Solid(color!(cycle(frame.progress),0.0,0.0));
-                //     clay
-                // };
                 material: {
                     let mut glass = Material::glass();
                     glass.reflectivity = 0.9;
                     glass.transparency = 0.7;
                     glass.ambient = 0.2;
                     glass.pattern = Pattern::Solid(color!(0.5, 0.5, 0.5));
-                    glass.refractive_index = 1. + 1. * cycle(frame.loop_progress);
+                    glass.refractive_index = 1.5;
                     glass
                 };
             );
@@ -65,17 +60,19 @@ impl TestScene for QueenMaterialAnimation {
         );
 
         let mut world = World::default();
+        world.max_ray_generation = 5;
         world.add(world_scene);
         world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
         world
     }
 
     fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
-        let mut camera = Camera::new(size, degrees!(35.0 - cycle(frame.loop_progress) * 15.0));
+        let prog = frame.loop_progress;
+        let mut camera = Camera::new(size, degrees!(35.0 - cycle(prog) * 20.0));
         camera.set_transform(
             ViewMatrix::new_look_at(
                 point!(4, 6, 8),
-                point!(0, 1.8 + cycle(frame.loop_progress) * 0.65, 0),
+                point!(0, 1.8 + cycle(prog) * 1.25, 0),
                 vector!(0, 1, 0),
             )
             .into(),
