@@ -28,7 +28,7 @@ impl AnimationSpec {
         Duration::from_micros(self.micros_per_frame())
     }
 
-    pub fn true_duration(&self) -> Duration {
+    pub fn final_frame_time(&self) -> Duration {
         self.per_frame_time_step() * self.frame_count()
     }
 }
@@ -45,28 +45,42 @@ mod animation_spec_tests {
     use super::*;
 
     #[test]
-    fn construction_macro_test() {
-        let spec = animation_spec!(1.5;seconds @25;fps);
+    fn construction_macro_whole_numbers() {
+        let spec = animation_spec!(10;seconds @25;fps);
         assert_eq!(25.0, spec.fps);
+        assert_eq!(Duration::from_secs_f32(10.0), spec.duration_limit);
+    }
+
+    #[test]
+    fn construction_macro_fractional_numbers() {
+        let spec = animation_spec!(1.5;seconds @29.97;fps);
+        assert_eq!(29.97, spec.fps);
         assert_eq!(Duration::from_secs_f32(1.5), spec.duration_limit);
     }
 
     macro_rules! frame_count {
-        ($($name:ident; $seconds:expr;secs @$fps:expr => frames: $expect_frames:expr; micros_per_frame: $expect_micros:expr)*) => {
+        ($($name:ident;
+           $seconds:expr;secs @$fps:expr =>
+           frames: $expect_frames:expr;
+           micros_per_frame: $expect_micros:expr;
+           duration_seconds: $expect_duration_seconds:expr)*) => {
             $(
                 #[test]
                 fn $name() {
                     let spec = $crate::animation_spec!($seconds;seconds @$fps;fps);
                     assert_eq!(spec.frame_count(), $expect_frames);
                     assert_eq!(spec.per_frame_time_step(), Duration::from_micros($expect_micros));
+                    assert_eq!(spec.final_frame_time(), Duration::from_secs_f64($expect_duration_seconds as f64));
                 }
             )*
         };
     }
 
     frame_count!(
-        whole_number_frames; 10;secs @25 => frames: 250; micros_per_frame: 40000
+        single_frame; 1;secs @1 => frames: 1; micros_per_frame: 1000000; duration_seconds: 1
 
-        fractional_frame_rate; 8;secs @29.97 => frames: 239; micros_per_frame: 33366
+        whole_number_frames; 10;secs @25 => frames: 250; micros_per_frame: 40000; duration_seconds: 10
+
+        fractional_frame_rate; 8;secs @29.97 => frames: 239; micros_per_frame: 33366; duration_seconds: 7.974474
     );
 }

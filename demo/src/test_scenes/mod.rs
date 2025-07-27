@@ -140,22 +140,18 @@ fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
         progress: 0.0,
         exposure: time_step_per_frame,
     };
-    let end_time = spec.true_duration();
+    let end_time = spec.final_frame_time();
     while animation_frame.number <= frame_count {
-        result.push(animation_frame.clone());
-        animation_frame.time += time_step_per_frame;
-        // Goes from 0..frame_count-1
+        // Maps [0..frame_count-1) to [0..1]
         animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;
-        animation_frame.progress = animation_frame.time.as_secs_f32() / end_time.as_secs_f32();
+        // Maps [0..frame_count-1] to [0..1]
+        animation_frame.progress = (animation_frame.number - 1) as f32 / (frame_count - 1) as f32;
+        result.push(animation_frame.clone());
+        // Advance time and frame only after pushing
         animation_frame.number += 1;
+        animation_frame.time += time_step_per_frame;
     }
     let last_frame = result.last();
-    println!(
-        "{}, {}, {}",
-        result.len(),
-        last_frame.unwrap().number,
-        last_frame.unwrap().last_frame_number
-    );
     if let Some(AnimationFrame { number, .. }) = last_frame {
         let number = *number;
         for animation_frame in result.iter_mut() {
