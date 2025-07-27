@@ -63,7 +63,7 @@ pub trait TestScene {
         None
     }
 
-    fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
+    fn build_world_for_frame(&self, _frame: &AnimationFrame) -> World {
         self.build_world()
     }
 
@@ -71,7 +71,7 @@ pub trait TestScene {
         self.build_world_for_frame(&AnimationFrame::default())
     }
 
-    fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+    fn build_camera_for_frame(&self, size: Size, _frame: &AnimationFrame) -> Camera {
         self.build_camera(size)
     }
 
@@ -140,7 +140,6 @@ fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
         progress: 0.0,
         exposure: time_step_per_frame,
     };
-    let end_time = spec.final_frame_start_time();
     while animation_frame.number <= frame_count {
         // Maps [0..frame_count-1) to [0..1]
         animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;

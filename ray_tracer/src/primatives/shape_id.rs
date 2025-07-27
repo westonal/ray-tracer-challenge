@@ -6,6 +6,7 @@ pub struct ShapeId {
     id: String,
 }
 
+#[cfg(test)]
 impl ShapeId {
     pub(crate) fn from_string(str: &str) -> Self {
         Self {

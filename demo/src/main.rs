@@ -91,12 +91,11 @@ fn main() {
         let help = match &scene.animation_spec {
             None => format!("{}", scene.file_name),
             Some(spec) => format!(
-                "{}, <= {} seconds @ {} FPS --> {} frames, {:?}",
+                "{}, <= {} seconds @ {} FPS --> {} frames",
                 scene.file_name,
                 spec.duration_limit.as_secs_f32(),
                 spec.fps,
                 spec.frame_count(),
-                spec.final_frame_start_time(),
             ),
         };
         let arg = Arg::default()
