@@ -140,7 +140,7 @@ fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
         progress: 0.0,
         exposure: time_step_per_frame,
     };
-    let end_time = spec.final_frame_time();
+    let end_time = spec.final_frame_start_time();
     while animation_frame.number <= frame_count {
         // Maps [0..frame_count-1) to [0..1]
         animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;

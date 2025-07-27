@@ -28,7 +28,7 @@ impl AnimationSpec {
         Duration::from_micros(self.micros_per_frame())
     }
 
-    pub fn final_frame_time(&self) -> Duration {
+    pub fn final_frame_start_time(&self) -> Duration {
         self.per_frame_time_step() * self.frame_count()
     }
 }
@@ -63,24 +63,24 @@ mod animation_spec_tests {
            $seconds:expr;secs @$fps:expr =>
            frames: $expect_frames:expr;
            micros_per_frame: $expect_micros:expr;
-           duration_seconds: $expect_duration_seconds:expr)*) => {
+           final_frame_start_at: $expect_final_frame_start_at:expr)*) => {
             $(
                 #[test]
                 fn $name() {
                     let spec = $crate::animation_spec!($seconds;seconds @$fps;fps);
                     assert_eq!(spec.frame_count(), $expect_frames);
                     assert_eq!(spec.per_frame_time_step(), Duration::from_micros($expect_micros));
-                    assert_eq!(spec.final_frame_time(), Duration::from_secs_f64($expect_duration_seconds as f64));
+                    assert_eq!(spec.final_frame_start_time(), Duration::from_secs_f64($expect_final_frame_start_at as f64));
                 }
             )*
         };
     }
 
     frame_count!(
-        single_frame; 1;secs @1 => frames: 1; micros_per_frame: 1000000; duration_seconds: 1
+        single_frame; 1;secs @1 => frames: 1; micros_per_frame: 1000000; final_frame_start_at: 1
 
-        whole_number_frames; 10;secs @25 => frames: 250; micros_per_frame: 40000; duration_seconds: 10
+        whole_number_frames; 10;secs @25 => frames: 250; micros_per_frame: 40000; final_frame_start_at: 10
 
-        fractional_frame_rate; 8;secs @29.97 => frames: 239; micros_per_frame: 33366; duration_seconds: 7.974474
+        fractional_frame_rate; 8;secs @29.97 => frames: 239; micros_per_frame: 33366; final_frame_start_at: 7.974474
     );
 }

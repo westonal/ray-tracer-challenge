@@ -96,7 +96,7 @@ fn main() {
                 spec.duration_limit.as_secs_f32(),
                 spec.fps,
                 spec.frame_count(),
-                spec.final_frame_time(),
+                spec.final_frame_start_time(),
             ),
         };
         let arg = Arg::default()
