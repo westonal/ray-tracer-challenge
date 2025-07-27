@@ -1,6 +1,7 @@
 pub mod chapter7_scene;
 pub mod chess_pawn;
 pub mod chess_queen;
+pub mod chess_queen_material_animated;
 pub mod csg;
 pub mod cube_of_spheres;
 pub mod cubes;
@@ -10,7 +11,6 @@ pub mod grid;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
-pub mod chess_queen_material_animated;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
@@ -26,9 +26,13 @@ pub struct SceneTiming {
     fps: f32,
 }
 
+#[derive(Clone)]
 pub struct AnimationFrame {
     /// One-based frame number
     pub number: usize,
+
+    /// One-based frame number
+    pub last_frame_number: usize,
 
     /// Current time starting at 0 for frame #1
     pub time: Duration,
@@ -44,6 +48,7 @@ impl Default for AnimationFrame {
     fn default() -> Self {
         Self {
             number: 0,
+            last_frame_number: 0,
             time: Duration::from_secs(0),
             progress: 1.0,
             exposure: Duration::from_secs(0),
@@ -58,15 +63,21 @@ pub trait TestScene {
         None
     }
 
-    fn build_world_at_time(&self, frame: &AnimationFrame) -> World {
+    fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         self.build_world()
     }
 
     fn build_world(&self) -> World {
-        self.build_world_at_time(&AnimationFrame::default())
+        self.build_world_for_frame(&AnimationFrame::default())
     }
 
-    fn build_camera(&self, size: Size) -> Camera;
+    fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+        self.build_camera(size)
+    }
+
+    fn build_camera(&self, size: Size) -> Camera {
+        self.build_camera_for_frame(size, &AnimationFrame::default())
+    }
 }
 
 pub trait RenderTestScene<T: ?Sized> {
@@ -88,24 +99,14 @@ pub trait RenderTestSceneAnimated<T: ?Sized> {
 
 impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming) {
-        let time_step_per_frame = Duration::from_millis((1000.0 / spec.fps) as u64);
-        let mut animation_frame = AnimationFrame {
-            number: 1,
-            time: Duration::from_secs(0),
-            progress: 0.0,
-            exposure: time_step_per_frame,
-        };
+        let frames = build_frames(spec);
         let name = self.name();
         let frame_path = format!("{}{}_frames/", path, name);
         let path_prefix = format!("{}{}_", frame_path, name);
         let _ = std::fs::create_dir_all(&frame_path);
-        while animation_frame.time <= spec.duration {
+        for animation_frame in frames {
             let file_name = format!("{}{:04}.png", path_prefix, animation_frame.number);
             self.render_scene_to_at_time(size, Some(&file_name), Some(&animation_frame));
-            animation_frame.time += time_step_per_frame;
-            animation_frame.progress =
-                animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
-            animation_frame.number += 1;
         }
         println!("Creating animation");
         let filename = format!("{}{}.mp4", path, name);
@@ -125,6 +126,32 @@ impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
             panic!("Failed to create animation from frames")
         }
     }
+}
+
+fn build_frames(spec: &SceneTiming) -> Vec<AnimationFrame> {
+    let mut result = vec![];
+    let time_step_per_frame = Duration::from_millis((1000.0 / spec.fps) as u64);
+    let mut animation_frame = AnimationFrame {
+        number: 1,
+        last_frame_number: 0,
+        time: Duration::from_secs(0),
+        progress: 0.0,
+        exposure: time_step_per_frame,
+    };
+    while animation_frame.time <= spec.duration {
+        result.push(animation_frame.clone());
+        animation_frame.time += time_step_per_frame;
+        animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
+        animation_frame.number += 1;
+    }
+    let last_frame = result.last();
+    if let Some(AnimationFrame { number, .. }) = last_frame {
+        let number = *number;
+        for animation_frame in result.iter_mut() {
+            animation_frame.last_frame_number = number;
+        }
+    }
+    result
 }
 
 impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
@@ -150,18 +177,20 @@ impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
             match frame {
                 None => println!("=== Rendering: {} at {} ===", name, size),
                 Some(time) => println!(
-                    "=== Rendering: {} at {} : Frame #{} ===",
-                    name, size, time.number
+                    "=== Rendering: {} at {} : Frame #{}/{} ===",
+                    name, size, time.number, time.last_frame_number,
                 ),
             };
         }
         const BLOCK_SIZE: u32 = 32;
         let mut canvas = ThreadedCanvas::new(size, BLOCK_SIZE);
-        let world = match frame {
-            None => self.build_world(),
-            Some(time) => self.build_world_at_time(time),
+        let (world, camera) = match frame {
+            None => (self.build_world(), self.build_camera(size)),
+            Some(frame) => (
+                self.build_world_for_frame(frame),
+                self.build_camera_for_frame(size, frame),
+            ),
         };
-        let camera = self.build_camera(size);
 
         let now = Instant::now();
 

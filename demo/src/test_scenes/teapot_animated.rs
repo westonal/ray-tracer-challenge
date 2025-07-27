@@ -27,7 +27,7 @@ impl TestScene for TeapotAnimated {
         })
     }
 
-    fn build_world_at_time(&self, frame: &AnimationFrame) -> World {
+    fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         let teapot = scene!(
             matrix: matrix4x4!(rotation_y(degrees!(-60))
                                rotation_y(degrees!(360.0 * frame.progress))

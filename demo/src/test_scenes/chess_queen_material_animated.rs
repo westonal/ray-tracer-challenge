@@ -22,13 +22,13 @@ impl TestScene for QueenMaterialAnimation {
     }
 
     fn animation(&self) -> Option<SceneTiming> {
-        Some(SceneTiming{
-            duration: Duration::from_secs(5),
-            fps: 30000.0/1001.0,
+        Some(SceneTiming {
+            duration: Duration::from_secs(8),
+            fps: 29.97,
         })
     }
 
-    fn build_world_at_time(&self, frame: &AnimationFrame) -> World {
+    fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         let queen = scene!(
             matrix: matrix4x4!(
                 translation(0.75, 0., 0.)
@@ -36,19 +36,27 @@ impl TestScene for QueenMaterialAnimation {
             );
             +obj!(
                 path: "objs/chess/queen.obj";
+                // material: {
+                //     let mut clay = Material::default();
+                //     clay.pattern = Pattern::Solid(color!(cycle(frame.progress),0.0,0.0));
+                //     clay
+                // };
                 material: {
                     let mut glass = Material::glass();
                     glass.reflectivity = 0.9;
                     glass.transparency = 0.7;
                     glass.ambient = 0.2;
                     glass.pattern = Pattern::Solid(color!(0.5, 0.5, 0.5));
-                    glass.refractive_index = 1. + 1. * frame.progress;
+                    glass.refractive_index = 1. + 1. * cycle(frame.progress);
                     glass
                 };
             );
         );
 
         let world_scene = scene!(
+            matrix: matrix4x4!(
+              rotation_y(degrees!(360.0 * frame.progress))
+            );
             +plane!(pattern: Pattern::Checker(
                                 *WHITE,
                                 *BLACK,
@@ -64,11 +72,20 @@ impl TestScene for QueenMaterialAnimation {
         world
     }
 
-    fn build_camera(&self, size: Size) -> Camera {
-        let mut camera = Camera::new(size, degrees!(35));
+    fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+        let mut camera = Camera::new(size, degrees!(35.0 - cycle(frame.progress) * 15.0));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.8, 0), vector!(0, 1, 0)).into(),
+            ViewMatrix::new_look_at(
+                point!(4, 6, 8),
+                point!(0, 1.8 + cycle(frame.progress) * 0.65, 0),
+                vector!(0, 1, 0),
+            )
+            .into(),
         );
         camera
     }
+}
+
+fn cycle(input: f32) -> f32 {
+    degrees!(input * 180.0).sin_cos().0
 }
