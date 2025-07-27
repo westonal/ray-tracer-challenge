@@ -14,6 +14,7 @@ pub mod triangles;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
+use animation::AnimationSpec;
 use ray_tracer::RenderWorld;
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::{Size, ViewPort};
@@ -21,21 +22,19 @@ use ray_tracer::world::World;
 use std::process::Command;
 use std::time::{Duration, Instant};
 
-pub struct SceneTiming {
-    duration: Duration,
-    fps: f32,
-}
-
 #[derive(Clone)]
 pub struct AnimationFrame {
     /// One-based frame number
-    pub number: usize,
+    pub number: u32,
 
     /// One-based frame number
-    pub last_frame_number: usize,
+    pub last_frame_number: u32,
 
     /// Current time starting at 0 for frame #1
     pub time: Duration,
+
+    /// Frame position in a looping animation, does not reach 1 as that is the same as 0
+    pub loop_progress: f32,
 
     /// Frame position in animation
     pub progress: f32,
@@ -51,6 +50,7 @@ impl Default for AnimationFrame {
             last_frame_number: 0,
             time: Duration::from_secs(0),
             progress: 1.0,
+            loop_progress: 0.0,
             exposure: Duration::from_secs(0),
         }
     }
@@ -59,7 +59,7 @@ impl Default for AnimationFrame {
 pub trait TestScene {
     fn name(&self) -> &'static str;
 
-    fn animation(&self) -> Option<SceneTiming> {
+    fn animation_spec(&self) -> Option<AnimationSpec> {
         None
     }
 
@@ -94,11 +94,11 @@ pub trait RenderTestScene<T: ?Sized> {
 }
 
 pub trait RenderTestSceneAnimated<T: ?Sized> {
-    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming);
+    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &AnimationSpec);
 }
 
 impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
-    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &SceneTiming) {
+    fn render_animation_scene_to(&self, size: Size, path: &str, spec: &AnimationSpec) {
         let frames = build_frames(spec);
         let name = self.name();
         let frame_path = format!("{}{}_frames/", path, name);
@@ -128,23 +128,34 @@ impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     }
 }
 
-fn build_frames(spec: &SceneTiming) -> Vec<AnimationFrame> {
+fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
     let mut result = vec![];
-    let time_step_per_frame = Duration::from_millis((1000.0 / spec.fps) as u64);
+    let time_step_per_frame = spec.per_frame_time_step();
+    let frame_count = spec.frame_count();
     let mut animation_frame = AnimationFrame {
         number: 1,
-        last_frame_number: 0,
+        last_frame_number: frame_count,
         time: Duration::from_secs(0),
+        loop_progress: 0.0,
         progress: 0.0,
         exposure: time_step_per_frame,
     };
-    while animation_frame.time <= spec.duration {
+    let end_time = spec.true_duration();
+    while animation_frame.number <= frame_count {
         result.push(animation_frame.clone());
         animation_frame.time += time_step_per_frame;
-        animation_frame.progress = animation_frame.time.as_secs_f32() / spec.duration.as_secs_f32();
+        // Goes from 0..frame_count-1
+        animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;
+        animation_frame.progress = animation_frame.time.as_secs_f32() / end_time.as_secs_f32();
         animation_frame.number += 1;
     }
     let last_frame = result.last();
+    println!(
+        "{}, {}, {}",
+        result.len(),
+        last_frame.unwrap().number,
+        last_frame.unwrap().last_frame_number
+    );
     if let Some(AnimationFrame { number, .. }) = last_frame {
         let number = *number;
         for animation_frame in result.iter_mut() {
@@ -157,7 +168,7 @@ fn build_frames(spec: &SceneTiming) -> Vec<AnimationFrame> {
 impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
     fn render_scene(&self, size: Size) {
         let name = self.name();
-        let animation_spec = self.animation();
+        let animation_spec = self.animation_spec();
         if let Some(animation_spec) = animation_spec {
             self.render_animation_scene_to(size, "test_scenes/", &animation_spec);
         } else {

@@ -1,5 +1,6 @@
 use crate::obj;
-use crate::test_scenes::{AnimationFrame, SceneTiming, TestScene};
+use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
+use animation::animation_spec;
 use math::tuple::color::{RED, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
@@ -20,17 +21,14 @@ impl TestScene for TeapotAnimated {
         "utah_teapot_animated"
     }
 
-    fn animation(&self) -> Option<SceneTiming> {
-        Some(SceneTiming {
-            duration: Duration::from_secs(4),
-            fps: 25.0,
-        })
+    fn animation_spec(&self) -> Option<AnimationSpec> {
+        Some(animation_spec!(4;seconds @25;fps))
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         let teapot = scene!(
             matrix: matrix4x4!(rotation_y(degrees!(-60))
-                               rotation_y(degrees!(360.0 * frame.progress))
+                               rotation_y(degrees!(360.0 * frame.loop_progress))
             );
             +obj!(path: "objs/teapot.obj";);
         );

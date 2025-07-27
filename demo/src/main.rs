@@ -1,7 +1,9 @@
+use animation::AnimationSpec;
 use clap::{Arg, ArgAction, command};
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
+use demo::test_scenes::chess_queen_material_animated::QueenMaterialAnimation;
 use demo::test_scenes::csg::Csg;
 use demo::test_scenes::cube_of_spheres::CubeOfSpheres;
 use demo::test_scenes::cubes::Cubes;
@@ -16,12 +18,12 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
-use demo::test_scenes::chess_queen_material_animated::QueenMaterialAnimation;
 
 struct BuiltScene {
     name: &'static str,
     file_name: String,
     test_scene: Box<dyn TestScene + Send + Sync>,
+    animation_spec: Option<AnimationSpec>,
 }
 
 impl Deref for BuiltScene {
@@ -36,10 +38,18 @@ macro_rules! scenes {
     ($($name:ident)+) => {
         vec!(
             $(
-                BuiltScene {
-                    name: stringify!($name),
-                    file_name: format!("{}.png", $name.name()),
-                    test_scene: Box::new($name),
+                {
+                    let spec = $name.animation_spec();
+                    let extension = match (spec) {
+                        None => ".png",
+                        Some(_) => ".mp4",
+                    };
+                    BuiltScene {
+                        name: stringify!($name),
+                        file_name: format!("{}{}", $name.name(), extension),
+                        test_scene: Box::new($name),
+                        animation_spec: $name.animation_spec(),
+                    }
                 },
             )+
         )
@@ -74,17 +84,28 @@ fn main() {
             .long("all")
             .short('a')
             .action(ArgAction::SetTrue)
-            .help("Render all scenes"),
+            .help("Render all png scenes, no animations"),
     );
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
+        let help = match &scene.animation_spec {
+            None => format!("{}", scene.file_name),
+            Some(spec) => format!(
+                "{}, <= {} seconds @ {} FPS --> {} frames, {:?}",
+                scene.file_name,
+                spec.duration_limit.as_secs_f32(),
+                spec.fps,
+                spec.frame_count(),
+                spec.true_duration(),
+            ),
+        };
         let arg = Arg::default()
             .id(format!("{}", scene.name))
             .required(false)
             .long(format!("{}", scene.name.to_lowercase()))
             .alias(format!("{}", n + 1))
             .action(ArgAction::SetTrue)
-            .help(format!("{}", scene.file_name));
+            .help(help);
         command = command.arg(arg);
     }
 
@@ -93,7 +114,7 @@ fn main() {
     let all = matches.get_flag("all");
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
-        if all || matches.get_flag(scene.name) {
+        if (all && scene.animation_spec.is_none()) || matches.get_flag(scene.name) {
             scene.test_scene.as_ref().render_scene(Size::HD_720P);
             count += 1;
         }

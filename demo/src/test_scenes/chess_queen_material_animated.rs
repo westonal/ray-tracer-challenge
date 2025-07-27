@@ -1,5 +1,6 @@
 use crate::obj;
-use crate::test_scenes::{AnimationFrame, SceneTiming, TestScene};
+use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
+use animation::animation_spec;
 use math::tuple::color::{BLACK, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
@@ -21,11 +22,8 @@ impl TestScene for QueenMaterialAnimation {
         "chess_queen_material_animation"
     }
 
-    fn animation(&self) -> Option<SceneTiming> {
-        Some(SceneTiming {
-            duration: Duration::from_secs(8),
-            fps: 29.97,
-        })
+    fn animation_spec(&self) -> Option<AnimationSpec> {
+        Some(animation_spec!(8;seconds @29.97;fps))
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
@@ -47,7 +45,7 @@ impl TestScene for QueenMaterialAnimation {
                     glass.transparency = 0.7;
                     glass.ambient = 0.2;
                     glass.pattern = Pattern::Solid(color!(0.5, 0.5, 0.5));
-                    glass.refractive_index = 1. + 1. * cycle(frame.progress);
+                    glass.refractive_index = 1. + 1. * cycle(frame.loop_progress);
                     glass
                 };
             );
@@ -55,7 +53,7 @@ impl TestScene for QueenMaterialAnimation {
 
         let world_scene = scene!(
             matrix: matrix4x4!(
-              rotation_y(degrees!(360.0 * frame.progress))
+              rotation_y(degrees!(360.0 * frame.loop_progress))
             );
             +plane!(pattern: Pattern::Checker(
                                 *WHITE,
@@ -73,11 +71,11 @@ impl TestScene for QueenMaterialAnimation {
     }
 
     fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
-        let mut camera = Camera::new(size, degrees!(35.0 - cycle(frame.progress) * 15.0));
+        let mut camera = Camera::new(size, degrees!(35.0 - cycle(frame.loop_progress) * 15.0));
         camera.set_transform(
             ViewMatrix::new_look_at(
                 point!(4, 6, 8),
-                point!(0, 1.8 + cycle(frame.progress) * 0.65, 0),
+                point!(0, 1.8 + cycle(frame.loop_progress) * 0.65, 0),
                 vector!(0, 1, 0),
             )
             .into(),

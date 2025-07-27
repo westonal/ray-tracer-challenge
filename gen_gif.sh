@@ -11,5 +11,11 @@ output="test_scenes/chess_queen_material_animation_palette.gif"
 #ffmpeg -v warning -i $input -vf "$filters,palettegen" -y $palette
 #ffmpeg -v warning -i $input -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
 
-ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -vf "$filters,palettegen" $palette
-ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
+#ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -vf "$filters,palettegen" $palette
+#ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
+
+input="test_scenes/utah_teapot_animated_frames/utah_teapot_animated_%04d.png"
+output="test_scenes/utah_teapot_animated.gif"
+
+ffmpeg -y -f image2 -i $input -vf "$filters,palettegen" $palette
+ffmpeg -y -f image2 -i $input -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
