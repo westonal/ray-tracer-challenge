@@ -10,6 +10,7 @@ use demo::test_scenes::cubes::Cubes;
 use demo::test_scenes::cylinders::Cylinders;
 use demo::test_scenes::glass_sphere_with_air::GlassSphereWithAir;
 use demo::test_scenes::grid::Grid;
+use demo::test_scenes::satisfying_pipes::SatisfyingPipesAnimated;
 use demo::test_scenes::teapot::Teapot;
 use demo::test_scenes::teapot_animated::TeapotAnimated;
 use demo::test_scenes::triangles::Triangles;
@@ -18,7 +19,6 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
-use demo::test_scenes::satisfying_pipes::SatisfyingPipesAnimated;
 
 struct BuiltScene {
     name: &'static str,
@@ -79,15 +79,24 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
 });
 
 fn main() {
-    let mut command = command!().arg(
-        Arg::default()
-            .id("all")
-            .required(false)
-            .long("all")
-            .short('a')
-            .action(ArgAction::SetTrue)
-            .help("Render all png scenes, no animations"),
-    );
+    let mut command = command!()
+        .arg(
+            Arg::default()
+                .id("all")
+                .required(false)
+                .long("all")
+                .short('a')
+                .action(ArgAction::SetTrue)
+                .help("Render all png scenes, no animations"),
+        )
+        .arg(
+            Arg::default()
+                .id("no-anim")
+                .required(false)
+                .long("no-anim")
+                .action(ArgAction::SetTrue)
+                .help("Render just first frame of an animation"),
+        );
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
         let help = match &scene.animation_spec {
@@ -116,7 +125,7 @@ fn main() {
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
         if (all && scene.animation_spec.is_none()) || matches.get_flag(scene.name) {
-            scene.test_scene.as_ref().render_scene(Size::HD_720P);
+            scene.test_scene.as_ref().render_scene(Size::HD_720P, !matches.get_flag("no-anim"));
             count += 1;
         }
     }
