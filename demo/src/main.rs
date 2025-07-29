@@ -19,6 +19,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
+use demo::test_scenes::satisfying_pipes_raising::SatisfyingPipesRaisingAnimated;
 
 struct BuiltScene {
     name: &'static str,
@@ -73,6 +74,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         CubeOfSpheres
         Grid
         SatisfyingPipesAnimated
+        SatisfyingPipesRaisingAnimated
     );
     scenes.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
     scenes

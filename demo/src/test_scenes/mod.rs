@@ -12,6 +12,7 @@ pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
 pub mod satisfying_pipes;
+pub mod satisfying_pipes_raising;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
