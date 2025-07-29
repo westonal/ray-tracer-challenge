@@ -3,7 +3,7 @@
 # See https://blog.pkh.me/p/21-high-quality-gif-with-ffmpeg.html
 
 palette="/tmp/palette.png"
-filters="fps=29.97,scale=360:-1:flags=lanczos"
+filters="fps=25,scale=540:-1:flags=lanczos"
 
 input="test_scenes/chess_queen_material_animation.mp4"
 output="test_scenes/chess_queen_material_animation_palette.gif"

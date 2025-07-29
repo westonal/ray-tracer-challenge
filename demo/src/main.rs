@@ -127,7 +127,7 @@ fn main() {
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
         if (all && scene.animation_spec.is_none()) || matches.get_flag(scene.name) {
-            scene.test_scene.as_ref().render_scene(Size::HD_720P, !matches.get_flag("no-anim"));
+            scene.test_scene.as_ref().render_scene(Size::HD_1080P, !matches.get_flag("no-anim"));
             count += 1;
         }
     }
