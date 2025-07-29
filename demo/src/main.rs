@@ -18,6 +18,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
+use demo::test_scenes::satisfying_pipes::SatisfyingPipesAnimated;
 
 struct BuiltScene {
     name: &'static str,
@@ -58,19 +59,20 @@ macro_rules! scenes {
 
 static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
     let mut scenes = scenes!(
-       Csg
-       Teapot
-       TeapotAnimated
-       Pawn
-       Queen
-       QueenMaterialAnimation
-       Triangles
-       Chapter7Scene
-       GlassSphereWithAir
-       Cubes
-       Cylinders
-       CubeOfSpheres
-       Grid
+        Csg
+        Teapot
+        TeapotAnimated
+        Pawn
+        Queen
+        QueenMaterialAnimation
+        Triangles
+        Chapter7Scene
+        GlassSphereWithAir
+        Cubes
+        Cylinders
+        CubeOfSpheres
+        Grid
+        SatisfyingPipesAnimated
     );
     scenes.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
     scenes
