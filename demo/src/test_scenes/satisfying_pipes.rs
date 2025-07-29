@@ -28,10 +28,10 @@ impl TestScene for SatisfyingPipesAnimated {
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
-        let pipe_length = 2.9;
-        let gap = 0.1;
+        let pipe_length = 3.0;
+        let gap = 0.0;
         let pipe_grid_length = pipe_length + gap;
-        let grid_size = (3, 3);
+        let grid_size = (3, 1);
         let floor_height = 2.;
         let world_scene = scene!(
             +plane!(
@@ -46,7 +46,7 @@ impl TestScene for SatisfyingPipesAnimated {
                 for x in -(grid_size.0/2)..(grid_size.0/2 + 1) {
                     for y in -(grid_size.1/2)..(grid_size.1/2 + 1) {
                         let rot = if (x + y) % 2 == 0 {
-                            degrees!(360.0 * frame.loop_progress)
+                            degrees!(180.0 * frame.loop_progress)
                         }else {
                             degrees!(0.)//360.0 * frame.loop_progress + 90.)
                         };
@@ -78,7 +78,11 @@ impl TestScene for SatisfyingPipesAnimated {
         );
 
         let mut world = World::default();
-        world.add(world_scene);
+        world.add(
+            scene!(
+                matrix: matrix4x4!(translation(pipe_length,0.,0.));
+            +world_scene;
+            ));
         world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
@@ -86,7 +90,7 @@ impl TestScene for SatisfyingPipesAnimated {
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(0, 40, 0), point!(0, 0, 0), vector!(0, 0, 1)).into(),
+            ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1)).into(),
         );
         camera
     }
@@ -102,13 +106,24 @@ impl SatisfyingPipesAnimated {
                 scale(1., length, 1.,)
             );
             bounding_volume: cube!(matrix: matrix4x4!(scale(1.21, 1.01, 1.21)));
-            +cylinder!(matrix: matrix4x4!(scale(1.2, 1., 1.2)))
+            +(cylinder!(matrix: matrix4x4!(scale(1.2, 1., 1.2)))
               - cylinder!(matrix: matrix4x4!(scale(1., 1.01, 1.)))
               - cube!(matrix: matrix4x4!(
                                 scale(1.21, 1.01, 1.21 / 2.)
                                 translation(0., 0., -1.)
                               )
-                     );
+                     )) & cylinder!(matrix: matrix4x4!(
+                scale(length, 1., length,)
+                // Move down to the bed level
+                // translation(0., 0., 0.5)
+                rotation_x(degrees!(90))
+            ));
+            // +cylinder!(matrix: matrix4x4!(
+            //     scale(length, 1., length,)
+            //     // Move down to the bed level
+            //     // translation(0., 0., 0.5)
+            //     rotation_x(degrees!(90))
+            // ));
         )
     }
 }
