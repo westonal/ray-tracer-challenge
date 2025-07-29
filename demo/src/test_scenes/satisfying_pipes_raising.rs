@@ -24,49 +24,59 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
     }
 
     fn animation_spec(&self) -> Option<AnimationSpec> {
-        Some(animation_spec!(4;seconds @25;fps))
+        Some(animation_spec!(2;seconds @25;fps))
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient);
         let pipe_grid_length = TAU;
-        let gap = 0.05;
+        let gap = 0.0;
         factory.pipe_length = pipe_grid_length - gap;
         factory.floor_height = 10.0;
         let factory = factory;
 
-        // time stuff
+        let angle_of_pipe = degrees!(15);
+        let distance_of_travel = pipe_grid_length * angle_of_pipe.sin_cos().1;
 
         let world_scene = scene!(
             +plane!(
                 matrix: matrix4x4!(
                     translation(0., -factory.floor_height, 0.)
                 );
-                pattern: Pattern::Checker(*WHITE, *BLUE, Transform::identity());
+                pattern: Pattern::Checker(*WHITE, *BLUE, Transform::new(
+                    matrix4x4!(
+                        scale_all(distance_of_travel * 0.5)
+                        translation(frame.loop_progress * distance_of_travel, 0., 0.)
+                    )
+                ));
             );
 
             +{
                 let mut scene = scene!();
-                    for x in -2..2 {
+                    for x in -4..2 {
+                        let artifical_progress_in = factory.prog(x, frame.loop_progress);
+                        let artifical_progress = factory.prog(x, frame.loop_progress);
+                        let extra_height = -2. * artifical_progress;
                         scene.add(
                             scene!(
                                 matrix: matrix4x4!(
-                                            rotation_z(degrees!(15))
+                                            rotation_z(angle_of_pipe)
                                             translation(
                                                 pipe_grid_length * (frame.loop_progress - 0.5 + -x as f32),
-                                                factory.pipe_height(x, frame.loop_progress),
-                                                0.,//pipe_grid_length * y as f32
+                                                extra_height,
+                                                0.,
                                             )
-                                            rotation_z(degrees!(-15))
-                                            //rotation_y(rot)
+                                            // TODO, should implement Neg on Angle
+                                            rotation_z(degrees!(-angle_of_pipe.to_degrees()))
+                                            rotation_y(degrees!(-45.0 * artifical_progress))
                                         );
                                 +scene!(
                                     matrix: matrix4x4!(
                                         rotation_z(degrees!(15))
                                     );
-                                    +factory.pipe_segment(PipeAngle::StaticZ);
+                                    +factory.pipe_segment();
                                 );
-                                +factory.pipe_stand();
+                                +factory.pipe_stand(factory.floor_height + 2. * extra_height);
                             )
                         );
                     }
@@ -83,7 +93,6 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
 
         let mut world = World::default();
         world.add(scene!(
-            //matrix: matrix4x4!(translation(pipe_grid_length,0.,0.));
             +world_scene;
         ));
         world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
@@ -93,9 +102,11 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
         let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
+        let side_on = ViewMatrix::new_look_at(point!(0, 0, 10), point!(0, 0, 0), vector!(0, 1, 0));
         let top_down_high =
-            ViewMatrix::new_look_at(point!(-5, 2, 10), point!(0., 1.2, 0.), vector!(0, 1, 0));
+            ViewMatrix::new_look_at(point!(-5, 5, 10), point!(0., 1.2, 0.), vector!(0, 1, 0));
         camera.set_transform(top_down_high.into());
+        // camera.set_transform(side_on.into());
         camera
     }
 }
@@ -113,50 +124,26 @@ struct SatisfyingPipesAnimatedFactory {
 }
 
 impl SatisfyingPipesAnimatedFactory {
-    pub(crate) fn pipe_height(&self, p: i32, progress: f32) -> f32 {
+    pub(crate) fn prog(&self, p: i32, progress: f32) -> f32 {
         let p32 = p as f32;
         if p == 0 {
             0.
         } else if p > 0 {
-          -2. * ((1. - progress) * p32 + p32 - 1.)
+            p32 - decelerate(progress)
+        } else if p == -1 {
+            (1. - accelerate(progress)) + p32
         } else {
-          -2. * (progress * p32 + p32 + 1.)
-        }
-    }
-}
-
-#[derive(PartialEq, Copy, Clone)]
-enum PipeAngle {
-    StaticX,
-    MovingToZ,
-    StaticZ,
-    MovingToX,
-}
-
-impl SatisfyingPipesAnimatedFactory {
-    pub(crate) fn progress_to_angle(&self, loop_progress: f32) -> (Angle, PipeAngle) {
-        let rotate_stage = (loop_progress * 4.0) % 4.0;
-        if rotate_stage < 1. {
-            (degrees!(0.), PipeAngle::StaticX)
-        } else if rotate_stage < 2. {
-            (degrees!((rotate_stage - 1.) * 90.), PipeAngle::MovingToZ)
-        } else if rotate_stage < 3. {
-            (degrees!(90.), PipeAngle::StaticZ)
-        } else {
-            (degrees!(90. + (rotate_stage - 3.) * 90.), PipeAngle::MovingToX)
+            (1. - progress) + p32
         }
     }
 }
 
 impl SatisfyingPipesAnimatedFactory {
-    pub(crate) fn pipe_stand(&self) -> SceneTree {
-        // if self.mode == Mode::Efficient {
-        //     return scene!();
-        // }
+    pub(crate) fn pipe_stand(&self, height: f32) -> SceneTree {
         scene!(
             +cylinder!(matrix: matrix4x4!(
-                translation(0., -self.floor_height, 0.)
-                scale(0.2, self.floor_height / 2., 0.2)
+                translation(0., -height, 0.)
+                scale(0.2, height / 2., 0.2)
                 translation(0., 1., 0.)
             ));
         )
@@ -172,7 +159,7 @@ impl SatisfyingPipesAnimatedFactory {
         }
     }
 
-    fn pipe_segment(&self, pipe_motion: PipeAngle) -> SceneTree {
+    fn pipe_segment(&self) -> SceneTree {
         let length = self.pipe_length / 2.;
         scene!(
             matrix: matrix4x4!(
@@ -185,22 +172,20 @@ impl SatisfyingPipesAnimatedFactory {
             +(cylinder!(matrix: matrix4x4!(scale(1.2, 1., 1.2)))
               - {
                     let mut c = cylinder!(matrix: matrix4x4!(scale(1., 1.01, 1.)));
-                    c.material.pattern = match pipe_motion {
-                        PipeAngle::StaticX => {Pattern::Solid(*GREEN)}
-                        PipeAngle::MovingToZ => {Pattern::Solid(*BLUE)}
-                        PipeAngle::StaticZ => {Pattern::Solid(*GREEN)}
-                        PipeAngle::MovingToX => {Pattern::Solid(*BLUE)}
-                    };
+                    c.material.pattern = Pattern::Solid(*GREEN);
                     c
                 }
               - cube!(matrix: matrix4x4!(
                                 scale(1.21, 1.01, 1.21 / 2.)
                                 translation(0., 0., -1.)
                               )
-                     )) & sphere!(matrix: matrix4x4!(
-                scale(length, 1., length,)
-                translation(0., 0., 0.5)
-            ));
+                     )) & sphere!(
+                        matrix: matrix4x4!(
+                            scale(length, 1., length,)
+                            translation(0., 0., 0.5)
+                        );
+                        pattern: Pattern::Solid(color!(1.0, 1.0, 0.0));
+                    );
             // +cylinder!(matrix: matrix4x4!(
             //     scale(length, 1., length,)
             //     // Move down to the bed level
@@ -209,4 +194,12 @@ impl SatisfyingPipesAnimatedFactory {
             // ));
         )
     }
+}
+
+fn accelerate(input: f32) -> f32 {
+    input * input
+}
+
+fn decelerate(input: f32) -> f32 {
+    1.0 - accelerate(1.0 - input)
 }

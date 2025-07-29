@@ -15,7 +15,8 @@ output="test_scenes/chess_queen_material_animation_palette.gif"
 #ffmpeg -y -f image2 -i "test_scenes/chess_queen_material_animation_frames/chess_queen_material_animation_%04d.png" -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse" -y $output
 
 # name="utah_teapot_animated"
-name="chess_queen_material_animation"
+# name="chess_queen_material_animation"
+name="satisfying-pipes-raising"
 input="test_scenes/${name}_frames/${name}_%04d.png"
 output="test_scenes/${name}.gif"
 
