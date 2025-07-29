@@ -1,5 +1,6 @@
 use std::f32::consts::PI;
 
+#[derive(Copy, Clone)]
 pub struct Angle(f32);
 
 impl Angle {

@@ -2,7 +2,7 @@ use crate::obj;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLUE, RED, WHITE};
-use math::{color, degrees, matrix4x4, point, vector};
+use math::{color, degrees, matrix4x4, point, vector, Angle};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
@@ -23,8 +23,8 @@ impl TestScene for SatisfyingPipesAnimated {
     }
 
     fn animation_spec(&self) -> Option<AnimationSpec> {
-        None
-        //Some(animation_spec!(4;seconds @10;fps))
+        //None
+        Some(animation_spec!(4;seconds @10;fps))
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
@@ -35,6 +35,10 @@ impl TestScene for SatisfyingPipesAnimated {
         let gap = 0.05;
         let pipe_grid_length = factory.pipe_length + gap;
         let grid_size = (5, 3);
+
+        // time stuff
+        let angle1 = factory.progress_to_angle(frame.loop_progress);
+        let angle2 = factory.progress_to_angle(frame.loop_progress + 0.25);
 
         let world_scene = scene!(
             +plane!(
@@ -49,9 +53,9 @@ impl TestScene for SatisfyingPipesAnimated {
                 for x in -(grid_size.0/2)..(grid_size.0/2 + 1) {
                     for y in -(grid_size.1/2)..(grid_size.1/2 + 1) {
                         let rot = if (x + y) % 2 == 0 {
-                            degrees!(180.0 * frame.loop_progress)
-                        }else {
-                            degrees!(0.)//360.0 * frame.loop_progress + 90.)
+                            angle1
+                        } else {
+                            angle2
                         };
                         scene.add(
                             scene!(
@@ -106,6 +110,24 @@ struct SatisfyingPipesAnimatedFactory {
     mode: Mode,
     pipe_length: f32,
     floor_height: f32,
+}
+
+impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn progress_to_angle(&self, mut loop_progress: f32) -> Angle {
+        if loop_progress > 1. {
+            loop_progress -= 1.;
+        }
+        let rotate_stage = loop_progress * 4.0;
+        if rotate_stage < 1. {
+            degrees!(0.)
+        } else if rotate_stage < 2. {
+            degrees!((rotate_stage - 1.) * 90.)
+        } else if rotate_stage < 3. {
+            degrees!(90.)
+        } else {
+            degrees!(90. + (rotate_stage - 3.) * 90.)
+        }
+    }
 }
 
 impl SatisfyingPipesAnimatedFactory {
