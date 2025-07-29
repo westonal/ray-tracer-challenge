@@ -23,20 +23,23 @@ impl TestScene for SatisfyingPipesAnimated {
     }
 
     fn animation_spec(&self) -> Option<AnimationSpec> {
-        //None
-        Some(animation_spec!(4;seconds @10;fps))
+        None
+        //Some(animation_spec!(4;seconds @10;fps))
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
-        let pipe_length = 3.0;
-        let gap = 0.0;
-        let pipe_grid_length = pipe_length + gap;
-        let grid_size = (3, 1);
-        let floor_height = 2.;
+        let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient);
+        factory.pipe_length = 3.0;
+        factory.floor_height = 2.0;
+        let factory = factory;
+        let gap = 0.05;
+        let pipe_grid_length = factory.pipe_length + gap;
+        let grid_size = (5, 3);
+
         let world_scene = scene!(
             +plane!(
                 matrix: matrix4x4!(
-                    translation(0., -floor_height, 0.)
+                    translation(0., -factory.floor_height, 0.)
                 );
                 pattern: Pattern::Checker(*WHITE, *BLUE, Transform::identity());
             );
@@ -60,11 +63,8 @@ impl TestScene for SatisfyingPipesAnimated {
                                             )
                                             rotation_y(rot)
                                         );
-                                +Self::pipe_segment(pipe_length);
-                                +cylinder!(matrix: matrix4x4!(
-                                    translation(0., -floor_height/2., 0.)
-                                    scale(0.2, 1., 0.2)
-                                ));
+                                +factory.pipe_segment();
+                                +factory.pipe_stand();
                             )
                         );
                     }
@@ -78,26 +78,61 @@ impl TestScene for SatisfyingPipesAnimated {
         );
 
         let mut world = World::default();
-        world.add(
-            scene!(
-                matrix: matrix4x4!(translation(pipe_length,0.,0.));
+        world.add(scene!(
+            //matrix: matrix4x4!(translation(pipe_grid_length,0.,0.));
             +world_scene;
-            ));
+        ));
         world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1)).into(),
-        );
+        let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
+        let top_down_high =
+            ViewMatrix::new_look_at(point!(0, 30, 0), point!(0, 0, 0), vector!(0, 0, 1));
+        camera.set_transform(top_down_high.into());
         camera
     }
 }
 
-impl SatisfyingPipesAnimated {
-    fn pipe_segment(length: f32) -> SceneTree {
+#[derive(PartialEq)]
+enum Mode {
+    Efficient,
+    Final,
+}
+
+struct SatisfyingPipesAnimatedFactory {
+    mode: Mode,
+    pipe_length: f32,
+    floor_height: f32,
+}
+
+impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn pipe_stand(&self) -> SceneTree {
+        if self.mode == Mode::Efficient {
+            return scene!();
+        }
+        scene!(
+            +cylinder!(matrix: matrix4x4!(
+                translation(0., -self.floor_height/2., 0.)
+                scale(0.2, 1., 0.2)
+            ));
+        )
+    }
+}
+
+impl SatisfyingPipesAnimatedFactory {
+    fn new(mode: Mode) -> Self {
+        Self {
+            mode,
+            pipe_length: 1.,
+            floor_height: 1.,
+        }
+    }
+
+    fn pipe_segment(&self) -> SceneTree {
+        let length = self.pipe_length;
         scene!(
             matrix: matrix4x4!(
                 rotation_y(degrees!(90))
