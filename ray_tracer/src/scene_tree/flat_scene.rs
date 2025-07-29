@@ -98,6 +98,7 @@ impl Intersect for [Chain] {
     }
 }
 
+#[macro_export]
 macro_rules! chain_link {
     ($shape:expr) => {
         Chain::Shape($shape.to_intersectable())

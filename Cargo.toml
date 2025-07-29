@@ -1,5 +1,5 @@
 [workspace]
-members = [
+members = [ "animation",
     "demo", "demo",
     "math", "obj",
     "ray_tracer",

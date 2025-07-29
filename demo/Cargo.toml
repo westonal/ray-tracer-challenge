@@ -8,6 +8,7 @@ image = "0.25.6"
 math = { path = "../math" }
 ray_tracer = { path = "../ray_tracer" }
 obj = { path = "../obj" }
+animation = { path = "../animation" }
 rayon = "1.10.0"
 clap = { version = "4.5.41" , features = ["cargo", "string"]}
 

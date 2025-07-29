@@ -65,6 +65,7 @@ impl Obj {
     }
 }
 
+#[cfg(test)]
 type ObjResult = Result<Obj, ObjError>;
 
 impl Default for Obj {
@@ -101,17 +102,6 @@ macro_rules! parse_vec {
     ($t:tt, $args:expr) => {{
         let args: Vec<$t> = $args.iter().map(|f| f.parse::<$t>().unwrap()).collect();
         args
-    }};
-}
-
-macro_rules! read_triple_vec {
-    ($t:tt, $args:expr) => {{
-        let args = parse_vec!($t, $args);
-        vec![
-            *args.get(0).unwrap(),
-            *args.get(1).unwrap(),
-            *args.get(2).unwrap(),
-        ]
     }};
 }
 

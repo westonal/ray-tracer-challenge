@@ -1,3 +1,4 @@
+use crate::chain_link;
 use crate::scene_tree::SceneTree;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -31,7 +32,7 @@ impl SceneTree {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
-                into.push(Chain::Shape(shape.to_intersectable()))
+                into.push(chain_link!(shape))
             }
             SceneTree::CsgLeaf(lhs, operation, rhs) => {
                 let mut lhs = lhs.flatten_with_matrix(tree_matrix);
@@ -61,10 +62,7 @@ impl SceneTree {
 
                         let mut bounds = bounds.clone();
                         bounds.matrix = matrix * bounds.matrix;
-                        into.push(Chain::BoundingVolume(
-                            bounds.to_intersectable(),
-                            subtree.len(), // + 1,
-                        ));
+                        into.push(chain_link!(bounds, skip: subtree.len()));
                         // bounds2.material.transparency = 0.9;
                         // into.push(Chain::Shape(
                         //     bounds2.to_intersectable(),
