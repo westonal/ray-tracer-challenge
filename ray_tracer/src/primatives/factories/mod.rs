@@ -71,7 +71,7 @@ macro_rules! plane {
 
 #[macro_export]
 macro_rules! cube {
-        ($(matrix: $matrix:expr)?) => {
+    ($(matrix: $matrix:expr)?) => {
         $crate::shape!(
             surface: $crate::primatives::Surface::UnitCube;
             $(matrix: $matrix;)?
@@ -87,7 +87,7 @@ macro_rules! cube {
             surface: $crate::primatives::Surface::UnitCube;
             $(matrix: $matrix;)?
             $(material: $material;)?
-            $($pattern: $pattern;)?
+            $(pattern: $pattern;)?
         )
     };
 }

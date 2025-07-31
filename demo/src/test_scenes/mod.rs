@@ -8,6 +8,8 @@ pub mod cubes;
 pub mod cylinders;
 pub mod glass_sphere_with_air;
 pub mod grid;
+pub mod satisfying_pipes;
+pub mod satisfying_pipes_raising;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
@@ -81,7 +83,7 @@ pub trait TestScene {
 }
 
 pub trait RenderTestScene<T: ?Sized> {
-    fn render_scene(&self, size: Size);
+    fn render_scene(&self, size: Size, allow_animation: bool);
     fn render_scene_to_at_time(
         &self,
         size: Size,
@@ -161,10 +163,10 @@ fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
 }
 
 impl<T: TestScene + ?Sized> RenderTestScene<T> for T {
-    fn render_scene(&self, size: Size) {
+    fn render_scene(&self, size: Size, allow_animation: bool) {
         let name = self.name();
         let animation_spec = self.animation_spec();
-        if let Some(animation_spec) = animation_spec {
+        if allow_animation && let Some(animation_spec) = animation_spec {
             self.render_animation_scene_to(size, "test_scenes/", &animation_spec);
         } else {
             let file_name = format!("test_scenes/{}.png", name);
