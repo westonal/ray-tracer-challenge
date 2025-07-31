@@ -10,6 +10,7 @@ pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 
+#[derive(Clone)]
 pub enum SceneTree {
     Leaf(Shape),
     CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),

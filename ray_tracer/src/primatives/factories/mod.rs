@@ -95,7 +95,23 @@ macro_rules! cube {
 #[macro_export]
 macro_rules! cylinder {
     ($(matrix: $matrix:expr)?) => {
-        $crate::shape!(surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed); $(matrix: $matrix;)?)
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed);
+            $(matrix: $matrix;)?
+        )
+    };
+
+    (
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr$(;)?)?
+    ) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::UnitCylinder($crate::primatives::CylinderCapStyle::Closed);
+            $(matrix: $matrix;)?
+            $(material: $material;)?
+            $(pattern: $pattern;)?
+        )
     };
 }
 
