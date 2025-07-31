@@ -1013,6 +1013,7 @@ name = "ray_tracer"
 version = "0.1.0"
 dependencies = [
  "math",
+ "regex",
  "uuid",
 ]
 

@@ -1,5 +1,6 @@
 use animation::AnimationSpec;
-use clap::{Arg, ArgAction, command};
+use clap::builder::{IntoResettable, OsStr, Resettable};
+use clap::{Arg, ArgAction, command, value_parser};
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -80,6 +81,23 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
     scenes
 });
 
+/// Size is defined outside this module, so we can't implement [IntoResettable] directly.
+struct ClapSizeWrapper(Size);
+
+impl Deref for ClapSizeWrapper {
+    type Target = Size;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl IntoResettable<OsStr> for ClapSizeWrapper {
+    fn into_resettable(self) -> Resettable<OsStr> {
+        Resettable::Value(self.to_string().into())
+    }
+}
+
 fn main() {
     let mut command = command!()
         .arg(
@@ -98,6 +116,16 @@ fn main() {
                 .long("no-anim")
                 .action(ArgAction::SetTrue)
                 .help("Render just first frame of an animation"),
+        )
+        .arg(
+            Arg::default()
+                .id("size")
+                .value_parser(value_parser!(Size))
+                .required(false)
+                .long("size")
+                .short('s')
+                .default_value(ClapSizeWrapper(Size::HD_720P))
+                .help("Size of the frames"),
         );
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
@@ -123,6 +151,7 @@ fn main() {
 
     let matches = command.get_matches();
 
+    let size = *matches.get_one::<Size>("size").unwrap();
     let all = matches.get_flag("all");
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
@@ -130,7 +159,7 @@ fn main() {
             scene
                 .test_scene
                 .as_ref()
-                .render_scene(Size::HD_720P, !matches.get_flag("no-anim"));
+                .render_scene(size, !matches.get_flag("no-anim"));
             count += 1;
         }
     }
