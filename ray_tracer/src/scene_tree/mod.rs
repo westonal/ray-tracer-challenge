@@ -3,6 +3,7 @@ mod flatten;
 mod manipulation;
 
 use crate::csg::CSGOperation;
+use crate::material::Material;
 use crate::primatives::Shape;
 pub(crate) use flat_scene::Chain;
 pub use flat_scene::FlatScene;
@@ -14,6 +15,7 @@ pub enum SceneTree {
     CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
     Group {
         matrix: Matrix4x4,
+        material_override: Option<Material>,
         bounding_shape: Option<Shape>,
         children: Vec<SceneTree>,
     },
@@ -23,6 +25,7 @@ impl Default for SceneTree {
     fn default() -> Self {
         Self::Group {
             matrix: Matrix4x4::identity(),
+            material_override: None,
             bounding_shape: None,
             children: Default::default(),
         }
@@ -33,15 +36,21 @@ impl SceneTree {
     pub fn new(matrix: Matrix4x4) -> Self {
         Self::Group {
             matrix,
+            material_override: None,
             bounding_shape: None,
             children: Default::default(),
         }
     }
 
-    pub fn new_bounded(matrix: Matrix4x4, bounding_shape: Shape) -> Self {
+    pub fn new_bounded(
+        matrix: Matrix4x4,
+        bounding_shape: Option<Shape>,
+        material_override: Option<Material>,
+    ) -> Self {
         Self::Group {
             matrix,
-            bounding_shape: Some(bounding_shape),
+            material_override,
+            bounding_shape,
             children: Default::default(),
         }
     }
@@ -63,14 +72,18 @@ macro_rules! scene {
     };
 
     ($(matrix: $matrix:expr;)?
+     $(material_override: $material_override:expr;)?
      $(bounding_volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {
             let _matrix = math::matrix4x4!();
+            let _bounding_volume: Option<$crate::primatives::Shape> = None;
+            let _material_override: Option<$crate::material::Material> = None;
             $(let _matrix = $matrix;)?
-            let mut _tree = $crate::scene_tree::SceneTree::new(_matrix);
-            $(let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, $bounding_volume);)?
+            $(let _bounding_volume = Some($bounding_volume);)?
+            $(let _material_override = Some($material_override);)?
+            let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, _bounding_volume, _material_override);
             $(
             _tree.add($entry);
             )*

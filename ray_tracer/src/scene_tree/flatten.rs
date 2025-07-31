@@ -1,4 +1,5 @@
 use crate::chain_link;
+use crate::material::Material;
 use crate::scene_tree::SceneTree;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
@@ -21,43 +22,69 @@ impl<T: FlattenSceneWithMatrix> FlattenScene for T {
 impl FlattenSceneWithMatrix for SceneTree {
     fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, matrix4x4);
+        self.walk(&mut chain, matrix4x4, &Overrides::default());
         FlatScene::new(chain)
     }
 }
 
+#[derive(Default, Clone)]
+struct Overrides {
+    material_override: Option<Material>,
+}
+
+impl Overrides {
+    fn clone_with(&self, material: &Material) -> Self {
+        let mut clone = self.clone();
+        clone.material_override = Some(material.clone());
+        clone
+    }
+}
+
 impl SceneTree {
-    fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4) {
+    fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4, overrides: &Overrides) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
+                shape.material = overrides
+                    .material_override
+                    .to_owned()
+                    .unwrap_or(shape.material);
                 into.push(chain_link!(shape))
             }
-            SceneTree::CsgLeaf(lhs, operation, rhs) => {
-                let mut lhs = lhs.flatten_with_matrix(tree_matrix);
-                let mut rhs = rhs.flatten_with_matrix(tree_matrix);
-                into.push(Chain::CSG(*operation, lhs.len(), rhs.len()));
-                into.append(&mut lhs);
-                into.append(&mut rhs);
+            SceneTree::CsgLeaf(lhs_tree, operation, rhs_tree) => {
+                let mut lhs_chain = vec![];
+                lhs_tree.walk(&mut lhs_chain, tree_matrix, overrides);
+                let mut rhs_chain = vec![];
+                rhs_tree.walk(&mut rhs_chain, tree_matrix, overrides);
+                into.push(Chain::CSG(*operation, lhs_chain.len(), rhs_chain.len()));
+                into.append(&mut lhs_chain);
+                into.append(&mut rhs_chain);
             }
             SceneTree::Group {
-                children,
                 matrix,
+                material_override,
                 bounding_shape,
+                children,
             } => {
                 let matrix = tree_matrix * *matrix;
+
+                let overrides: &Overrides = if let Some(material) = material_override {
+                    &overrides.clone_with(material)
+                } else {
+                    overrides
+                };
 
                 match bounding_shape {
                     None => {
                         for child in children {
-                            child.walk(into, matrix);
+                            child.walk(into, matrix, overrides);
                         }
                     }
                     Some(bounds) => {
                         let mut subtree = vec![];
                         for child in children {
-                            child.walk(&mut subtree, matrix);
+                            child.walk(&mut subtree, matrix, overrides);
                         }
 
                         let mut bounds = bounds.clone();
@@ -170,5 +197,104 @@ mod flatten_matrix_tests {
         assert_eq!(Transform::new(r * a), vec.get(0).unwrap().transform);
         assert_eq!(Transform::new(r * b * c), vec.get(1).unwrap().transform);
         assert_eq!(Transform::new(r * d), vec.get(2).unwrap().transform);
+    }
+}
+
+#[cfg(test)]
+mod material_override_tests {
+    use super::*;
+
+    use crate::material::Material;
+
+    use crate::{cube, cylinder, scene, sphere};
+
+    #[test]
+    fn override_material() {
+        let vec = scene!(
+            +sphere!();
+            +scene!(
+                material_override: Material::air();
+                +cube!();
+                +scene!(
+                    +cube!();
+                );
+            );
+            +cylinder!();
+        )
+        .flatten_scene();
+
+        assert_eq!(4, vec.len());
+        assert_eq!(Material::default(), vec.get(0).unwrap().material);
+        assert_eq!(Material::air(), vec.get(1).unwrap().material);
+        assert_eq!(Material::air(), vec.get(2).unwrap().material);
+        assert_eq!(Material::default(), vec.get(3).unwrap().material);
+    }
+
+    #[test]
+    fn override_material_with_bounding_volume() {
+        let vec = scene!(
+            +sphere!();
+            +scene!(
+                material_override: Material::air();
+                bounding_volume: cube!();
+                +cube!();
+                +scene!(
+                    +cube!();
+                );
+            );
+            +cylinder!();
+        )
+        .flatten_scene();
+
+        assert_eq!(5, vec.len());
+        assert_eq!(Material::default(), vec.get(0).unwrap().material);
+        // index 1 is the BV
+        assert_eq!(Material::air(), vec.get(2).unwrap().material);
+        assert_eq!(Material::air(), vec.get(3).unwrap().material);
+        assert_eq!(Material::default(), vec.get(4).unwrap().material);
+    }
+
+    #[test]
+    fn double_override_material() {
+        let vec = scene!(
+            +sphere!();
+            +scene!(
+                material_override: Material::air();
+                +cube!();
+                +scene!(
+                    // second override
+                    material_override: Material::glass();
+                    +cube!();
+                );
+            );
+            +cylinder!();
+        )
+        .flatten_scene();
+
+        assert_eq!(4, vec.len());
+        assert_eq!(Material::default(), vec.get(0).unwrap().material);
+        assert_eq!(Material::air(), vec.get(1).unwrap().material);
+        assert_eq!(Material::glass(), vec.get(2).unwrap().material);
+        assert_eq!(Material::default(), vec.get(3).unwrap().material);
+    }
+
+    #[test]
+    fn override_material_with_csg() {
+        let vec = scene!(
+            +sphere!();
+            +scene!(
+                material_override: Material::air();
+                +cube!() + sphere!();
+            );
+            +cylinder!();
+        )
+        .flatten_scene();
+
+        assert_eq!(5, vec.len());
+        assert_eq!(Material::default(), vec.get(0).unwrap().material);
+        // index 1 is the CSG node
+        assert_eq!(Material::air(), vec.get(2).unwrap().material);
+        assert_eq!(Material::air(), vec.get(3).unwrap().material);
+        assert_eq!(Material::default(), vec.get(4).unwrap().material);
     }
 }
