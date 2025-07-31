@@ -41,7 +41,11 @@ impl TestScene for SatisfyingConveyor {
                 );
                 pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
             );
-            +factory.pawn.clone();
+            //+factory.pawn.clone();
+            +scene!(
+                material_override: factory.red();
+                +factory.pawn.clone() & sphere!(matrix: matrix4x4!(scale(1., 1.1, 1.)));
+            );
             +factory.half_world();
             +scene!(
                 matrix: matrix4x4!(
@@ -52,6 +56,7 @@ impl TestScene for SatisfyingConveyor {
         );
 
         let mut world = World::default();
+        //world.max_ray_generation = 3;
         world.add(scene!(
             +world_scene;
         ));
@@ -87,8 +92,17 @@ struct SatisfyingPipesAnimatedFactory {
 }
 
 impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn red(&self) -> Material {
+        let mut material = Material::default();
+        material.pattern = Pattern::Solid(*RED);
+        material
+    }
+}
+
+impl SatisfyingPipesAnimatedFactory {
 
     fn half_world(&self) -> SceneTree {
+        let x = 0.01;
         scene!(
         matrix: matrix4x4!(
             //scale(1., 0.5, 2.)
@@ -113,66 +127,28 @@ impl SatisfyingPipesAnimatedFactory {
         );
             // die stamp block
         +scene!(
-                // todo motion
-            matrix: matrix4x4!(translation(1., 0., 0.));
+            matrix: matrix4x4!(translation(x, 0., 0.));
             material_override: Material::glass();
             +cube!(
                 matrix: matrix4x4!(
                         scale(1., 1.6, 1.)
                         translation(0., 1., 0.)
                     );
-                    //pattern: Pattern::Solid(*RED);
             ) - scene!(
                     matrix: matrix4x4!(translation(-1., 0., 0.));
                     +self.silver_pawn();
             );
             );
-            // TODO IDEA - inject mould
-            // +self.silver_pawn() & sphere!(
-            //     matrix: matrix4x4!(scale(1., 1.9, 1.));
-            //     pattern: Pattern::Solid(*RED));
     )
     }
 
-    fn silver_pawn(&self) -> SceneTree {
+    pub(crate) fn silver_pawn(&self) -> SceneTree {
         let mut pawn = self.pawn.clone();
         // TODO MUST HAVE A MATERIAL OVERRIDE NODE
         pawn
     }
 }
 
-impl SatisfyingPipesAnimatedFactory {
-    /// origin is cutting point
-    pub(crate) fn chisel(&self) -> SceneTree {
-        let thickness = 0.01;
-        let thickness_2 = 0.04;
-        scene!(
-            matrix: matrix4x4!(
-                translation(-1., 0., 0.)
-            );
-            +cube!(
-                matrix: matrix4x4!(
-                    scale(1., thickness, thickness_2)
-                );
-                pattern: Pattern::Solid(color!(0.8, 0.8, 0.4));
-            ) + cylinder!(
-                matrix: matrix4x4!(
-                    translation(-0.5, 0., 0.)
-                    scale(4., 0.2, 0.2)
-                    translation(-1., 0., 0.)
-                    rotation_z(degrees!(90))
-                );
-                pattern: Pattern::Solid(color!(0.8, 0.8, 0.4));
-            ) + sphere!(
-                matrix: matrix4x4!(
-                    translation(-0.5, 0., 0.)
-                    scale_all(0.2)
-                );
-                pattern: Pattern::Solid(color!(0.8, 0.8, 0.4));
-            );
-        )
-    }
-}
 impl SatisfyingPipesAnimatedFactory {
     fn new(mode: Mode) -> Self {
         let pawn = scene!(
