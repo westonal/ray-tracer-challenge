@@ -31,6 +31,7 @@ impl TestScene for SatisfyingConveyor {
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
         let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient);
         factory.floor_height = 1.0;
+        factory.die_position = 0.;
         let factory = factory;
         let progress = frame.loop_progress;
 
@@ -42,17 +43,21 @@ impl TestScene for SatisfyingConveyor {
                 pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
             );
             //+factory.pawn.clone();
+            // +scene!(
+            //     material_override: factory.red();
+            //     +factory.pawn.clone() & sphere!(matrix: matrix4x4!(scale(1., 1.1, 1.)));
+            // );
+            // Left hand scene
             +scene!(
-                material_override: factory.red();
-                +factory.pawn.clone() & sphere!(matrix: matrix4x4!(scale(1., 1.1, 1.)));
-            );
-            +factory.half_world();
-            +scene!(
-                matrix: matrix4x4!(
-                    scale(-1., 1., 1.)
-                );
                 +factory.half_world();
             );
+            // Right hand scene
+            // +scene!(
+            //     matrix: matrix4x4!(
+            //         scale(-1., 1., 1.)
+            //     );
+            //     +factory.half_world();
+            // );
         );
 
         let mut world = World::default();
@@ -89,6 +94,7 @@ struct SatisfyingPipesAnimatedFactory {
     pipe_length: f32,
     floor_height: f32,
     pawn: SceneTree,
+    die_position: f32,
 }
 
 impl SatisfyingPipesAnimatedFactory {
@@ -102,32 +108,46 @@ impl SatisfyingPipesAnimatedFactory {
 impl SatisfyingPipesAnimatedFactory {
 
     fn half_world(&self) -> SceneTree {
-        let x = 0.01;
+        let conveyor_length = 40.;
+        let conveyor_motion = 0.5;
         scene!(
-        matrix: matrix4x4!(
-            //scale(1., 0.5, 2.)
-            translation(1., 0., 0.)
-        );
-        // bounding_volume: cube!(
-        //
-        // );
-        +cube!(
             matrix: matrix4x4!(
-                scale(1., 0.5, 2.)
-                translation(0., -1., 0.)
+                //scale(1., 0.5, 2.)
+                translation(1., 0., 0.)
             );
-            pattern: Pattern::Stripe(*YELLOW, *BLACK, Transform::new(
-                matrix4x4!(
-                    rotation_y(degrees!(-60))
-                    scale_all(0.5)
-                    // scale_all(0.5)
-                    // scale(1., 1., 1. / 10.)
-                )
-            ))
-        );
-            // die stamp block
-        +scene!(
-            matrix: matrix4x4!(translation(x, 0., 0.));
+            // bounding_volume: cube!(
+            //
+            // );
+            // conveyor
+            +cube!(
+                matrix: matrix4x4!(
+                    scale(1., 0.5, conveyor_length)
+                    translation(0., -1., 0.)
+                );
+                pattern: Pattern::Stripe(*YELLOW, *BLACK, Transform::new(
+                    matrix4x4!(
+                        scale(1., 1., 1. / conveyor_length)
+                        rotation_y(degrees!(-60))
+                        translation(0.5, 0., 0.)
+                        scale_all(0.5)
+                        // scale_all(0.5)
+                        // scale(1., 1., 1. / 10.)
+                    )
+                ))
+            );
+            //+self.die_stamp();
+        )
+    }
+
+    pub(crate) fn silver_pawn(&self) -> SceneTree {
+        let mut pawn = self.pawn.clone();
+        // TODO MUST HAVE A MATERIAL OVERRIDE NODE
+        pawn
+    }
+
+    fn die_stamp(&self) -> SceneTree {
+        scene!(
+            matrix: matrix4x4!(translation(self.die_position, 0., 0.));
             material_override: Material::glass();
             +cube!(
                 matrix: matrix4x4!(
@@ -138,14 +158,7 @@ impl SatisfyingPipesAnimatedFactory {
                     matrix: matrix4x4!(translation(-1., 0., 0.));
                     +self.silver_pawn();
             );
-            );
-    )
-    }
-
-    pub(crate) fn silver_pawn(&self) -> SceneTree {
-        let mut pawn = self.pawn.clone();
-        // TODO MUST HAVE A MATERIAL OVERRIDE NODE
-        pawn
+        )
     }
 }
 
@@ -161,6 +174,7 @@ impl SatisfyingPipesAnimatedFactory {
             mode,
             pipe_length: 1.,
             floor_height: 1.,
+            die_position: 0.,
             pawn,
         }
     }
