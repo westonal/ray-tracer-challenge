@@ -105,14 +105,17 @@ impl TestScene for SatisfyingConveyor {
         world
     }
 
-    fn build_camera(&self, size: Size) -> Camera {
-        let mut camera = Camera::new(size, degrees!(30));
+    fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+        let mut camera = Camera::new(size, degrees!(25));
         let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
         let top_down_high =
             ViewMatrix::new_look_at(point!(0, 30, 0), point!(0, 0, 0), vector!(0, 0, 1));
         let front_on =
             ViewMatrix::new_look_at(point!(-10, 10, 20), point!(0, 0.5, 0), vector!(0, 1, 0));
-        camera.set_transform(front_on.into());
+
+        let zoom =
+            ViewMatrix::new_look_at(point!((accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8, 8. * 0.8, 20. * 0.8), point!(0, 0.5, 0), vector!(0, 1, 0));
+        camera.set_transform(zoom.into());
         camera
     }
 }
