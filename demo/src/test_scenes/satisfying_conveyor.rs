@@ -2,7 +2,6 @@ use crate::obj;
 use crate::obj_loader::AABBBuilder;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
-use image::codecs::png::FilterType::Paeth;
 use math::tuple::color::{BLACK, RED, YELLOW};
 use math::tuple::point::Point;
 use math::{color, degrees, matrix4x4, point, vector};
@@ -10,22 +9,17 @@ use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::intersection::Intersect;
 use ray_tracer::lighting::PointLight;
-use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
+use ray_tracer::material::Material;
 use ray_tracer::rays::Ray;
 use ray_tracer::scene_tree::{FlatScene, FlattenScene, SceneTree};
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
-use ray_tracer::{cube, cylinder, plane, ray, scene, sphere};
+use ray_tracer::{cube, plane, ray, scene, sphere};
 use std::default::Default;
 use std::f32::consts::PI;
-use std::ops::Deref;
-use std::panic::panic_any;
 use std::time::Duration;
-use image::Frame;
-
-pub struct SatisfyingConveyorOld;
 
 macro_rules! animation {
     (
@@ -64,7 +58,7 @@ macro_rules! animation {
 animation!(
     SatisfyingConveyor;
     "satisfying-conveyor";
-    animation_spec!(1;seconds @25;fps);
+    animation_spec!(2;seconds @30;fps);
     |frame:&AnimationFrame|{
         let factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
         factory.injection_scene()
@@ -92,111 +86,6 @@ animation!(
     |frame|scene!();
     |size, frame|Camera::new(size, degrees!(25));
 );
-
-impl TestScene for SatisfyingConveyorOld {
-    fn name(&self) -> &'static str {
-        "satisfying-conveyor"
-    }
-
-    fn animation_spec(&self) -> Option<AnimationSpec> {
-        Some(animation_spec!(1;seconds @25;fps))
-    }
-
-    fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
-        let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
-        factory.floor_height = 1.0;
-        factory.die_position = 0.;
-        let progress = frame.loop_progress;
-        factory.conveyor_position = 0.; //frame.loop_progress;
-        let factory = factory;
-        let inject_progress = frame.progress;
-        let inject_blob_radius = 0.54;
-
-        factory.injection_scene();
-
-        let world_scene = scene!(
-            //material_override: Material::default();
-            +plane!(
-                matrix: matrix4x4!(
-                    translation(0., -factory.floor_height, 0.)
-                );
-                pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
-            );
-            //+factory.pawn.clone();
-            +{
-                if inject_progress > 0. {
-                    scene!(
-                        material_override: factory.red();
-                        +factory.pawn.clone() & (
-                            // Middle injection point
-                            sphere!(matrix: matrix4x4!(
-                                translation(0., 1., 0.)
-                                scale_all(inject_blob_radius * decelerate(inject_progress))
-                            )) +
-                            // Top injection point
-                            sphere!(matrix: matrix4x4!(
-                                translation(0., 2., 0.)
-                                scale_all(inject_blob_radius * decelerate(inject_progress))
-                            )) +
-                            // Bottom injection point
-                            sphere!(matrix: matrix4x4!(
-                                translation(0., 0., 0.)
-                                scale_all(inject_blob_radius * decelerate(inject_progress))
-                            ))
-                        );
-                    )
-                } else {
-                    scene!()
-                }
-            };
-            // Left hand scene
-            +scene!(
-                +factory.half_world();
-                +factory.die_stamp();
-            );
-            // Right hand scene
-            +scene!(
-                matrix: matrix4x4!(
-                    scale(-1., 1., 1.)
-                );
-                +factory.half_world();
-                // do not draw left when combined
-                //+factory.die_stamp();
-            );
-        );
-
-        let mut world = World::default();
-        //world.max_ray_generation = 3;
-        world.add(scene!(
-            +world_scene;
-        ));
-        world.add_light(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
-        world
-    }
-
-    fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
-        let mut camera = Camera::new(size, degrees!(25));
-        let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
-        let top_down_high =
-            ViewMatrix::new_look_at(point!(0, 30, 0), point!(0, 0, 0), vector!(0, 0, 1));
-        let front_on =
-            ViewMatrix::new_look_at(point!(-10, 10, 20), point!(0, 0.5, 0), vector!(0, 1, 0));
-
-        let zoom = ViewMatrix::new_look_at(
-            point!(
-                (accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8,
-                8. * 0.8,
-                20. * 0.8
-            ),
-            point!(0, 0.5, 0),
-            vector!(0, 1, 0),
-        );
-        camera.set_transform(zoom.into());
-        camera
-    }
-}
-
-//
 
 #[derive(PartialEq)]
 enum Mode {
