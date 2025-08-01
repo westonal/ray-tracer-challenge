@@ -26,6 +26,48 @@ use std::time::Duration;
 
 pub struct SatisfyingConveyor;
 
+macro_rules! animation {
+    (
+        $name:tt;
+        $file_name:expr;
+        $animation_spec:expr;
+        $scene:expr;
+        $camera:expr;
+    ) => {
+        pub struct $name;
+
+        impl TestScene for $name {
+            fn name(&self) -> &'static str {
+                $file_name
+            }
+
+            fn animation_spec(&self) -> Option<AnimationSpec> {
+                Some($animation_spec)
+            }
+
+            fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
+                let mut world = World::default();
+                //world.max_ray_generation = 3;
+                world.add($scene(frame));
+                world.add_light(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
+                world
+            }
+
+            fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+                $camera(size, frame)
+            }
+        }
+    };
+}
+
+animation!(
+    SatisfyingConveyorPt2;
+    "satisfying-conveyor-pt2";
+    animation_spec!(1;seconds @25;fps);
+    |frame|scene!();
+    |size, frame|Camera::new(size, degrees!(25));
+);
+
 impl TestScene for SatisfyingConveyor {
     fn name(&self) -> &'static str {
         "satisfying-conveyor"
@@ -40,7 +82,7 @@ impl TestScene for SatisfyingConveyor {
         factory.floor_height = 1.0;
         factory.die_position = 0.;
         let progress = frame.loop_progress;
-        factory.conveyor_position = 0.;//frame.loop_progress;
+        factory.conveyor_position = 0.; //frame.loop_progress;
         let factory = factory;
         let inject_progress = frame.progress;
         let inject_blob_radius = 0.54;
@@ -113,8 +155,15 @@ impl TestScene for SatisfyingConveyor {
         let front_on =
             ViewMatrix::new_look_at(point!(-10, 10, 20), point!(0, 0.5, 0), vector!(0, 1, 0));
 
-        let zoom =
-            ViewMatrix::new_look_at(point!((accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8, 8. * 0.8, 20. * 0.8), point!(0, 0.5, 0), vector!(0, 1, 0));
+        let zoom = ViewMatrix::new_look_at(
+            point!(
+                (accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8,
+                8. * 0.8,
+                20. * 0.8
+            ),
+            point!(0, 0.5, 0),
+            vector!(0, 1, 0),
+        );
         camera.set_transform(zoom.into());
         camera
     }
