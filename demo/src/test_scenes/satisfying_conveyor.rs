@@ -23,8 +23,9 @@ use std::f32::consts::PI;
 use std::ops::Deref;
 use std::panic::panic_any;
 use std::time::Duration;
+use image::Frame;
 
-pub struct SatisfyingConveyor;
+pub struct SatisfyingConveyorOld;
 
 macro_rules! animation {
     (
@@ -61,6 +62,30 @@ macro_rules! animation {
 }
 
 animation!(
+    SatisfyingConveyor;
+    "satisfying-conveyor";
+    animation_spec!(1;seconds @25;fps);
+    |frame:&AnimationFrame|{
+        let factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
+        factory.injection_scene()
+    };
+    |size, frame:&AnimationFrame|{
+        let mut camera = Camera::new(size, degrees!(25));
+        let zoom = ViewMatrix::new_look_at(
+            point!(
+                (accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8,
+                8. * 0.8,
+                20. * 0.8
+            ),
+            point!(0, 0.5, 0),
+            vector!(0, 1, 0),
+        );
+        camera.set_transform(zoom.into());
+        camera
+    };
+);
+
+animation!(
     SatisfyingConveyorPt2;
     "satisfying-conveyor-pt2";
     animation_spec!(1;seconds @25;fps);
@@ -68,7 +93,7 @@ animation!(
     |size, frame|Camera::new(size, degrees!(25));
 );
 
-impl TestScene for SatisfyingConveyor {
+impl TestScene for SatisfyingConveyorOld {
     fn name(&self) -> &'static str {
         "satisfying-conveyor"
     }
@@ -78,7 +103,7 @@ impl TestScene for SatisfyingConveyor {
     }
 
     fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
-        let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient);
+        let mut factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
         factory.floor_height = 1.0;
         factory.die_position = 0.;
         let progress = frame.loop_progress;
@@ -86,6 +111,8 @@ impl TestScene for SatisfyingConveyor {
         let factory = factory;
         let inject_progress = frame.progress;
         let inject_blob_radius = 0.54;
+
+        factory.injection_scene();
 
         let world_scene = scene!(
             //material_override: Material::default();
@@ -179,6 +206,7 @@ enum Mode {
 
 struct SatisfyingPipesAnimatedFactory {
     mode: Mode,
+    frame: AnimationFrame,
     pipe_length: f32,
     floor_height: f32,
     pawn: SceneTree,
@@ -187,6 +215,66 @@ struct SatisfyingPipesAnimatedFactory {
     conveyor_length: f32,
     conveyor_width: f32,
     side_width: f32,
+}
+
+impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn injection_scene(&self) -> SceneTree {
+        let progress = self.frame.loop_progress;
+        let factory = self;
+        let inject_progress = self.frame.progress;
+        let inject_blob_radius = 0.54;
+
+        scene!(
+            //material_override: Material::default();
+            +plane!(
+                matrix: matrix4x4!(
+                    translation(0., -factory.floor_height, 0.)
+                );
+                pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
+            );
+            //+factory.pawn.clone();
+            +{
+                if inject_progress > 0. {
+                    scene!(
+                        material_override: factory.red();
+                        +factory.pawn.clone() & (
+                            // Middle injection point
+                            sphere!(matrix: matrix4x4!(
+                                translation(0., 1., 0.)
+                                scale_all(inject_blob_radius * decelerate(inject_progress))
+                            )) +
+                            // Top injection point
+                            sphere!(matrix: matrix4x4!(
+                                translation(0., 2., 0.)
+                                scale_all(inject_blob_radius * decelerate(inject_progress))
+                            )) +
+                            // Bottom injection point
+                            sphere!(matrix: matrix4x4!(
+                                translation(0., 0., 0.)
+                                scale_all(inject_blob_radius * decelerate(inject_progress))
+                            ))
+                        );
+                    )
+                } else {
+                    scene!()
+                }
+            };
+            // Left hand scene
+            +scene!(
+                +factory.half_world();
+                +factory.die_stamp();
+            );
+            // Right hand scene
+            +scene!(
+                matrix: matrix4x4!(
+                    scale(-1., 1., 1.)
+                );
+                +factory.half_world();
+                // do not draw left when combined
+                //+factory.die_stamp();
+            );
+        )
+    }
 }
 
 impl SatisfyingPipesAnimatedFactory {
@@ -299,12 +387,13 @@ impl SatisfyingPipesAnimatedFactory {
 }
 
 impl SatisfyingPipesAnimatedFactory {
-    fn new(mode: Mode) -> Self {
+    fn new(mode: Mode, frame: AnimationFrame) -> Self {
         // pawn, but can insert any obj here, it will measure and fit height to 2
         let pawn = obj_scaled_to_height_2("objs/chess/queen.obj");
 
         Self {
             mode,
+            frame,
             pipe_length: 1.,
             floor_height: 1.,
             die_position: 0.,
