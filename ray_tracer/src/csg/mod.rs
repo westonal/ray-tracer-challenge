@@ -42,7 +42,9 @@ impl Debug for SceneTree {
             SceneTree::CsgLeaf(lhs, operation, rhs) => {
                 write!(f, "({:?} {:?} {:?})", lhs, operation, rhs)
             }
-            &SceneTree::Group { .. } => todo!(),
+            SceneTree::Group { bounding_shape, children, .. } => {
+                write!(f, "[bv:{:?}; {:?}]", bounding_shape, children.len())
+            },
         }
     }
 }
