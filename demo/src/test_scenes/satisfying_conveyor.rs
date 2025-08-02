@@ -22,7 +22,7 @@ use std::f32::consts::PI;
 use std::mem;
 use std::time::Duration;
 
-const MODE: Mode = Mode::Middle;
+const MODE: Mode = Mode::Final;
 const CAMERA_MOTION: bool = false;
 const FPS: usize = 30;
 
