@@ -200,7 +200,7 @@ animation!(
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
         factory.die_position = accelerate_decelerate(1. - frame.progress);
-        factory.conveyor_position = 0.5 + factory.conveyor_motion_per_cycle/2. * decelerate(frame.progress);
+        factory.conveyor_position = factory.conveyor_motion_per_cycle/2. * decelerate(frame.progress);
         factory.close_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -268,7 +268,7 @@ impl SatisfyingPipesAnimatedFactory {
 
         scene!(
             +self.background();
-            +self.prior_prints();
+            +self.prior_prints(1);
             +{
                 if inject_progress > 0. {
                     scene!(
@@ -315,7 +315,7 @@ impl SatisfyingPipesAnimatedFactory {
     pub(crate) fn release_scene(&self) -> SceneTree {
         scene!(
             +self.background();
-            +self.prior_prints();
+            +self.prior_prints(1);
             +scene!(
                 material_override: self.red();
                 +self.injection_object.clone();
@@ -342,7 +342,7 @@ impl SatisfyingPipesAnimatedFactory {
     pub(crate) fn close_scene(&self) -> SceneTree {
         scene!(
             +self.background();
-            +self.prior_prints();
+            +self.prior_prints(0);
             // Left hand scene
             +scene!(
                 +self.half_world();
@@ -365,7 +365,7 @@ impl SatisfyingPipesAnimatedFactory {
     pub(crate) fn conveyor_move_scene(&self) -> SceneTree {
         scene!(
             +self.background();
-            +self.prior_prints();
+            +self.prior_prints(1);
             +scene!(
                 matrix: matrix4x4!(
                     translation(0.,0.,self.conveyor_position)
@@ -395,12 +395,12 @@ impl SatisfyingPipesAnimatedFactory {
     }
 
     /// Place prior printed objects on the belt
-    fn prior_prints(&self) -> SceneTree {
+    fn prior_prints(&self, offset: usize) -> SceneTree {
         let mut scene = scene!();
         for i in 0..self.prior_objects_on_belt {
             scene.add(scene!(
                 matrix: matrix4x4!(
-                    translation(0., 0., (self.conveyor_motion_per_cycle/2.) * (i+1) as f32)
+                    translation(0., 0., (self.conveyor_motion_per_cycle/2.) * (i+1+offset) as f32)
                     translation(0.,0.,self.conveyor_position)
                 );
                 +scene!(
@@ -542,7 +542,7 @@ impl SatisfyingPipesAnimatedFactory {
             conveyor_length: 40.,
             conveyor_width: 1.,
             conveyor_motion_per_cycle: 4.,
-            prior_objects_on_belt: 2,
+            prior_objects_on_belt: 1,
             side_width: 1.,
             injection_object,
         }
