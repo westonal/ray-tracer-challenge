@@ -102,7 +102,7 @@ pub trait RenderTestSceneAnimated<T: ?Sized> {
 
 impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     fn render_animation_scene_to(&self, size: Size, path: &str, spec: &AnimationSpec) {
-        let frames = build_frames(spec);
+        let frames = spec.build_frames();
         let name = self.name();
         let frame_path = format!("{}{}_frames/", path, name);
         let path_prefix = format!("{}{}_", frame_path, name);
@@ -131,36 +131,42 @@ impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     }
 }
 
-fn build_frames(spec: &AnimationSpec) -> Vec<AnimationFrame> {
-    let mut result = vec![];
-    let time_step_per_frame = spec.per_frame_time_step();
-    let frame_count = spec.frame_count();
-    let mut animation_frame = AnimationFrame {
-        number: 1,
-        last_frame_number: frame_count,
-        time: Duration::from_secs(0),
-        loop_progress: 0.0,
-        progress: 0.0,
-        exposure: time_step_per_frame,
-    };
-    while animation_frame.number <= frame_count {
-        // Maps [0..frame_count-1) to [0..1]
-        animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;
-        // Maps [0..frame_count-1] to [0..1]
-        animation_frame.progress = (animation_frame.number - 1) as f32 / (frame_count - 1) as f32;
-        result.push(animation_frame.clone());
-        // Advance time and frame only after pushing
-        animation_frame.number += 1;
-        animation_frame.time += time_step_per_frame;
-    }
-    let last_frame = result.last();
-    if let Some(AnimationFrame { number, .. }) = last_frame {
-        let number = *number;
-        for animation_frame in result.iter_mut() {
-            animation_frame.last_frame_number = number;
+pub trait Frames{
+    fn build_frames(&self) -> Vec<AnimationFrame>;
+}
+
+impl Frames for AnimationSpec {
+    fn build_frames(&self) -> Vec<AnimationFrame> {
+        let mut result = vec![];
+        let time_step_per_frame = self.per_frame_time_step();
+        let frame_count = self.frame_count();
+        let mut animation_frame = AnimationFrame {
+            number: 1,
+            last_frame_number: frame_count,
+            time: Duration::from_secs(0),
+            loop_progress: 0.0,
+            progress: 0.0,
+            exposure: time_step_per_frame,
+        };
+        while animation_frame.number <= frame_count {
+            // Maps [0..frame_count-1) to [0..1]
+            animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;
+            // Maps [0..frame_count-1] to [0..1]
+            animation_frame.progress = (animation_frame.number - 1) as f32 / (frame_count - 1) as f32;
+            result.push(animation_frame.clone());
+            // Advance time and frame only after pushing
+            animation_frame.number += 1;
+            animation_frame.time += time_step_per_frame;
         }
+        let last_frame = result.last();
+        if let Some(AnimationFrame { number, .. }) = last_frame {
+            let number = *number;
+            for animation_frame in result.iter_mut() {
+                animation_frame.last_frame_number = number;
+            }
+        }
+        result
     }
-    result
 }
 
 impl<T: TestScene + ?Sized> RenderTestScene<T> for T {

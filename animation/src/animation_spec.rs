@@ -1,3 +1,4 @@
+use std::iter::Sum;
 use std::time::Duration;
 
 #[derive(Debug, PartialEq)]
@@ -83,4 +84,16 @@ mod animation_spec_tests {
 
         fractional_frame_rate; 8;secs @29.97 => frames: 239; micros_per_frame: 33366; final_frame_start_at: 7.974474
     );
+}
+
+impl Sum for AnimationSpec{
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        let mut fps = None;
+        let mut duration = Duration::from_secs(0);
+        for i in iter{
+            duration += i.duration_limit;
+            fps = Some(i.fps);
+        }
+        AnimationSpec::new(duration, fps.expect("Can't sum zero animation specs"))
+    }
 }

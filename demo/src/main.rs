@@ -21,7 +21,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
-use demo::test_scenes::satisfying_conveyor::SatisfyingConveyor;
+use demo::test_scenes::satisfying_conveyor::{SatisfyingConveyor, SatisfyingConveyorPt2, SatisfyingConveyorFull};
 
 struct BuiltScene {
     name: &'static str,
@@ -78,6 +78,8 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         SatisfyingPipesAnimated
         SatisfyingPipesRaisingAnimated
         SatisfyingConveyor
+        SatisfyingConveyorPt2
+        SatisfyingConveyorFull
     );
     scenes.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
     scenes

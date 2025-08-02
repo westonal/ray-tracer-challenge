@@ -1,6 +1,6 @@
 use crate::obj;
 use crate::obj_loader::AABBBuilder;
-use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
+use crate::test_scenes::{AnimationFrame, AnimationSpec, Frames, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLACK, RED, YELLOW};
 use math::tuple::point::Point;
@@ -9,8 +9,8 @@ use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::intersection::Intersect;
 use ray_tracer::lighting::PointLight;
-use ray_tracer::material::pattern::Pattern;
 use ray_tracer::material::Material;
+use ray_tracer::material::pattern::Pattern;
 use ray_tracer::rays::Ray;
 use ray_tracer::scene_tree::{FlatScene, FlattenScene, SceneTree};
 use ray_tracer::transform::Transform;
@@ -55,10 +55,70 @@ macro_rules! animation {
     };
 }
 
+macro_rules! multi_part_animation {
+    (
+        $name:tt;
+        $file_name:expr;
+        [$($sub_animation:expr,)+]
+    ) => {
+        pub struct $name;
+
+        impl $name {
+            fn all_animations() -> Vec<DynamicScene> {
+                vec![
+                    $(DynamicScene(Box::new($sub_animation),), )+
+                ]
+            }
+        }
+
+        impl TestScene for $name {
+            fn name(&self) -> &'static str {
+                $file_name
+            }
+
+            fn animation_spec(&self) -> Option<AnimationSpec> {
+                Some($name::all_animations().iter().map(|f| f.0.animation_spec().unwrap()).sum())
+            }
+
+            fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
+                let (scene, frame) = map_frame($name::all_animations(), frame);
+                scene.0.build_world_for_frame(&frame)
+            }
+
+            fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
+                let (scene, frame) = map_frame($name::all_animations(), frame);
+                scene.0.build_camera_for_frame(size, &frame)
+            }
+        }
+    };
+}
+
+fn map_frame(scenes:Vec<DynamicScene>,input_frame: &AnimationFrame) -> (DynamicScene, AnimationFrame) {
+    let mut frame_number = input_frame.number;
+    println!("Frame {}", frame_number);
+    for sub_animation in scenes.into_iter() {
+        let spec = sub_animation.0.animation_spec().unwrap();
+        let frames_in_part = spec.frame_count();
+        println!("{} has {}", sub_animation.0.name(), frames_in_part);
+        if frame_number <= frames_in_part {
+            println!("Getting frame {} from {}", frame_number, sub_animation.0.name());
+            return (
+                sub_animation,
+                spec.build_frames()
+                    .get((frame_number - 1) as usize)
+                    .unwrap()
+                    .clone(),
+            );
+        }
+        frame_number -= frames_in_part;
+    }
+    panic!("Out of bounds")
+}
+
 animation!(
     SatisfyingConveyor;
     "satisfying-conveyor";
-    animation_spec!(2;seconds @30;fps);
+    animation_spec!(1;seconds @25;fps);
     |frame:&AnimationFrame|{
         let factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
         factory.injection_scene()
@@ -82,9 +142,22 @@ animation!(
 animation!(
     SatisfyingConveyorPt2;
     "satisfying-conveyor-pt2";
-    animation_spec!(1;seconds @25;fps);
-    |frame|scene!();
+    animation_spec!(2;seconds @25;fps);
+    |frame|scene!(
+        +cube!();
+    );
     |size, frame|Camera::new(size, degrees!(25));
+);
+
+struct DynamicScene(Box<dyn TestScene>);
+
+multi_part_animation!(
+    SatisfyingConveyorFull;
+    "satisfying-conveyor-full";
+    [
+        SatisfyingConveyor,
+        SatisfyingConveyorPt2,
+    ]
 );
 
 #[derive(PartialEq)]
@@ -151,7 +224,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +factory.half_world();
-                +factory.die_stamp();
+                // +factory.die_stamp();
             );
             // Right hand scene
             +scene!(
