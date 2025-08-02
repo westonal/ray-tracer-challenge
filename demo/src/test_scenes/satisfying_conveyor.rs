@@ -22,7 +22,7 @@ use std::f32::consts::PI;
 use std::mem;
 use std::time::Duration;
 
-const MODE: Mode = Mode::Final;
+const MODE: Mode = Mode::Middle;
 const CAMERA_MOTION: bool = false;
 const FPS: usize = 30;
 
@@ -47,7 +47,7 @@ macro_rules! animation {
 
             fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
                 let mut world = World::default();
-                //world.max_ray_generation = 3;
+                world.max_ray_generation = 7;
                 world.add($scene(frame));
                 world.add_light(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
                 world
@@ -262,6 +262,7 @@ struct SatisfyingPipesAnimatedFactory {
     prior_objects_on_belt: usize,
     side_width: f32,
     printing_material: Material,
+    use_full_die: bool,
     prior_material_odd: Material,
     prior_material_even: Material,
 }
@@ -321,7 +322,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.half_die_stamp();
+                +self.half_die_stamp_left();
             );
             // Right hand scene
             +scene!(
@@ -329,10 +330,7 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(-1., 1., 1.)
                 );
                 +self.half_world();
-                +scene!(
-                    iff: self.mode != Mode::Efficient;
-                    +self.half_die_stamp();
-                );
+                +self.half_die_stamp_right();
             );
         )
     }
@@ -348,7 +346,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.half_die_stamp();
+                +self.half_die_stamp_left();
             );
             // Right hand scene
             +scene!(
@@ -356,10 +354,7 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(-1., 1., 1.)
                 );
                 +self.half_world();
-                +scene!(
-                    iff: self.mode != Mode::Efficient;
-                    +self.half_die_stamp();
-                );
+                +self.half_die_stamp_right();
             );
         )
     }
@@ -371,7 +366,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.half_die_stamp();
+                +self.half_die_stamp_left();
             );
             // Right hand scene
             +scene!(
@@ -379,10 +374,7 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(-1., 1., 1.)
                 );
                 +self.half_world();
-                +scene!(
-                    iff: self.mode != Mode::Efficient;
-                    +self.half_die_stamp();
-                );
+                +self.half_die_stamp_right();
             );
         )
     }
@@ -403,7 +395,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.half_die_stamp();
+                +self.half_die_stamp_left();
             );
             // Right hand scene
             +scene!(
@@ -411,10 +403,7 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(-1., 1., 1.)
                 );
                 +self.half_world();
-                +scene!(
-                    iff: self.mode != Mode::Efficient;
-                    +self.half_die_stamp();
-                );
+                +self.half_die_stamp_right();
             );
         )
     }
@@ -451,6 +440,21 @@ impl SatisfyingPipesAnimatedFactory {
             );
             +self.conveyor();
             +self.side();
+        )
+    }
+
+    fn half_die_stamp_left(&self) -> SceneTree {
+        if self.use_full_die && self.die_position == 0. {
+            self.full_die_stamp()
+        } else {
+            self.half_die_stamp()
+        }
+    }
+
+    fn half_die_stamp_right(&self) -> SceneTree {
+        scene!(
+            iff: self.mode != Mode::Efficient && (!self.use_full_die || self.die_position > 0.);
+            +self.half_die_stamp();
         )
     }
 
@@ -561,6 +565,7 @@ impl SatisfyingPipesAnimatedFactory {
             conveyor_motion_per_cycle: 4.,
             prior_objects_on_belt: 1,
             side_width: 1.5,
+            use_full_die: true,
             printing_material: {
                 let mut mat = Material::default();
                 mat.pattern = Pattern::Solid(*GREEN);
