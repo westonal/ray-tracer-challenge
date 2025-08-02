@@ -31,6 +31,9 @@ pub struct AnimationFrame {
     /// One-based frame number
     pub number: u32,
 
+    /// If nested, what sub-scene is this
+    pub sub_scene: u32,
+
     /// One-based frame number
     pub last_frame_number: u32,
 
@@ -51,6 +54,7 @@ impl Default for AnimationFrame {
     fn default() -> Self {
         Self {
             number: 0,
+            sub_scene: 0,
             last_frame_number: 0,
             time: Duration::from_secs(0),
             progress: 1.0,
@@ -163,6 +167,7 @@ impl Frames for AnimationSpec {
         let frame_count = self.frame_count();
         let mut animation_frame = AnimationFrame {
             number: 1,
+            sub_scene: 0,
             last_frame_number: frame_count,
             time: Duration::from_secs(0),
             loop_progress: 0.0,

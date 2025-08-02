@@ -2,7 +2,7 @@ use crate::obj;
 use crate::obj_loader::AABBBuilder;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, TestScene};
 use animation::animation_spec;
-use math::tuple::color::{BLACK, RED, YELLOW};
+use math::tuple::color::{BLACK, BLUE, Color, GREEN, RED, YELLOW};
 use math::tuple::point::Point;
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
@@ -19,10 +19,12 @@ use ray_tracer::world::World;
 use ray_tracer::{cube, plane, ray, scene, sphere};
 use std::default::Default;
 use std::f32::consts::PI;
+use std::mem;
 use std::time::Duration;
 
 const MODE: Mode = Mode::Middle;
 const CAMERA_MOTION: bool = false;
+const FPS: usize = 10;
 
 macro_rules! animation {
     (
@@ -99,17 +101,17 @@ fn map_frame(
     input_frame: &AnimationFrame,
 ) -> (DynamicScene, AnimationFrame) {
     let mut frame_number = input_frame.number;
-    for sub_animation in scenes.into_iter() {
+    for (sub_scene_index, sub_animation) in scenes.into_iter().enumerate() {
         let spec = sub_animation.0.animation_spec().unwrap();
         let frames_in_part = spec.frame_count();
         if frame_number <= frames_in_part {
-            return (
-                sub_animation,
-                spec.build_frames()
-                    .get((frame_number - 1) as usize)
-                    .unwrap()
-                    .clone(),
-            );
+            let mut f = spec
+                .build_frames()
+                .get((frame_number - 1) as usize)
+                .unwrap()
+                .clone();
+            f.sub_scene = sub_scene_index as u32;
+            return (sub_animation, f);
         }
         frame_number -= frames_in_part;
     }
@@ -119,9 +121,10 @@ fn map_frame(
 animation!(
     SatisfyingConveyorInject;
     "satisfying-conveyor-pt.1-inject";
-    animation_spec!(1;seconds @25;fps);
+    animation_spec!(1;seconds @FPS;fps);
     |frame:&AnimationFrame|{
-        let factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        factory.set_printing_material(frame.sub_scene / 4 % 2 == 0);
         factory.injection_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -144,9 +147,10 @@ animation!(
 animation!(
     SatisfyingConveyorRelease;
     "satisfying-conveyor-pt.2-release";
-    animation_spec!(2;seconds @25;fps);
+    animation_spec!(2;seconds @FPS;fps);
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        factory.set_printing_material(frame.sub_scene / 4 % 2 == 0);
         factory.die_position = accelerate_decelerate(frame.progress);
         factory.release_scene()
     };
@@ -170,11 +174,12 @@ animation!(
 animation!(
     SatisfyingConveyorMove;
     "satisfying-conveyor-pt.3-move";
-    animation_spec!(2;seconds @25;fps);
+    animation_spec!(2;seconds @FPS;fps);
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
         factory.die_position = 1.;
         factory.conveyor_position = factory.conveyor_motion_per_cycle/2. * accelerate(frame.progress);
+        factory.set_printing_material(frame.sub_scene / 4 % 2 == 0);
         factory.conveyor_move_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -196,11 +201,12 @@ animation!(
 animation!(
     SatisfyingConveyorClose;
     "satisfying-conveyor-pt.4-close";
-    animation_spec!(2;seconds @25;fps);
+    animation_spec!(2;seconds @FPS;fps);
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
         factory.die_position = accelerate_decelerate(1. - frame.progress);
         factory.conveyor_position = factory.conveyor_motion_per_cycle/2. * decelerate(frame.progress);
+        factory.set_printing_material(frame.sub_scene / 4 % 2 == 0);
         factory.close_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -228,6 +234,11 @@ multi_part_animation!(
         SatisfyingConveyorRelease,
         SatisfyingConveyorMove,
         SatisfyingConveyorClose,
+        // Repeat for second color
+        SatisfyingConveyorInject,
+        SatisfyingConveyorRelease,
+        SatisfyingConveyorMove,
+        SatisfyingConveyorClose,
     ]
 );
 
@@ -250,6 +261,18 @@ struct SatisfyingPipesAnimatedFactory {
     conveyor_motion_per_cycle: f32,
     prior_objects_on_belt: usize,
     side_width: f32,
+    printing_material: Material,
+    prior_material_odd: Material,
+    prior_material_even: Material,
+}
+
+impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn set_printing_material(&mut self, even: bool) {
+        if !even {
+            mem::swap(&mut self.prior_material_odd, &mut self.prior_material_even);
+        }
+        self.printing_material = self.prior_material_even.clone()
+    }
 }
 
 impl SatisfyingPipesAnimatedFactory {
@@ -272,7 +295,7 @@ impl SatisfyingPipesAnimatedFactory {
             +{
                 if inject_progress > 0. {
                     scene!(
-                        material_override: self.red();
+                        material_override: self.printing_material.clone();
                         +self.injection_object.clone() & (
                             // Middle injection point
                             sphere!(matrix: matrix4x4!(
@@ -317,7 +340,7 @@ impl SatisfyingPipesAnimatedFactory {
             +self.background();
             +self.prior_prints(1);
             +scene!(
-                material_override: self.red();
+                material_override: self.printing_material.clone();
                 +self.injection_object.clone();
             );
             // Left hand scene
@@ -371,7 +394,7 @@ impl SatisfyingPipesAnimatedFactory {
                     translation(0.,0.,self.conveyor_position)
                 );
                 +scene!(
-                    material_override: self.red();
+                    material_override: self.printing_material.clone();
                     +self.injection_object.clone();
                 );
             );
@@ -398,13 +421,18 @@ impl SatisfyingPipesAnimatedFactory {
     fn prior_prints(&self, offset: usize) -> SceneTree {
         let mut scene = scene!();
         for i in 0..self.prior_objects_on_belt {
+            let i = i + offset + 1;
             scene.add(scene!(
                 matrix: matrix4x4!(
-                    translation(0., 0., (self.conveyor_motion_per_cycle/2.) * (i+1+offset) as f32)
+                    translation(0., 0., (self.conveyor_motion_per_cycle/2.) * i as f32)
                     translation(0.,0.,self.conveyor_position)
                 );
                 +scene!(
-                    material_override: self.red();
+                    material_override: if i % 2 == 1 {
+                        self.prior_material_even.clone()
+                    } else {
+                        self.prior_material_odd.clone()
+                    };
                     +self.injection_object.clone();
                 );
             ))
@@ -414,24 +442,11 @@ impl SatisfyingPipesAnimatedFactory {
 }
 
 impl SatisfyingPipesAnimatedFactory {
-    pub(crate) fn red(&self) -> Material {
-        let mut material = Material::default();
-        material.pattern = Pattern::Solid(*RED);
-        material
-    }
-}
-
-impl SatisfyingPipesAnimatedFactory {
     fn half_world(&self) -> SceneTree {
         scene!(
             matrix: matrix4x4!(
-                //scale(1., 0.5, 2.)
                 translation(1., -0.5, 0.)
             );
-            // bounding_volume: cube!(
-            //
-            // );
-            // conveyor
             +self.conveyor();
             +self.side();
         )
@@ -544,6 +559,21 @@ impl SatisfyingPipesAnimatedFactory {
             conveyor_motion_per_cycle: 4.,
             prior_objects_on_belt: 1,
             side_width: 1.,
+            printing_material: {
+                let mut mat = Material::default();
+                mat.pattern = Pattern::Solid(*GREEN);
+                mat
+            },
+            prior_material_odd: {
+                let mut mat = Material::default();
+                mat.pattern = Pattern::Solid(*BLUE);
+                mat
+            },
+            prior_material_even: {
+                let mut mat = Material::default();
+                mat.pattern = Pattern::Solid(*YELLOW);
+                mat
+            },
             injection_object,
         }
     }
