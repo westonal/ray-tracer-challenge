@@ -22,7 +22,7 @@ use std::f32::consts::PI;
 use std::time::Duration;
 
 const MODE: Mode = Mode::Middle;
-const CAMERA_MOTION:bool = false;
+const CAMERA_MOTION: bool = false;
 
 macro_rules! animation {
     (
@@ -94,7 +94,10 @@ macro_rules! multi_part_animation {
     };
 }
 
-fn map_frame(scenes:Vec<DynamicScene>,input_frame: &AnimationFrame) -> (DynamicScene, AnimationFrame) {
+fn map_frame(
+    scenes: Vec<DynamicScene>,
+    input_frame: &AnimationFrame,
+) -> (DynamicScene, AnimationFrame) {
     let mut frame_number = input_frame.number;
     for sub_animation in scenes.into_iter() {
         let spec = sub_animation.0.animation_spec().unwrap();
@@ -144,7 +147,7 @@ animation!(
     animation_spec!(2;seconds @25;fps);
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
-        factory.die_position = frame.progress;
+        factory.die_position = accelerate_decelerate(frame.progress);
         factory.release_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -171,7 +174,7 @@ animation!(
     |frame:&AnimationFrame|{
         let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
         factory.die_position = 1.;
-        factory.conveyor_position = 4. * frame.progress;
+        factory.conveyor_position = factory.conveyor_motion_per_cycle/2. * accelerate(frame.progress);
         factory.conveyor_move_scene()
     };
     |size, frame:&AnimationFrame|{
@@ -190,6 +193,33 @@ animation!(
     };
 );
 
+animation!(
+    SatisfyingConveyorClose;
+    "satisfying-conveyor-pt.4-close";
+    animation_spec!(2;seconds @25;fps);
+    |frame:&AnimationFrame|{
+        let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        factory.die_position = accelerate_decelerate(1. - frame.progress);
+        factory.conveyor_position = 0.5 + factory.conveyor_motion_per_cycle/2. * decelerate(frame.progress);
+        factory.close_scene()
+    };
+    |size, frame:&AnimationFrame|{
+        let mut camera = Camera::new(size, degrees!(25));
+        let motion = if CAMERA_MOTION {accelerate_decelerate(1.-frame.progress)} else {1.};
+        let zoom = ViewMatrix::new_look_at(
+            point!(
+                (motion * -20. + 10.) * 0.8,
+                8. * 0.8,
+                20. * 0.8
+            ),
+            point!(0, 0.5, 0),
+            vector!(0, 1, 0),
+        );
+        camera.set_transform(zoom.into());
+        camera
+    };
+);
+
 multi_part_animation!(
     SatisfyingConveyor;
     "satisfying-conveyor";
@@ -197,6 +227,7 @@ multi_part_animation!(
         SatisfyingConveyorInject,
         SatisfyingConveyorRelease,
         SatisfyingConveyorMove,
+        SatisfyingConveyorClose,
     ]
 );
 
@@ -210,13 +241,14 @@ enum Mode {
 struct SatisfyingPipesAnimatedFactory {
     mode: Mode,
     frame: AnimationFrame,
-    pipe_length: f32,
     floor_height: f32,
     injection_object: SceneTree,
     die_position: f32,
     conveyor_position: f32,
     conveyor_length: f32,
     conveyor_width: f32,
+    conveyor_motion_per_cycle: f32,
+    prior_objects_on_belt: usize,
     side_width: f32,
 }
 
@@ -236,6 +268,7 @@ impl SatisfyingPipesAnimatedFactory {
 
         scene!(
             +self.background();
+            +self.prior_prints();
             +{
                 if inject_progress > 0. {
                     scene!(
@@ -282,6 +315,7 @@ impl SatisfyingPipesAnimatedFactory {
     pub(crate) fn release_scene(&self) -> SceneTree {
         scene!(
             +self.background();
+            +self.prior_prints();
             +scene!(
                 material_override: self.red();
                 +self.injection_object.clone();
@@ -298,7 +332,30 @@ impl SatisfyingPipesAnimatedFactory {
                 );
                 +self.half_world();
                 +scene!(
-                    iff: self.mode != Mode::Efficient;
+                    iff: self.mode != Mode::Efficient && self.die_position > 0.;
+                    +self.die_stamp();
+                );
+            );
+        )
+    }
+
+    pub(crate) fn close_scene(&self) -> SceneTree {
+        scene!(
+            +self.background();
+            +self.prior_prints();
+            // Left hand scene
+            +scene!(
+                +self.half_world();
+                +self.die_stamp();
+            );
+            // Right hand scene
+            +scene!(
+                matrix: matrix4x4!(
+                    scale(-1., 1., 1.)
+                );
+                +self.half_world();
+                +scene!(
+                    iff: self.mode != Mode::Efficient && self.die_position > 0.;
                     +self.die_stamp();
                 );
             );
@@ -308,6 +365,7 @@ impl SatisfyingPipesAnimatedFactory {
     pub(crate) fn conveyor_move_scene(&self) -> SceneTree {
         scene!(
             +self.background();
+            +self.prior_prints();
             +scene!(
                 matrix: matrix4x4!(
                     translation(0.,0.,self.conveyor_position)
@@ -334,6 +392,24 @@ impl SatisfyingPipesAnimatedFactory {
                 );
             );
         )
+    }
+
+    /// Place prior printed objects on the belt
+    fn prior_prints(&self) -> SceneTree {
+        let mut scene = scene!();
+        for i in 0..self.prior_objects_on_belt {
+            scene.add(scene!(
+                matrix: matrix4x4!(
+                    translation(0., 0., (self.conveyor_motion_per_cycle/2.) * (i+1) as f32)
+                    translation(0.,0.,self.conveyor_position)
+                );
+                +scene!(
+                    material_override: self.red();
+                    +self.injection_object.clone();
+                );
+            ))
+        }
+        scene
     }
 }
 
@@ -422,7 +498,7 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(1. / conveyor_width, 1., 1. / conveyor_length)
                     rotation_y(degrees!(15))
                     rotation_y(degrees!(-90))
-                    translation(self.conveyor_position, 0., 0.)
+                    translation(self.conveyor_position * 2., 0., 0.)
                     scale_all(0.5)
                 )
             ))
@@ -451,18 +527,22 @@ impl SatisfyingPipesAnimatedFactory {
         let injection_object = match mode {
             // can insert any obj here, it will measure and fit height to 2
             Mode::Final => obj_scaled_to_height_2("objs/chess/queen.obj"),
-            _ => sphere!(matrix: matrix4x4!(scale_all(0.5) scale(1., 2., 1.) translation(0.,1.,0.))).into(),
+            _ => {
+                sphere!(matrix: matrix4x4!(scale_all(0.5) scale(1., 2., 1.) translation(0.,1.,0.)))
+                    .into()
+            }
         };
 
         Self {
             mode,
             frame,
-            pipe_length: 1.,
             floor_height: 1.,
             die_position: 0.,
             conveyor_position: 0.,
             conveyor_length: 40.,
             conveyor_width: 1.,
+            conveyor_motion_per_cycle: 4.,
+            prior_objects_on_belt: 2,
             side_width: 1.,
             injection_object,
         }
