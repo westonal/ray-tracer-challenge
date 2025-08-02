@@ -2,7 +2,7 @@ use crate::obj;
 use crate::obj_loader::AABBBuilder;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, TestScene};
 use animation::animation_spec;
-use math::tuple::color::{BLACK, BLUE, Color, GREEN, RED, YELLOW};
+use math::tuple::color::{BLACK, BLUE, Color, GREEN, RED, YELLOW, WHITE};
 use math::tuple::point::Point;
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
@@ -22,9 +22,9 @@ use std::f32::consts::PI;
 use std::mem;
 use std::time::Duration;
 
-const MODE: Mode = Mode::Middle;
+const MODE: Mode = Mode::Final;
 const CAMERA_MOTION: bool = false;
-const FPS: usize = 10;
+const FPS: usize = 30;
 
 macro_rules! animation {
     (
@@ -321,7 +321,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.die_stamp();
+                +self.half_die_stamp();
             );
             // Right hand scene
             +scene!(
@@ -329,8 +329,10 @@ impl SatisfyingPipesAnimatedFactory {
                     scale(-1., 1., 1.)
                 );
                 +self.half_world();
-                // do not draw left when combined
-                //+factory.die_stamp();
+                +scene!(
+                    iff: self.mode != Mode::Efficient;
+                    +self.half_die_stamp();
+                );
             );
         )
     }
@@ -346,7 +348,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.die_stamp();
+                +self.half_die_stamp();
             );
             // Right hand scene
             +scene!(
@@ -355,8 +357,8 @@ impl SatisfyingPipesAnimatedFactory {
                 );
                 +self.half_world();
                 +scene!(
-                    iff: self.mode != Mode::Efficient && self.die_position > 0.;
-                    +self.die_stamp();
+                    iff: self.mode != Mode::Efficient;
+                    +self.half_die_stamp();
                 );
             );
         )
@@ -369,7 +371,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.die_stamp();
+                +self.half_die_stamp();
             );
             // Right hand scene
             +scene!(
@@ -378,8 +380,8 @@ impl SatisfyingPipesAnimatedFactory {
                 );
                 +self.half_world();
                 +scene!(
-                    iff: self.mode != Mode::Efficient && self.die_position > 0.;
-                    +self.die_stamp();
+                    iff: self.mode != Mode::Efficient;
+                    +self.half_die_stamp();
                 );
             );
         )
@@ -401,7 +403,7 @@ impl SatisfyingPipesAnimatedFactory {
             // Left hand scene
             +scene!(
                 +self.half_world();
-                +self.die_stamp();
+                +self.half_die_stamp();
             );
             // Right hand scene
             +scene!(
@@ -411,7 +413,7 @@ impl SatisfyingPipesAnimatedFactory {
                 +self.half_world();
                 +scene!(
                     iff: self.mode != Mode::Efficient;
-                    +self.die_stamp();
+                    +self.half_die_stamp();
                 );
             );
         )
@@ -452,48 +454,48 @@ impl SatisfyingPipesAnimatedFactory {
         )
     }
 
-    fn die_stamp(&self) -> SceneTree {
-        if self.die_position > 0. {
-            scene!(
+    fn half_die_stamp(&self) -> SceneTree {
+        scene!(
+            matrix: matrix4x4!(
+                translation(self.die_position, 0., 0.)
+                translation(0.01, 0., 0.)
+                translation(1., 0., 0.)
+            );
+            material_override: Material::glass();
+            +cube!(
                 matrix: matrix4x4!(
-                    translation(self.die_position, 0., 0.)
-                    translation(1., 0., 0.)
+                    translation(-1., -1., 0.)
+                    scale(0.5, 1.05, 1.)
+                    translation(1., 1., 0.)
+                    translation(0., 1., 0.)
                 );
-                material_override: Material::glass();
-                +cube!(
-                    matrix: matrix4x4!(
-                        translation(-1., -1., 0.)
-                        scale(0.5, 1.05, 1.)
-                        translation(1., 1., 0.)
-                        translation(0., 1., 0.)
-                    );
-                ) - scene!(
-                        matrix: matrix4x4!(translation(-1., 0., 0.));
-                        +self.injection_object.clone();
-                );
-            )
-        } else {
-            // FULL block
-            scene!(
+            ) - scene!(
+                    matrix: matrix4x4!(translation(-1., 0., 0.));
+                    +self.injection_object.clone();
+            );
+        )
+    }
+    
+    fn full_die_stamp(&self) -> SceneTree {
+        scene!(
+            matrix: matrix4x4!(
+                translation(self.die_position, 0., 0.)
+                translation(1., 0., 0.)
+            );
+            material_override: Material::glass();
+            +cube!(
                 matrix: matrix4x4!(
-                    translation(self.die_position, 0., 0.)
-                    translation(1., 0., 0.)
+                    scale(2., 1., 1.) // scale for full block
+                    translation(-1., -1., 0.)
+                    scale(0.5, 1.05, 1.)
+                    translation(1., 1., 0.)
+                    translation(0., 1., 0.)
                 );
-                material_override: Material::glass();
-                +cube!(
-                    matrix: matrix4x4!(
-                        scale(2., 1., 1.) // scale for full block
-                        translation(-1., -1., 0.)
-                        scale(0.5, 1.05, 1.)
-                        translation(1., 1., 0.)
-                        translation(0., 1., 0.)
-                    );
-                ) - scene!(
-                        matrix: matrix4x4!(translation(-1., 0., 0.));
-                        +self.injection_object.clone();
-                );
-            )
-        }
+            ) - scene!(
+                    matrix: matrix4x4!(translation(-1., 0., 0.));
+                    +self.injection_object.clone();
+            );
+        )
     }
 
     fn conveyor(&self) -> SceneTree {
@@ -558,7 +560,7 @@ impl SatisfyingPipesAnimatedFactory {
             conveyor_width: 1.,
             conveyor_motion_per_cycle: 4.,
             prior_objects_on_belt: 1,
-            side_width: 1.,
+            side_width: 1.5,
             printing_material: {
                 let mut mat = Material::default();
                 mat.pattern = Pattern::Solid(*GREEN);
@@ -566,12 +568,12 @@ impl SatisfyingPipesAnimatedFactory {
             },
             prior_material_odd: {
                 let mut mat = Material::default();
-                mat.pattern = Pattern::Solid(*BLUE);
+                mat.pattern = Pattern::Solid(*WHITE);
                 mat
             },
             prior_material_even: {
                 let mut mat = Material::default();
-                mat.pattern = Pattern::Solid(*YELLOW);
+                mat.pattern = Pattern::Solid(*BLACK);
                 mat
             },
             injection_object,
