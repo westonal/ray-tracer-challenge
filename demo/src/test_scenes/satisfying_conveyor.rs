@@ -1,6 +1,6 @@
 use crate::obj;
 use crate::obj_loader::AABBBuilder;
-use crate::test_scenes::{AnimationFrame, AnimationSpec, Frames, TestScene};
+use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLACK, RED, YELLOW};
 use math::tuple::point::Point;
@@ -21,6 +21,9 @@ use std::default::Default;
 use std::f32::consts::PI;
 use std::time::Duration;
 
+const MODE: Mode = Mode::Middle;
+const CAMERA_MOTION:bool = false;
+
 macro_rules! animation {
     (
         $name:tt;
@@ -29,7 +32,7 @@ macro_rules! animation {
         $scene:expr;
         $camera:expr;
     ) => {
-        pub struct $name;
+        struct $name;
 
         impl TestScene for $name {
             fn name(&self) -> &'static str {
@@ -63,31 +66,29 @@ macro_rules! multi_part_animation {
     ) => {
         pub struct $name;
 
-        impl $name {
-            fn all_animations() -> Vec<DynamicScene> {
-                vec![
-                    $(DynamicScene(Box::new($sub_animation),), )+
-                ]
-            }
-        }
-
         impl TestScene for $name {
             fn name(&self) -> &'static str {
                 $file_name
             }
 
             fn animation_spec(&self) -> Option<AnimationSpec> {
-                Some($name::all_animations().iter().map(|f| f.0.animation_spec().unwrap()).sum())
+                Some($name.sub_scenes().iter().map(|f| f.0.animation_spec().unwrap()).sum())
             }
 
             fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
-                let (scene, frame) = map_frame($name::all_animations(), frame);
+                let (scene, frame) = map_frame($name.sub_scenes(), frame);
                 scene.0.build_world_for_frame(&frame)
             }
 
             fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
-                let (scene, frame) = map_frame($name::all_animations(), frame);
+                let (scene, frame) = map_frame($name.sub_scenes(), frame);
                 scene.0.build_camera_for_frame(size, &frame)
+            }
+
+            fn sub_scenes(&self) -> Vec<DynamicScene> {
+                vec![
+                    $(DynamicScene(Box::new($sub_animation),), )+
+                ]
             }
         }
     };
@@ -95,13 +96,10 @@ macro_rules! multi_part_animation {
 
 fn map_frame(scenes:Vec<DynamicScene>,input_frame: &AnimationFrame) -> (DynamicScene, AnimationFrame) {
     let mut frame_number = input_frame.number;
-    println!("Frame {}", frame_number);
     for sub_animation in scenes.into_iter() {
         let spec = sub_animation.0.animation_spec().unwrap();
         let frames_in_part = spec.frame_count();
-        println!("{} has {}", sub_animation.0.name(), frames_in_part);
         if frame_number <= frames_in_part {
-            println!("Getting frame {} from {}", frame_number, sub_animation.0.name());
             return (
                 sub_animation,
                 spec.build_frames()
@@ -116,18 +114,19 @@ fn map_frame(scenes:Vec<DynamicScene>,input_frame: &AnimationFrame) -> (DynamicS
 }
 
 animation!(
-    SatisfyingConveyor;
-    "satisfying-conveyor";
+    SatisfyingConveyorInject;
+    "satisfying-conveyor-pt.1-inject";
     animation_spec!(1;seconds @25;fps);
     |frame:&AnimationFrame|{
-        let factory = SatisfyingPipesAnimatedFactory::new(Mode::Efficient, frame.clone());
+        let factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
         factory.injection_scene()
     };
     |size, frame:&AnimationFrame|{
         let mut camera = Camera::new(size, degrees!(25));
+        let motion = if CAMERA_MOTION {accelerate_decelerate(frame.progress)} else {1.};
         let zoom = ViewMatrix::new_look_at(
             point!(
-                (accelerate_decelerate(frame.progress) * -20. + 10.) * 0.8,
+                (motion * -20. + 10.) * 0.8,
                 8. * 0.8,
                 20. * 0.8
             ),
@@ -140,29 +139,71 @@ animation!(
 );
 
 animation!(
-    SatisfyingConveyorPt2;
-    "satisfying-conveyor-pt2";
+    SatisfyingConveyorRelease;
+    "satisfying-conveyor-pt.2-release";
     animation_spec!(2;seconds @25;fps);
-    |frame|scene!(
-        +cube!();
-    );
-    |size, frame|Camera::new(size, degrees!(25));
+    |frame:&AnimationFrame|{
+        let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        factory.die_position = frame.progress;
+        factory.release_scene()
+    };
+    |size, frame:&AnimationFrame|{
+        let mut camera = Camera::new(size, degrees!(25));
+        let motion = if CAMERA_MOTION {accelerate_decelerate(1.-frame.progress)} else {1.};
+        let zoom = ViewMatrix::new_look_at(
+            point!(
+                (motion * -20. + 10.) * 0.8,
+                8. * 0.8,
+                20. * 0.8
+            ),
+            point!(0, 0.5, 0),
+            vector!(0, 1, 0),
+        );
+        camera.set_transform(zoom.into());
+        camera
+    };
 );
 
-struct DynamicScene(Box<dyn TestScene>);
+animation!(
+    SatisfyingConveyorMove;
+    "satisfying-conveyor-pt.3-move";
+    animation_spec!(2;seconds @25;fps);
+    |frame:&AnimationFrame|{
+        let mut factory = SatisfyingPipesAnimatedFactory::new(MODE, frame.clone());
+        factory.die_position = 1.;
+        factory.conveyor_position = 4. * frame.progress;
+        factory.conveyor_move_scene()
+    };
+    |size, frame:&AnimationFrame|{
+        let mut camera = Camera::new(size, degrees!(25));
+        let zoom = ViewMatrix::new_look_at(
+            point!(
+                -10. * 0.8,
+                8. * 0.8,
+                20. * 0.8
+            ),
+            point!(0, 0.5, 0),
+            vector!(0, 1, 0),
+        );
+        camera.set_transform(zoom.into());
+        camera
+    };
+);
 
 multi_part_animation!(
-    SatisfyingConveyorFull;
-    "satisfying-conveyor-full";
+    SatisfyingConveyor;
+    "satisfying-conveyor";
     [
-        SatisfyingConveyor,
-        SatisfyingConveyorPt2,
+        SatisfyingConveyorInject,
+        SatisfyingConveyorRelease,
+        SatisfyingConveyorMove,
     ]
 );
 
 #[derive(PartialEq)]
 enum Mode {
     Efficient,
+    Middle,
     Final,
 }
 
@@ -171,7 +212,7 @@ struct SatisfyingPipesAnimatedFactory {
     frame: AnimationFrame,
     pipe_length: f32,
     floor_height: f32,
-    pawn: SceneTree,
+    injection_object: SceneTree,
     die_position: f32,
     conveyor_position: f32,
     conveyor_length: f32,
@@ -180,26 +221,26 @@ struct SatisfyingPipesAnimatedFactory {
 }
 
 impl SatisfyingPipesAnimatedFactory {
+    pub(crate) fn background(&self) -> SceneTree {
+        plane!(
+            matrix: matrix4x4!(
+                translation(0., -self.floor_height, 0.)
+            );
+            pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
+        ).into()
+    }
+
     pub(crate) fn injection_scene(&self) -> SceneTree {
-        let progress = self.frame.loop_progress;
-        let factory = self;
         let inject_progress = self.frame.progress;
         let inject_blob_radius = 0.54;
 
         scene!(
-            //material_override: Material::default();
-            +plane!(
-                matrix: matrix4x4!(
-                    translation(0., -factory.floor_height, 0.)
-                );
-                pattern: Pattern::Checker(color!(0.3, 0.3, 0.3), color!(0.7, 0.7, 0.7), Transform::identity());
-            );
-            //+factory.pawn.clone();
+            +self.background();
             +{
                 if inject_progress > 0. {
                     scene!(
-                        material_override: factory.red();
-                        +factory.pawn.clone() & (
+                        material_override: self.red();
+                        +self.injection_object.clone() & (
                             // Middle injection point
                             sphere!(matrix: matrix4x4!(
                                 translation(0., 1., 0.)
@@ -223,17 +264,74 @@ impl SatisfyingPipesAnimatedFactory {
             };
             // Left hand scene
             +scene!(
-                +factory.half_world();
-                // +factory.die_stamp();
+                +self.half_world();
+                +self.die_stamp();
             );
             // Right hand scene
             +scene!(
                 matrix: matrix4x4!(
                     scale(-1., 1., 1.)
                 );
-                +factory.half_world();
+                +self.half_world();
                 // do not draw left when combined
                 //+factory.die_stamp();
+            );
+        )
+    }
+
+    pub(crate) fn release_scene(&self) -> SceneTree {
+        scene!(
+            +self.background();
+            +scene!(
+                material_override: self.red();
+                +self.injection_object.clone();
+            );
+            // Left hand scene
+            +scene!(
+                +self.half_world();
+                +self.die_stamp();
+            );
+            // Right hand scene
+            +scene!(
+                matrix: matrix4x4!(
+                    scale(-1., 1., 1.)
+                );
+                +self.half_world();
+                +scene!(
+                    iff: self.mode != Mode::Efficient;
+                    +self.die_stamp();
+                );
+            );
+        )
+    }
+
+    pub(crate) fn conveyor_move_scene(&self) -> SceneTree {
+        scene!(
+            +self.background();
+            +scene!(
+                matrix: matrix4x4!(
+                    translation(0.,0.,self.conveyor_position)
+                );
+                +scene!(
+                    material_override: self.red();
+                    +self.injection_object.clone();
+                );
+            );
+            // Left hand scene
+            +scene!(
+                +self.half_world();
+                +self.die_stamp();
+            );
+            // Right hand scene
+            +scene!(
+                matrix: matrix4x4!(
+                    scale(-1., 1., 1.)
+                );
+                +self.half_world();
+                +scene!(
+                    iff: self.mode != Mode::Efficient;
+                    +self.die_stamp();
+                );
             );
         )
     }
@@ -280,7 +378,7 @@ impl SatisfyingPipesAnimatedFactory {
                     );
                 ) - scene!(
                         matrix: matrix4x4!(translation(-1., 0., 0.));
-                        +self.pawn.clone();
+                        +self.injection_object.clone();
                 );
             )
         } else {
@@ -301,7 +399,7 @@ impl SatisfyingPipesAnimatedFactory {
                     );
                 ) - scene!(
                         matrix: matrix4x4!(translation(-1., 0., 0.));
-                        +self.pawn.clone();
+                        +self.injection_object.clone();
                 );
             )
         }
@@ -350,8 +448,11 @@ impl SatisfyingPipesAnimatedFactory {
 
 impl SatisfyingPipesAnimatedFactory {
     fn new(mode: Mode, frame: AnimationFrame) -> Self {
-        // pawn, but can insert any obj here, it will measure and fit height to 2
-        let pawn = obj_scaled_to_height_2("objs/chess/queen.obj");
+        let injection_object = match mode {
+            // can insert any obj here, it will measure and fit height to 2
+            Mode::Final => obj_scaled_to_height_2("objs/chess/queen.obj"),
+            _ => sphere!(matrix: matrix4x4!(scale_all(0.5) scale(1., 2., 1.) translation(0.,1.,0.))).into(),
+        };
 
         Self {
             mode,
@@ -363,7 +464,7 @@ impl SatisfyingPipesAnimatedFactory {
             conveyor_length: 40.,
             conveyor_width: 1.,
             side_width: 1.,
-            pawn,
+            injection_object,
         }
     }
 }

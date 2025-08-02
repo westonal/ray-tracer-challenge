@@ -16,17 +16,18 @@ use demo::test_scenes::satisfying_pipes_raising::SatisfyingPipesRaisingAnimated;
 use demo::test_scenes::teapot::Teapot;
 use demo::test_scenes::teapot_animated::TeapotAnimated;
 use demo::test_scenes::triangles::Triangles;
-use demo::test_scenes::{RenderTestScene, TestScene};
+use demo::test_scenes::{DynamicScene, RenderTestScene, TestScene};
 use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
-use demo::test_scenes::satisfying_conveyor::{SatisfyingConveyor, SatisfyingConveyorPt2, SatisfyingConveyorFull};
+use demo::test_scenes::satisfying_conveyor::SatisfyingConveyor;
 
 struct BuiltScene {
-    name: &'static str,
+    name: String,
     file_name: String,
-    test_scene: Box<dyn TestScene + Send + Sync>,
+    cli_argument_name: String,
+    test_scene: DynamicScene,
     animation_spec: Option<AnimationSpec>,
 }
 
@@ -34,29 +35,49 @@ impl Deref for BuiltScene {
     type Target = dyn TestScene;
 
     fn deref(&self) -> &Self::Target {
-        self.test_scene.as_ref()
+        self.test_scene.deref()
     }
 }
 
 macro_rules! scenes {
     ($($name:ident)+) => {
-        vec!(
+        {
+            let mut all_scenes = vec![];
             $(
-                {
-                    let spec = $name.animation_spec();
-                    let extension = match (spec) {
+                let animation_spec = $name.animation_spec();
+                let extension = match animation_spec {
+                    None => ".png",
+                    Some(_) => ".mp4",
+                };
+
+                let name = stringify!($name);
+
+                all_scenes.push(BuiltScene {
+                            name: name.to_string(),
+                            file_name: format!("{}{}", $name.name(), extension),
+                            cli_argument_name: name.to_string(),
+                            test_scene: DynamicScene::new(Box::new($name)),
+                            animation_spec: animation_spec,
+                        });
+
+                for (i, sub) in $name.sub_scenes().into_iter().enumerate() {
+                    let sub_scene = sub.deref();
+                    let animation_spec = sub_scene.animation_spec();
+                    let extension = match (animation_spec) {
                         None => ".png",
                         Some(_) => ".mp4",
                     };
-                    BuiltScene {
-                        name: stringify!($name),
-                        file_name: format!("{}{}", $name.name(), extension),
-                        test_scene: Box::new($name),
-                        animation_spec: $name.animation_spec(),
-                    }
-                },
+                    all_scenes.push(BuiltScene {
+                            name: format!("{}.part_{}", name, i + 1),
+                            file_name: format!("{}{}", sub_scene.name(), extension),
+                            cli_argument_name: format!("{}.{}", name, i + 1),
+                            test_scene: sub,
+                            animation_spec: animation_spec,
+                        });
+                }
             )+
-        )
+            all_scenes
+        }
     };
 }
 
@@ -78,10 +99,8 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         SatisfyingPipesAnimated
         SatisfyingPipesRaisingAnimated
         SatisfyingConveyor
-        SatisfyingConveyorPt2
-        SatisfyingConveyorFull
     );
-    scenes.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
+    scenes.sort_by(|a, b| a.cli_argument_name.cmp(&b.cli_argument_name));
     scenes
 });
 
@@ -146,7 +165,7 @@ fn main() {
         let arg = Arg::default()
             .id(format!("{}", scene.name))
             .required(false)
-            .long(format!("{}", scene.name.to_lowercase()))
+            .long(format!("{}", scene.cli_argument_name.to_lowercase()))
             .alias(format!("{}", n + 1))
             .action(ArgAction::SetTrue)
             .help(help);
@@ -159,10 +178,10 @@ fn main() {
     let all = matches.get_flag("all");
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
-        if (all && scene.animation_spec.is_none()) || matches.get_flag(scene.name) {
+        if (all && scene.animation_spec.is_none()) || matches.get_flag(&scene.name) {
             scene
                 .test_scene
-                .as_ref()
+                .deref()
                 .render_scene(size, !matches.get_flag("no-anim"));
             count += 1;
         }

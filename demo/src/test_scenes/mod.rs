@@ -8,13 +8,14 @@ pub mod cubes;
 pub mod cylinders;
 pub mod glass_sphere_with_air;
 pub mod grid;
+pub mod satisfying_conveyor;
 pub mod satisfying_pipes;
 pub mod satisfying_pipes_raising;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
-pub mod satisfying_conveyor;
 
+use std::ops::Deref;
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
 use animation::AnimationSpec;
@@ -59,6 +60,22 @@ impl Default for AnimationFrame {
     }
 }
 
+pub struct DynamicScene(Box<dyn TestScene + Send + Sync>);
+
+impl DynamicScene{
+    pub fn new(scene: Box<dyn TestScene + Send + Sync>) ->Self    {
+        Self(scene)
+    }
+}
+
+impl Deref for DynamicScene{
+    type Target = dyn TestScene;
+
+    fn deref(&self) -> &Self::Target {
+        &*self.0
+    }
+}
+
 pub trait TestScene {
     fn name(&self) -> &'static str;
 
@@ -80,6 +97,10 @@ pub trait TestScene {
 
     fn build_camera(&self, size: Size) -> Camera {
         self.build_camera_for_frame(size, &AnimationFrame::default())
+    }
+
+    fn sub_scenes(&self) -> Vec<DynamicScene> {
+        vec![]
     }
 }
 
@@ -131,7 +152,7 @@ impl<T: TestScene + ?Sized> RenderTestSceneAnimated<T> for T {
     }
 }
 
-pub trait Frames{
+pub trait Frames {
     fn build_frames(&self) -> Vec<AnimationFrame>;
 }
 
@@ -150,9 +171,11 @@ impl Frames for AnimationSpec {
         };
         while animation_frame.number <= frame_count {
             // Maps [0..frame_count-1) to [0..1]
-            animation_frame.loop_progress = (animation_frame.number - 1) as f32 / frame_count as f32;
+            animation_frame.loop_progress =
+                (animation_frame.number - 1) as f32 / frame_count as f32;
             // Maps [0..frame_count-1] to [0..1]
-            animation_frame.progress = (animation_frame.number - 1) as f32 / (frame_count - 1) as f32;
+            animation_frame.progress =
+                (animation_frame.number - 1) as f32 / (frame_count - 1) as f32;
             result.push(animation_frame.clone());
             // Advance time and frame only after pushing
             animation_frame.number += 1;
