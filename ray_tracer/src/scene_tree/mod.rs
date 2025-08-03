@@ -55,6 +55,19 @@ impl SceneTree {
             children: Default::default(),
         }
     }
+
+    pub fn is_not_empty(&self) -> bool {
+        match self {
+            SceneTree::Leaf(_) => true,
+            SceneTree::CsgLeaf(_, _, _) => true,
+            SceneTree::Group { children, .. } =>
+                children.iter().any(|c| c.is_not_empty()),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        !self.is_not_empty()
+    }
 }
 
 impl From<Shape> for SceneTree {

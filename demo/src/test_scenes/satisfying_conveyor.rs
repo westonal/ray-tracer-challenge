@@ -4,7 +4,7 @@ use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, Te
 use animation::animation_spec;
 use math::tuple::color::{BLACK, BLUE, Color, GREEN, RED, YELLOW, WHITE};
 use math::tuple::point::Point;
-use math::{color, degrees, matrix4x4, point, vector};
+use math::{color, degrees, matrix4x4, max, min, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::intersection::Intersect;
@@ -21,10 +21,13 @@ use std::default::Default;
 use std::f32::consts::PI;
 use std::mem;
 use std::time::Duration;
+use ray_tracer::primatives::Surface;
 
 const MODE: Mode = Mode::Final;
 const CAMERA_MOTION: bool = false;
 const FPS: usize = 30;
+const FinalInput: &str = "objs/19354_Rubber_duck_v1.obj";
+//const FinalInput: &str = "objs/chess/queen.obj";
 
 macro_rules! animation {
     (
@@ -547,7 +550,7 @@ impl SatisfyingPipesAnimatedFactory {
     fn new(mode: Mode, frame: AnimationFrame) -> Self {
         let injection_object = match mode {
             // can insert any obj here, it will measure and fit height to 2
-            Mode::Final => obj_scaled_to_height_2("objs/chess/queen.obj"),
+            Mode::Final => obj_scaled_to_height_2(FinalInput),
             _ => {
                 sphere!(matrix: matrix4x4!(scale_all(0.5) scale(1., 2., 1.) translation(0.,1.,0.)))
                     .into()
@@ -588,19 +591,42 @@ impl SatisfyingPipesAnimatedFactory {
 
 fn obj_scaled_to_height_2(path: &str) -> SceneTree {
     let obj = obj!(path: path;);
-    let measure_scene: Option<SceneTree> = match &obj {
-        SceneTree::Group { bounding_shape, .. } => bounding_shape.to_owned().map(|f| f.into()),
-        _ => None,
-    };
-    let (min, max) = extents(&measure_scene.unwrap());
+    // let measure_scene: Option<SceneTree> = match &obj {
+    //     SceneTree::Group { bounding_shape, .. } => bounding_shape.to_owned()
+    //         .map(
+    //             |f| f.into()
+    //         ),
+    //     _ => None,
+    // };
+    // let (min, max) = extents(&measure_scene.unwrap());
+    let m = match &obj {
+        SceneTree::Group { bounding_shape, .. } =>
+            bounding_shape.to_owned()
+                .map(
+                    |f| {
+                        let intersectable_shape = f.to_intersectable().transform;
+                        let x_scale = intersectable_shape.object_to_world_transform[0][0];
+                        let y_scale = intersectable_shape.object_to_world_transform[1][1];
+                        let z_scale = intersectable_shape.object_to_world_transform[2][2];
+
+                        let max_scale = max!(x_scale, y_scale, z_scale);
+
+                        matrix4x4!(
+                               scale(x_scale/max_scale, y_scale/max_scale, z_scale/max_scale)
+                                translation(0., 1., 0.)
+                            ) *
+                            intersectable_shape.world_to_object_transform *
+                            matrix4x4!(
+                               // scale_all(0.5)
+                               //translation(0., -1., 0.)
+                               // scale(1./x_scale, 1./y_scale, 1./z_scale)
+                           )
+                    }
+                ),
+        _ => panic!(),
+    }.unwrap();
     scene!(
-        matrix: matrix4x4!(
-            scale_all(2. / (max.y - min.y))
-            // Center on x and z
-            translation(-(max.x - min.x) / 2.0, 0., -(max.z - min.z) / 2.0)
-            // Set origin to min point
-            translation(-min.x, -min.y, -min.z)
-        );
+        matrix: m;
         +obj;
     )
 }
@@ -616,6 +642,7 @@ fn extents(scene: &SceneTree) -> (Point, Point) {
         ray!(point!(0, 0, 100), vector!(0, 0, -1)),
         ray!(point!(0, 0, -100), vector!(0, 0, 1)),
     ] {
+        println!("Ray {}", ray);
         aabb.push_point(&intersect(&scene, &ray));
     }
     (aabb.min_point(), aabb.max_point())

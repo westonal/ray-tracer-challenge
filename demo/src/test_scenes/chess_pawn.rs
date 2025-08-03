@@ -24,7 +24,7 @@ impl TestScene for Pawn {
         let pawn = scene!(
             matrix: matrix4x4!(rotation_y(degrees!(-60)));
             +obj!(
-                path: "objs/chess/pawn.obj";
+                path: "objs/19354_Rubber_duck_v1.obj";// "objs/chess/pawn.obj";
                 material: Material::glass();
             );
         );

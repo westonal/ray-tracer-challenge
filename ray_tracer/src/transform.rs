@@ -6,8 +6,8 @@ use math::tuple::vector::normal::Normal;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Transform {
-    object_to_world_transform: Matrix4x4,
-    world_to_object_transform: Matrix4x4,
+    pub object_to_world_transform: Matrix4x4,
+    pub world_to_object_transform: Matrix4x4,
 }
 
 impl Transform {

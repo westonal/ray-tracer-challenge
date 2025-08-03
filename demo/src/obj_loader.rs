@@ -1,3 +1,4 @@
+use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::{matrix4x4, point};
 use obj::{Group, Obj};
@@ -38,8 +39,10 @@ impl ObjLoader {
         let mut complete_aabb = AABBBuilder::new();
 
         let (object, aabb) = self.add_group(&obj, &obj.default_group);
-        scene.add(object);
-        complete_aabb += aabb;
+        if object.is_not_empty() {
+            scene.add(object);
+            complete_aabb += aabb;
+        }
         count += 1;
 
         for g in obj.group_names() {
@@ -50,10 +53,18 @@ impl ObjLoader {
             count += 1;
         }
 
-        scene!(
-            bounding_volume: complete_aabb.to_bounding();
-            +scene;
-        )
+        Self::scene_bounded_by(scene, &complete_aabb)
+    }
+
+    fn scene_bounded_by(scene: SceneTree, aabb: &AABBBuilder) -> SceneTree {
+        if let Some(bv) = aabb.to_bounding_range().map(|m| cube!(matrix: m)) {
+            scene!(
+                bounding_volume: bv;
+                +scene;
+            )
+        } else {
+            scene
+        }
     }
 
     fn add_group(&self, obj: &Obj, g: &Group) -> (SceneTree, AABBBuilder) {
@@ -72,6 +83,7 @@ impl ObjLoader {
         }
 
         let mut part = scene!();
+        let mut part_size = 0;
 
         let mut aabb = AABBBuilder::new();
         for t in g.iter() {
@@ -88,22 +100,18 @@ impl ObjLoader {
             }
 
             part.add(triangle);
+            part_size += 1;
 
             if aabb.3 > 300 {
-                group.add(scene!(
-                    bounding_volume: aabb.to_bounding();
-                    +part;
-                ));
+                group.add(Self::scene_bounded_by(part, &aabb));
                 complete_aabb += aabb;
                 part = scene!();
+                part_size = 0;
                 aabb = AABBBuilder::new();
             }
         }
 
-        group.add(scene!(
-            bounding_volume: aabb.to_bounding();
-            +part;
-        ));
+        group.add(Self::scene_bounded_by(part, &aabb));
         complete_aabb += aabb;
 
         (group, complete_aabb)
@@ -114,6 +122,12 @@ impl ObjLoader {
 struct AABBBuilderRange {
     min: f32,
     max: f32,
+}
+
+impl AABBBuilderRange {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.min >= self.max
+    }
 }
 
 impl Default for AABBBuilderRange {
@@ -145,13 +159,22 @@ impl AABBBuilder {
 }
 
 impl AABBBuilder {
-    pub(crate) fn to_bounding(&self) -> Shape {
-        cube!(matrix: matrix4x4!(
+    pub(crate) fn to_bounding_range(&self) -> Option<Matrix4x4> {
+        if self.0.is_empty() {
+            return None;
+        }
+        if self.1.is_empty() {
+            return None;
+        }
+        if self.2.is_empty() {
+            return None;
+        }
+        Some(matrix4x4!(
             translation(self.0.min, self.1.min, self.2.min)
             scale(self.0.width(), self.1.width(), self.2.width())
             translation(0.5, 0.5, 0.5)
-            scale_all(0.5))
-        )
+            scale_all(0.5)
+        ))
     }
 }
 
