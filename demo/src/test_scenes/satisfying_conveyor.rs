@@ -1,6 +1,7 @@
 use crate::obj;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, TestScene};
 use animation::animation_spec;
+use animation::interpolation::{Accelerate, AccelerateDecelerate, Decelerate, Interpolator};
 use math::tuple::color::{BLACK, GREEN, WHITE, YELLOW};
 use math::{color, degrees, matrix4x4, max, point, vector};
 use ray_tracer::camera::Camera;
@@ -14,7 +15,6 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, plane, scene, sphere};
 use std::default::Default;
-use std::f32::consts::PI;
 use std::mem;
 use std::ops::Deref;
 use std::time::Duration;
@@ -618,13 +618,13 @@ fn obj_scaled_to_height_2(path: &str) -> SceneTree {
 }
 
 fn accelerate(input: f32) -> f32 {
-    input * input
+    Accelerate::interpolate(input)
 }
 
 fn decelerate(input: f32) -> f32 {
-    1.0 - accelerate(1.0 - input)
+    Decelerate::interpolate(input)
 }
 
 fn accelerate_decelerate(input: f32) -> f32 {
-    ((input + 1.) * PI).cos() / 2. + 0.5
+    AccelerateDecelerate::interpolate(input)
 }

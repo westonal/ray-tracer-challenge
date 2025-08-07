@@ -1,5 +1,6 @@
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
+use animation::interpolation::{Accelerate, Decelerate, Interpolator};
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{color, degrees, matrix4x4, point, radians, vector};
 use ray_tracer::camera::Camera;
@@ -12,7 +13,7 @@ use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, cylinder, plane, scene, sphere};
 use std::default::Default;
-use std::f32::consts::{PI, TAU};
+use std::f32::consts::TAU;
 use std::time::Duration;
 
 pub struct SatisfyingPipesRaisingAnimated;
@@ -140,11 +141,11 @@ impl SatisfyingPipesAnimatedFactory {
         if p == 0 {
             0.
         } else if p == 1 {
-            p32 - decelerate(progress)
+            p32 - Decelerate::interpolate(progress)
         } else if p > 1 {
             p32 - progress
         } else if p == -1 {
-            (1. - accelerate(progress)) + p32
+            (1. - Accelerate::interpolate(progress)) + p32
         } else {
             (1. - progress) + p32
         }
@@ -221,16 +222,4 @@ impl SatisfyingPipesAnimatedFactory {
             // ));
         )
     }
-}
-
-fn accelerate(input: f32) -> f32 {
-    input * input
-}
-
-fn decelerate(input: f32) -> f32 {
-    1.0 - accelerate(1.0 - input)
-}
-
-fn accelerate_decelerate(input: f32) -> f32 {
-    ((input + 1.).cos() * PI) / 2. + 0.5
 }
