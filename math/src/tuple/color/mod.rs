@@ -143,6 +143,7 @@ pub_static_color! {TRANSPARENT = color!(0,0,0,0)}
 pub_static_color! {RED = color!(1,0,0)}
 pub_static_color! {GREEN = color!(0,1,0)}
 pub_static_color! {BLUE = color!(0,0,1)}
+pub_static_color! {YELLOW = color!(1,1,0)}
 
 #[cfg(test)]
 mod color_macro_creation_tests {

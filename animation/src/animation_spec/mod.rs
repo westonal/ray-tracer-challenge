@@ -1,3 +1,5 @@
+mod sum;
+
 use std::time::Duration;
 
 #[derive(Debug, PartialEq)]

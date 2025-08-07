@@ -15,11 +15,21 @@ impl Transform {
         let world_normal = self.world_to_object_transform.transpose() * object_normal;
         world_normal.force_vector().normalize()
     }
+
     pub(crate) fn world_ray_to_object_ray(&self, world_ray: &Ray) -> Ray {
         self.world_to_object_transform * world_ray
     }
+
     pub(crate) fn world_point_to_object_point(&self, point: Point) -> Point {
         (self.world_to_object_transform * point).try_into().unwrap()
+    }
+
+    pub fn object_to_world_matrix(&self) -> Matrix4x4 {
+        self.object_to_world_transform
+    }
+
+    pub fn world_to_object_matrix(&self) -> Matrix4x4 {
+        self.world_to_object_transform
     }
 }
 

@@ -10,6 +10,7 @@ pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 
+#[derive(Clone)]
 pub enum SceneTree {
     Leaf(Shape),
     CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
@@ -54,6 +55,18 @@ impl SceneTree {
             children: Default::default(),
         }
     }
+
+    pub fn is_not_empty(&self) -> bool {
+        match self {
+            SceneTree::Leaf(_) => true,
+            SceneTree::CsgLeaf(_, _, _) => true,
+            SceneTree::Group { children, .. } => children.iter().any(|c| c.is_not_empty()),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        !self.is_not_empty()
+    }
 }
 
 impl From<Shape> for SceneTree {
@@ -64,6 +77,10 @@ impl From<Shape> for SceneTree {
 
 #[macro_export]
 macro_rules! scene {
+    () => {
+        $crate::scene_tree::SceneTree::new(math::matrix4x4!())
+    };
+
     ($shape:expr) => {
         {
             let tree: $crate::scene_tree::SceneTree = $shape.into();
@@ -71,23 +88,30 @@ macro_rules! scene {
         }
     };
 
-    ($(matrix: $matrix:expr;)?
+    ($(iff: $iff:expr;)?
+     $(matrix: $matrix:expr;)?
      $(material_override: $material_override:expr;)?
      $(bounding_volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {
-            let _matrix = math::matrix4x4!();
-            let _bounding_volume: Option<$crate::primatives::Shape> = None;
-            let _material_override: Option<$crate::material::Material> = None;
-            $(let _matrix = $matrix;)?
-            $(let _bounding_volume = Some($bounding_volume);)?
-            $(let _material_override = Some($material_override);)?
-            let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, _bounding_volume, _material_override);
-            $(
-            _tree.add($entry);
-            )*
-            _tree
+            let mut _condition = true;
+            $(_condition = $iff;)?
+            if _condition {
+                let _matrix = math::matrix4x4!();
+                let _bounding_volume: Option<$crate::primatives::Shape> = None;
+                let _material_override: Option<$crate::material::Material> = None;
+                $(let _matrix = $matrix;)?
+                $(let _bounding_volume = Some($bounding_volume);)?
+                $(let _material_override = Some($material_override);)?
+                let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, _bounding_volume, _material_override);
+                $(
+                _tree.add($entry);
+                )*
+                _tree
+            } else {
+                scene!()
+            }
         }
     };
 }

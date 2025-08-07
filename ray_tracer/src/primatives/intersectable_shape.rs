@@ -12,8 +12,8 @@ use std::fmt::{Debug, Formatter};
 pub struct IntersectableShape {
     pub id: ShapeId,
     pub material: Material,
-    pub(crate) transform: Transform,
-    pub(crate) surface: Surface,
+    pub transform: Transform,
+    pub surface: Surface,
 }
 
 impl Debug for IntersectableShape {
