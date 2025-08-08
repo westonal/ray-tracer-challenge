@@ -3,14 +3,14 @@ use math::tuple::point::Point;
 use math::{matrix4x4, point};
 use std::ops::AddAssign;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct AABB {
     x: AABBAxis,
     y: AABBAxis,
     z: AABBAxis,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct AABBAxis {
     min: f32,
     max: f32,
