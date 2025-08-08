@@ -97,12 +97,15 @@ impl SceneTree {
                                 bounds.matrix = matrix * bounds.matrix;
                                 bounds
                             };
+
+                            // display bounds
+                            let mut bounds2 = bounds.clone();
+                            // TODO decide if we want this oversizing on the actual BV, not just the representation
+                            bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
+                            bounds2.material.transparency = 0.9;
+                            into.push(Chain::Shape(bounds2.to_intersectable()));
+
                             into.push(chain_link!(bounds, skip: subtree.len()));
-                            // bounds2.material.transparency = 0.9;
-                            // into.push(Chain::Shape(
-                            //     bounds2.to_intersectable(),
-                            //     //subtree.len(),
-                            // ));
                             into.append(&mut subtree);
                         }
                     }
@@ -127,13 +130,24 @@ fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
                     Surface::UnitSphere => {
                         // TODO, can be cleverer with this, 6 point
                         aabb.push_points(&vec![
-                            (x4 * point!(-1, -1, -1)).force_point(),
-                            (x4 * point!(1, 1, 1)).force_point(),
+                            (x4 * point!(1, 0, 0)).force_point(),
+                            (x4 * point!(-1, 0, 0)).force_point(),
+                            (x4 * point!(0, 1, 0)).force_point(),
+                            (x4 * point!(0, -1, 0)).force_point(),
+                            (x4 * point!(0, 0, 1)).force_point(),
+                            (x4 * point!(0, 0, -1)).force_point(),
                         ])
                     }
                     Surface::UnitCube => aabb.push_points(&vec![
-                        (x4 * point!(-1, -1, -1)).force_point(),
+                        //todo check rotate
                         (x4 * point!(1, 1, 1)).force_point(),
+                        (x4 * point!(1, 1, -1)).force_point(),
+                        (x4 * point!(1, -1, 1)).force_point(),
+                        (x4 * point!(1, -1, -1)).force_point(),
+                        (x4 * point!(-1, 1, 1)).force_point(),
+                        (x4 * point!(-1, 1, -1)).force_point(),
+                        (x4 * point!(-1, -1, 1)).force_point(),
+                        (x4 * point!(-1, -1, -1)).force_point(),
                     ]),
                     Surface::PlaneXZ => {
                         panic!("Planes cannot be within auto bounding volumes")
@@ -151,7 +165,7 @@ fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
             }
         }
     }
-    result
+    aabb.to_bounding_range().unwrap()
 }
 
 #[cfg(test)]

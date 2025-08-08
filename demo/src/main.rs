@@ -23,6 +23,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
+use demo::test_scenes::bounding_volumes::BoundingVolumes;
 
 struct BuiltScene {
     name: String,
@@ -104,6 +105,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         SatisfyingPipesAnimated
         SatisfyingPipesRaisingAnimated
         SatisfyingConveyor
+        BoundingVolumes
     );
     scenes.sort_by(|a, b| a.cli_argument_name.cmp(&b.cli_argument_name));
     scenes
