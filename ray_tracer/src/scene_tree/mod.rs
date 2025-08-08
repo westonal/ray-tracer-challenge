@@ -1,17 +1,18 @@
+mod aabb;
+mod auto_bounding_volume;
 mod flat_scene;
 mod flatten;
 mod manipulation;
-mod auto_bounding_volume;
 
-use std::sync::LazyLock;
 use crate::csg::CSGOperation;
+use crate::cube;
 use crate::material::Material;
 use crate::primatives::Shape;
 pub(crate) use flat_scene::Chain;
 pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
-use crate::cube;
+use std::sync::LazyLock;
 
 #[derive(Clone)]
 pub enum SceneTree {

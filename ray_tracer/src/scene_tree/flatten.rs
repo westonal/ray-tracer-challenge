@@ -1,10 +1,10 @@
 use crate::material::Material;
+use crate::primatives::Surface;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
-use crate::{chain_link, cube};
+use crate::{AABB, chain_link, cube};
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::matrix4x4;
-use crate::primatives::Surface;
+use math::{matrix4x4, point};
 
 pub trait FlattenScene {
     fn flatten_scene(&self) -> FlatScene;
@@ -113,23 +113,37 @@ impl SceneTree {
 }
 
 fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
+    let mut aabb = AABB::new();
     let mut result = matrix4x4!();
-    if chain.len() > 1{
-        todo!("Multiple shapes not yet implemented")
-    }
-    for c in chain{
+    for c in chain {
         match c {
             Chain::BoundingVolume(_, _) => {
                 todo!("Auto BV not yet implemented for BVs")
             }
             Chain::Shape(s) => {
+                let x4 = s.transform.object_to_world_matrix();
                 result = s.transform.world_to_object_matrix();
                 match s.surface {
-                    Surface::UnitSphere => {}
-                    Surface::UnitCube => {}
-                    Surface::PlaneXZ => {}
-                    Surface::UnitCylinder(_) => {}
-                    Surface::SingleTriangle(_) => {}
+                    Surface::UnitSphere => {
+                        // TODO, can be cleverer with this, 6 point
+                        aabb.push_points(&vec![
+                            (x4 * point!(-1, -1, -1)).force_point(),
+                            (x4 * point!(1, 1, 1)).force_point(),
+                        ])
+                    }
+                    Surface::UnitCube => aabb.push_points(&vec![
+                        (x4 * point!(-1, -1, -1)).force_point(),
+                        (x4 * point!(1, 1, 1)).force_point(),
+                    ]),
+                    Surface::PlaneXZ => {
+                        panic!("Planes cannot be within auto bounding volumes")
+                    }
+                    Surface::UnitCylinder(_) => {
+                        todo!()
+                    }
+                    Surface::SingleTriangle(_) => {
+                        todo!()
+                    }
                 }
             }
             Chain::CSG(_, _, _) => {

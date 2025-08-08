@@ -92,21 +92,37 @@ impl AABB {
         self.y.push(point.y);
         self.z.push(point.z);
     }
+
+    pub fn push_points(&mut self, points: &[Point]) {
+        for p in points {
+            self.push_point(p);
+        }
+    }
 }
 
-//     pub fn push_points(&mut self, points: &[Point]) {
-//         for p in points {
-//             self.push_point(p);
-//         }
-//     }
-// }
+impl AABBPushable for AABB {
+    fn extreme_points(&self) -> Vec<Point> {
+        vec![self.min_point(), self.max_point()]
+            .into_iter()
+            .flatten()
+            .collect()
+    }
+}
 
-impl AddAssign for AABB {
-    fn add_assign(&mut self, rhs: Self) {
-        if let (Some(min), Some(max)) = (&rhs.min_point(), &rhs.max_point()) {
-            self.push_point(min);
-            self.push_point(max);
-        }
+impl AABBPushable for &[Point] {
+    fn extreme_points(&self) -> Vec<Point> {
+        self.to_vec()
+    }
+}
+
+pub trait AABBPushable {
+    /// Output some extreme points which can be used to expand an [AABB].
+    fn extreme_points(&self) -> Vec<Point>;
+}
+
+impl<T: AABBPushable> AddAssign<T> for AABB {
+    fn add_assign(&mut self, rhs: T) {
+        self.push_points(&rhs.extreme_points())
     }
 }
 
@@ -134,8 +150,8 @@ mod aabb_tests {
     fn push_one_point_min_and_max_points_available() {
         let mut aabb = AABB::new();
         aabb.push_point(&point!(1, 2, 3));
-        assert_eq!(Some(point!(1,2,3)), aabb.min_point());
-        assert_eq!(Some(point!(1,2,3)), aabb.max_point());
+        assert_eq!(Some(point!(1, 2, 3)), aabb.min_point());
+        assert_eq!(Some(point!(1, 2, 3)), aabb.max_point());
     }
 
     #[test]
@@ -168,6 +184,21 @@ mod aabb_tests {
         aabb.push_point(&point!(1, 0, 0));
         aabb.push_point(&point!(0, 1, 0));
         aabb.push_point(&point!(0, 0, 1));
+        assert_eq!(
+            matrix4x4!(
+                [0.5,   0,   0, 0.5]
+                [  0, 0.5,   0, 0.5]
+                [  0,   0, 0.5, 0.5]
+                [  0,   0,   0,   1]
+            ),
+            aabb.to_bounding_range().unwrap()
+        );
+    }
+
+    #[test]
+    fn push_three_points_in_vec_that_define_a_box() {
+        let mut aabb = AABB::new();
+        aabb.push_points(&vec![point!(1, 0, 0), point!(0, 1, 0), point!(0, 0, 1)]);
         assert_eq!(
             matrix4x4!(
                 [0.5,   0,   0, 0.5]

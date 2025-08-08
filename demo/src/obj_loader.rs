@@ -1,12 +1,8 @@
-use math::matrix::matrix_4x4::Matrix4x4;
-use math::tuple::point::Point;
-use math::{matrix4x4, point};
 use obj::{Group, Obj};
 use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene_tree::SceneTree;
-use ray_tracer::{cube, scene};
-use std::ops::AddAssign;
+use ray_tracer::{AABB, cube, scene};
 
 #[macro_export]
 macro_rules! obj {
@@ -36,7 +32,7 @@ impl ObjLoader {
     pub fn obj_to_scene(&self, obj: &Obj) -> SceneTree {
         let mut scene = scene!();
         let mut count = 0;
-        let mut complete_aabb = AABBBuilder::new();
+        let mut complete_aabb = AABB::new();
 
         let (object, aabb) = self.add_group(&obj, &obj.default_group);
         if object.is_not_empty() {
@@ -56,7 +52,7 @@ impl ObjLoader {
         Self::scene_bounded_by(scene, &complete_aabb)
     }
 
-    fn scene_bounded_by(scene: SceneTree, aabb: &AABBBuilder) -> SceneTree {
+    fn scene_bounded_by(scene: SceneTree, aabb: &AABB) -> SceneTree {
         if let Some(bv) = aabb.to_bounding_range().map(|m| cube!(matrix: m)) {
             scene!(
                 bounding_volume: bv;
@@ -67,14 +63,14 @@ impl ObjLoader {
         }
     }
 
-    fn add_group(&self, obj: &Obj, g: &Group) -> (SceneTree, AABBBuilder) {
+    fn add_group(&self, obj: &Obj, g: &Group) -> (SceneTree, AABB) {
         println!(
             "{}: {} Triangles",
             g.name.clone().unwrap_or("Default Group".to_string()),
             g.len()
         );
 
-        let mut complete_aabb = AABBBuilder::new();
+        let mut complete_aabb = AABB::new();
 
         let mut group = scene!();
 
@@ -85,7 +81,8 @@ impl ObjLoader {
         let mut part = scene!();
         let mut part_size = 0;
 
-        let mut aabb = AABBBuilder::new();
+        let mut aabb = AABB::new();
+        let mut count = 0;
         for t in g.iter() {
             let points = obj.points.of(t);
             aabb.push_points(&points);
@@ -102,12 +99,13 @@ impl ObjLoader {
             part.add(triangle);
             part_size += 1;
 
-            if aabb.3 > 300 {
+            if count > 300 {
                 group.add(Self::scene_bounded_by(part, &aabb));
                 complete_aabb += aabb;
                 part = scene!();
                 part_size = 0;
-                aabb = AABBBuilder::new();
+                aabb = AABB::new();
+                count = 0;
             }
         }
 
@@ -115,105 +113,5 @@ impl ObjLoader {
         complete_aabb += aabb;
 
         (group, complete_aabb)
-    }
-}
-
-#[derive(Debug)]
-struct AABBBuilderRange {
-    min: f32,
-    max: f32,
-}
-
-impl AABBBuilderRange {
-    pub(crate) fn is_empty(&self) -> bool {
-        self.min >= self.max
-    }
-}
-
-impl Default for AABBBuilderRange {
-    fn default() -> Self {
-        Self {
-            min: f32::MAX,
-            max: f32::MIN,
-        }
-    }
-}
-
-impl AABBBuilderRange {
-    fn width(&self) -> f32 {
-        self.max - self.min
-    }
-}
-
-#[derive(Debug)]
-pub struct AABBBuilder(AABBBuilderRange, AABBBuilderRange, AABBBuilderRange, usize);
-
-impl AABBBuilder {
-    pub fn min_point(&self) -> Point {
-        point!(self.0.min, self.1.min, self.2.min)
-    }
-
-    pub fn max_point(&self) -> Point {
-        point!(self.0.max, self.1.max, self.2.max)
-    }
-}
-
-impl AABBBuilder {
-    pub(crate) fn to_bounding_range(&self) -> Option<Matrix4x4> {
-        if self.0.is_empty() {
-            return None;
-        }
-        if self.1.is_empty() {
-            return None;
-        }
-        if self.2.is_empty() {
-            return None;
-        }
-        Some(matrix4x4!(
-            translation(self.0.min, self.1.min, self.2.min)
-            scale(self.0.width(), self.1.width(), self.2.width())
-            translation(0.5, 0.5, 0.5)
-            scale_all(0.5)
-        ))
-    }
-}
-
-impl AABBBuilder {
-    pub fn new() -> Self {
-        Self(
-            Default::default(),
-            Default::default(),
-            Default::default(),
-            0,
-        )
-    }
-}
-
-impl AABBBuilderRange {
-    fn push(&mut self, value: f32) {
-        self.min = self.min.min(value);
-        self.max = self.max.max(value);
-    }
-}
-
-impl AABBBuilder {
-    pub fn push_point(&mut self, point: &Point) {
-        self.0.push(point.x);
-        self.1.push(point.y);
-        self.2.push(point.z);
-        self.3 += 1;
-    }
-
-    pub fn push_points(&mut self, points: &[Point]) {
-        for p in points {
-            self.push_point(p);
-        }
-    }
-}
-
-impl AddAssign for AABBBuilder {
-    fn add_assign(&mut self, rhs: Self) {
-        self.push_point(&rhs.min_point());
-        self.push_point(&rhs.max_point());
     }
 }
