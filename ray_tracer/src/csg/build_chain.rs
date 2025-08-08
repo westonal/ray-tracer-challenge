@@ -117,4 +117,20 @@ mod filter_intersections_tests {
             ]
         );
     }
+
+    #[test]
+    fn bv_skipped_if_no_objects() {
+        let scene = scene!(
+            +scene!(
+                bounding_volume: cube!();
+            );
+            +sphere!();
+        );
+        assert_chain!(
+            actual: scene.flatten_scene(),
+            expect: [
+                Surface::UnitSphere
+            ]
+        );
+    }
 }

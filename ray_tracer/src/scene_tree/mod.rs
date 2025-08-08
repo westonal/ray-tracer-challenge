@@ -1,7 +1,9 @@
 mod flat_scene;
 mod flatten;
 mod manipulation;
+mod auto_bounding_volume;
 
+use std::sync::LazyLock;
 use crate::csg::CSGOperation;
 use crate::material::Material;
 use crate::primatives::Shape;
@@ -9,6 +11,7 @@ pub(crate) use flat_scene::Chain;
 pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
+use crate::cube;
 
 #[derive(Clone)]
 pub enum SceneTree {
@@ -73,6 +76,16 @@ impl From<Shape> for SceneTree {
     fn from(value: Shape) -> Self {
         SceneTree::Leaf(value)
     }
+}
+
+pub static AUTO_CUBE_BOUNDING_VOLUME: LazyLock<Shape> = LazyLock::new(|| cube!());
+
+/// Auto Bounding Volume
+#[macro_export]
+macro_rules! auto {
+    () => {
+        $crate::scene_tree::AUTO_CUBE_BOUNDING_VOLUME.clone()
+    };
 }
 
 #[macro_export]

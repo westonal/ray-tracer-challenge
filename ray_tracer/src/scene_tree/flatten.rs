@@ -1,9 +1,10 @@
-use crate::chain_link;
 use crate::material::Material;
-use crate::scene_tree::SceneTree;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
+use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
+use crate::{chain_link, cube};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
+use crate::primatives::Surface;
 
 pub trait FlattenScene {
     fn flatten_scene(&self) -> FlatScene;
@@ -87,20 +88,56 @@ impl SceneTree {
                             child.walk(&mut subtree, matrix, overrides);
                         }
 
-                        let mut bounds = bounds.clone();
-                        bounds.matrix = matrix * bounds.matrix;
-                        into.push(chain_link!(bounds, skip: subtree.len()));
-                        // bounds2.material.transparency = 0.9;
-                        // into.push(Chain::Shape(
-                        //     bounds2.to_intersectable(),
-                        //     //subtree.len(),
-                        // ));
-                        into.append(&mut subtree);
+                        if !subtree.is_empty() {
+                            let bounds = if bounds.id == AUTO_CUBE_BOUNDING_VOLUME.id {
+                                let bounds_matrix = auto_bounds_matrix(&subtree);
+                                cube!(matrix: bounds_matrix)
+                            } else {
+                                let mut bounds = bounds.clone();
+                                bounds.matrix = matrix * bounds.matrix;
+                                bounds
+                            };
+                            into.push(chain_link!(bounds, skip: subtree.len()));
+                            // bounds2.material.transparency = 0.9;
+                            // into.push(Chain::Shape(
+                            //     bounds2.to_intersectable(),
+                            //     //subtree.len(),
+                            // ));
+                            into.append(&mut subtree);
+                        }
                     }
                 }
             }
         }
     }
+}
+
+fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
+    let mut result = matrix4x4!();
+    if chain.len() > 1{
+        todo!("Multiple shapes not yet implemented")
+    }
+    for c in chain{
+        match c {
+            Chain::BoundingVolume(_, _) => {
+                todo!("Auto BV not yet implemented for BVs")
+            }
+            Chain::Shape(s) => {
+                result = s.transform.world_to_object_matrix();
+                match s.surface {
+                    Surface::UnitSphere => {}
+                    Surface::UnitCube => {}
+                    Surface::PlaneXZ => {}
+                    Surface::UnitCylinder(_) => {}
+                    Surface::SingleTriangle(_) => {}
+                }
+            }
+            Chain::CSG(_, _, _) => {
+                todo!("Auto BV not yet implemented for CSG")
+            }
+        }
+    }
+    result
 }
 
 #[cfg(test)]

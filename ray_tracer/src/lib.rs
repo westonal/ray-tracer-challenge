@@ -11,6 +11,7 @@ pub mod scene_tree;
 pub mod transform;
 pub mod view_matrix;
 pub mod world;
+mod aabb;
 
 pub use render::RenderableWorld;
 pub use render::render_world::RenderPartialWorld;

@@ -89,6 +89,9 @@ macro_rules! point {
     ($x:expr, $y:expr, $z:expr) => {
         $crate::tuple::point::Point::point($x as f32, $y as f32, $z as f32)
     };
+    () => {
+        point!(0, 0, 0)
+    };
 }
 
 #[cfg(test)]
