@@ -1,0 +1,8 @@
+[package]
+name = "dsl"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ray_tracer = { path = "../ray_tracer" }
+animation = { path = "../animation" }

@@ -374,11 +374,20 @@ dependencies = [
  "animation",
  "clap",
  "criterion",
+ "dsl",
  "image",
  "math",
  "obj",
  "ray_tracer",
  "rayon",
+]
+
+[[package]]
+name = "dsl"
+version = "0.1.0"
+dependencies = [
+ "animation",
+ "ray_tracer",
 ]
 
 [[package]]

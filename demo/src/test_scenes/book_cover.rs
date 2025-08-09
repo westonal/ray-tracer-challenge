@@ -1,74 +1,10 @@
+use dsl::still;
 use math::{color, degrees, matrix4x4, point, radians, scale, translate, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::lighting::PointLight;
-use ray_tracer::material::Material;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
-use ray_tracer::{cube, plane, scene, sphere};
-
-macro_rules! still {
-    (
-        $name:tt;
-        file_name: $file_name:expr;
-        $(size: $size:expr;)?
-        camera: $camera:expr;
-        world: $world:expr;
-        scene: $scene:expr;
-    ) => {
-        pub struct $name;
-
-        impl $crate::test_scenes::TestScene for $name {
-            fn name(&self) -> &'static str {
-                $file_name
-            }
-
-            $(
-            fn default_size(&self) -> Option<ray_tracer::canvas::Size> {
-                Some($size.into())
-            }
-            )?
-
-            fn build_world(&self) -> ray_tracer::world::World {
-                let mut world = ray_tracer::world::World::default();
-                $world(&mut world);
-                world.add($scene);
-                world
-            }
-
-            fn build_camera(&self, size: ray_tracer::canvas::Size) -> Camera {
-                $camera(size)
-            }
-        }
-    };
-}
-
-macro_rules! material {
-    (
-        $(base: $base:expr;)?
-        $(color: $color:expr;)?
-        $(diffuse: $diffuse:expr;)?
-        $(ambient: $ambient:expr;)?
-        $(specular: $specular:expr;)?
-        $(shininess: $shininess:expr;)?
-        $(transparency: $transparency:expr;)?
-        $(reflectivity: $reflectivity:expr;)?
-        $(refractive-index: $refractive_index:expr;)?
-    ) => {
-        {
-            let mut _material = Material::default();
-            $(_material = $base.clone();)?
-            $(_material.pattern = ray_tracer::material::pattern::Pattern::Solid($color.into());)?
-            $(_material.diffuse = $diffuse as f32;)?
-            $(_material.ambient = $ambient as f32;)?
-            $(_material.specular = $specular as f32;)?
-            $(_material.shininess = $shininess as f32;)?
-            $(_material.transparency = $transparency as f32;)?
-            $(_material.reflectivity = $reflectivity as f32;)?
-            $(_material.refractive_index = $refractive_index as f32;)?
-            _material
-        }
-    };
-}
+use ray_tracer::{cube, material, plane, scene, sphere};
 
 macro_rules! cover_cube {
     (
