@@ -1,3 +1,8 @@
+# Rust Raytracer
+
+A rust implementation of the book [The Ray Tracer Challenge](https://pragprog.com/titles/jbtracer/the-ray-tracer-challenge/), A Test-Driven Guide to Your First 3D Renderer by Jamis Buck.
+
+![Book Cover](test_scenes/book-cover.png)
 
 ![Demo](test_scenes/Chapter%207%20Scene.png)
 

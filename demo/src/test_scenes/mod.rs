@@ -1,3 +1,4 @@
+pub mod book_cover;
 pub mod chapter7_scene;
 pub mod chess_pawn;
 pub mod chess_queen;
@@ -14,7 +15,6 @@ pub mod satisfying_pipes_raising;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
-pub mod book_cover;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;
@@ -83,6 +83,10 @@ impl Deref for DynamicScene {
 
 pub trait TestScene {
     fn name(&self) -> &'static str;
+
+    fn default_size(&self) -> Option<Size> {
+        None
+    }
 
     fn animation_spec(&self) -> Option<AnimationSpec> {
         None
