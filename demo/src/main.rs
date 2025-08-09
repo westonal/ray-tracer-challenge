@@ -22,6 +22,7 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
+use demo::test_scenes::book_cover::BookCover;
 
 struct BuiltScene {
     name: String,
@@ -87,6 +88,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         Teapot
         TeapotAnimated
         Pawn
+        BookCover
         Queen
         QueenMaterialAnimation
         Triangles

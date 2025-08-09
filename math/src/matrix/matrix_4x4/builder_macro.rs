@@ -13,6 +13,33 @@ macro_rules! matrix4x4 {
     };
 }
 
+#[macro_export]
+macro_rules! translate {
+    ($x:expr, $y:expr, $z:expr) => {
+        matrix4x4!(
+            translation($x as f32, $y as f32, $z as f32)
+        )
+    };
+    
+    (
+        $(x: $x:expr;)?
+        $(y: $y:expr;)?
+        $(z: $z:expr;)?
+    ) => {
+        {
+            let mut _x = 0_f32;
+            let mut _y = 0_f32;
+            let mut _z = 0_f32;
+            $(_x = $x as f32;)?
+            $(_y = $y as f32;)?
+            $(_z = $z as f32;)?
+            matrix4x4!(
+                translation(_x, _y, _z)
+            )
+        }
+    };
+}
+
 #[cfg(test)]
 mod matrix4x4_builder_tests {
     use crate::degrees;

@@ -16,7 +16,7 @@ macro_rules! shape {
         {
             let mut shape = $crate::shape!(surface: $surface;);
             $(shape.matrix = $matrix;)?
-            $(shape.material = $material;)?
+            $(shape.material = $material.clone();)?
             $(shape.material.pattern = $pattern;)?
             shape
         }
