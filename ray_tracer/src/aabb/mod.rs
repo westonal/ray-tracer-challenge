@@ -122,7 +122,9 @@ pub trait AABBPushable {
 
 impl<T: AABBPushable> AddAssign<T> for AABB {
     fn add_assign(&mut self, rhs: T) {
-        self.push_points(&rhs.extreme_points())
+        let x = &rhs.extreme_points();
+        println!("Extreme {:?}", x);
+        self.push_points(x)
     }
 }
 

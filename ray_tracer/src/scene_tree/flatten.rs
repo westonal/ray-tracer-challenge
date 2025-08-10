@@ -175,7 +175,6 @@ impl SceneTree {
                                         .into_iter()
                                         .filter(|f| match f {
                                             Chain::BoundingVolume(_, i) => {
-                                                println!("i {}", i);
                                                 true
                                             }
                                             Chain::Shape { source, .. } => {
@@ -192,7 +191,6 @@ impl SceneTree {
                                 }
                             }
 
-                            println!("BV SIZE {}", subtree.len());
                             into.push(chain_link!(bounds, skip: subtree.len()));
                             into.append(&mut subtree);
                         }
