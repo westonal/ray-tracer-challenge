@@ -16,7 +16,7 @@ impl FlatScene {
 }
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum ShapeSource {
+pub enum ShapeSource {
     Scene,
     Debug,
 }
