@@ -69,14 +69,11 @@ impl TestScene for QueenMaterialAnimation {
     fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
         let prog = frame.loop_progress;
         let mut camera = Camera::new(size, degrees!(35.0 - cycle(prog) * 20.0));
-        camera.set_transform(
-            ViewMatrix::new_look_at(
-                point!(4, 6, 8),
-                point!(0, 1.8 + cycle(prog) * 1.25, 0),
-                vector!(0, 1, 0),
-            )
-            .into(),
-        );
+        camera.set_transform(ViewMatrix::new_look_at(
+            point!(4, 6, 8),
+            point!(0, 1.8 + cycle(prog) * 1.25, 0),
+            vector!(0, 1, 0),
+        ));
         camera
     }
 }

@@ -98,7 +98,7 @@ impl TestScene for SatisfyingPipesAnimated {
         let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
         let top_down_high =
             ViewMatrix::new_look_at(point!(0, 30, 0), point!(0, 0, 0), vector!(0, 0, 1));
-        camera.set_transform(top_down_high.into());
+        camera.set_transform(top_down_high);
         camera
     }
 }

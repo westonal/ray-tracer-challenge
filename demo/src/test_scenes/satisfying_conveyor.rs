@@ -137,7 +137,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -164,7 +164,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -191,7 +191,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -219,7 +219,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );

@@ -1,9 +1,7 @@
 use dsl::still;
-use crate::test_scenes::TestScene;
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
-use math::{color, degrees, matrix4x4, point, translate, vector};
+use math::{degrees, matrix4x4, point, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
@@ -19,7 +17,7 @@ still!(
     camera: |size| {
         let mut camera = Camera::new(size, degrees!(30));
         camera.set_transform(
-            *ViewMatrix::new_look_at(point!(17, 19, 23), point!(1, 2, -3), vector!(0, 1, 0)),
+            ViewMatrix::new_look_at(point!(17, 19, 23), point!(1, 2, -3), vector!(0, 1, 0)),
         );
         camera
     };

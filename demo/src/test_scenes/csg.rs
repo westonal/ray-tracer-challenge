@@ -53,9 +53,11 @@ impl TestScene for Csg {
 
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(30));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(17, 19, 23), point!(0, -1, -3), vector!(0, 1, 0)).into(),
-        );
+        camera.set_transform(ViewMatrix::new_look_at(
+            point!(17, 19, 23),
+            point!(0, -1, -3),
+            vector!(0, 1, 0),
+        ));
         camera
     }
 }

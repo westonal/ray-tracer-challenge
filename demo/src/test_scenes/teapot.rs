@@ -17,7 +17,7 @@ still!(
     camera: | size| {
         let mut camera = Camera::new(size, degrees!(35));
         camera.set_transform(
-            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0.8, 0), vector!(0, 1, 0)).into(),
+            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0.8, 0), vector!(0, 1, 0)),
         );
         camera
     };

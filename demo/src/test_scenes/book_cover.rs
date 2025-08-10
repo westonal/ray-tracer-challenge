@@ -30,7 +30,8 @@ still!(
                 point!(-6, 6, -10),
                 point!(6,0,6),
                 vector!(-0.45,1,0),
-            ).into());
+            )
+        );
         camera
     };
     world: | world: &mut World | {

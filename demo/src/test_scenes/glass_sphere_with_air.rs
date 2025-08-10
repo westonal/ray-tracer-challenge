@@ -1,10 +1,8 @@
 use dsl::still;
-use crate::test_scenes::TestScene;
 use math::tuple::color::{BLACK, WHITE};
 use math::tuple::point::Point;
-use math::{color, degrees, matrix4x4, point, scale, translate, vector};
+use math::{degrees, matrix4x4, point, scale, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::canvas::Size;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
@@ -18,7 +16,7 @@ still!(
     file_name: "glass_sphere_with_air";
     camera: |s| {
         let mut camera = Camera::new(s, degrees!(20));
-        camera.set_transform(*ViewMatrix::new_look_at(
+        camera.set_transform(ViewMatrix::new_look_at(
             point!(0, 40, 0),
             Point::origin(),
             vector!(0, 0, 1),
