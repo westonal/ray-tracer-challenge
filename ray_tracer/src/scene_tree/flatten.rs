@@ -1,6 +1,6 @@
 use crate::material::Material;
 use crate::primatives::Surface;
-use crate::scene_tree::flat_scene::{Chain, FlatScene};
+use crate::scene_tree::flat_scene::{Chain, FlatScene, ShapeSource};
 use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
 use crate::world::{BoundingVolumeDebug, RenderPreferences};
 use crate::{AABB, chain_link, cube};
@@ -160,9 +160,12 @@ impl SceneTree {
                                     // TODO decide if we want this oversizing on the actual BV, not just the representation
                                     bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
                                     bounds2.material.transparency = 0.9;
-                                    into.push(Chain::Shape(bounds2.to_intersectable()));
+                                    into.push(Chain::Shape {
+                                        shape: bounds2.to_intersectable(),
+                                        source: ShapeSource::Debug,
+                                    });
                                 }
-                                BoundingVolumeDebug::Solid => {
+                                BoundingVolumeDebug::TranslucentEmpty => {
                                     // display bounds
                                     let mut bounds2 = bounds.clone();
                                     // TODO decide if we want this oversizing on the actual BV, not just the representation
@@ -171,17 +174,25 @@ impl SceneTree {
                                     subtree = subtree
                                         .into_iter()
                                         .filter(|f| match f {
-                                            Chain::BoundingVolume(_, _) => true,
-                                            _ => false,
+                                            Chain::BoundingVolume(_, i) => {
+                                                println!("i {}", i);
+                                                true
+                                            }
+                                            Chain::Shape { source, .. } => {
+                                                source == &ShapeSource::Debug
+                                            }
+                                            Chain::CSG(_, _, _) => false,
                                         })
                                         .collect();
-                                    if !subtree.is_empty() {
-                                        bounds2.material.transparency = 0.9;
-                                    }
-                                    into.push(Chain::Shape(bounds2.to_intersectable()));
+                                    bounds2.material.transparency = 0.9;
+                                    into.push(Chain::Shape {
+                                        shape: bounds2.to_intersectable(),
+                                        source: ShapeSource::Debug,
+                                    });
                                 }
                             }
 
+                            println!("BV SIZE {}", subtree.len());
                             into.push(chain_link!(bounds, skip: subtree.len()));
                             into.append(&mut subtree);
                         }
@@ -200,10 +211,10 @@ fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
             Chain::BoundingVolume(_, _) => {
                 todo!("Auto BV not yet implemented for BVs")
             }
-            Chain::Shape(s) => {
-                let x4 = s.transform.object_to_world_matrix();
-                result = s.transform.world_to_object_matrix();
-                match s.surface {
+            Chain::Shape{shape,..} => {
+                let x4 = shape.transform.object_to_world_matrix();
+                result = shape.transform.world_to_object_matrix();
+                match shape.surface {
                     Surface::UnitSphere => {
                         // TODO, can be cleverer with this, 6 point
                         aabb.push_points(&vec![

@@ -4,7 +4,7 @@ use math::tuple::color::{Color, BLACK};
 pub enum BoundingVolumeDebug{
     Off,
     Translucent,
-    Solid,
+    TranslucentEmpty,
 }
 
 #[derive(Copy, Clone)]

@@ -24,7 +24,7 @@ still!(
     };
     world: | world: &mut World | {
         world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
-        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Translucent;
+        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::TranslucentEmpty;
     };
     scene: {
         scene!(

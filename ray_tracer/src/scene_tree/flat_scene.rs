@@ -15,10 +15,19 @@ impl FlatScene {
     }
 }
 
+#[derive(Debug, PartialEq)]
+pub(crate) enum ShapeSource {
+    Scene,
+    Debug,
+}
+
 #[derive(Debug)]
 pub enum Chain {
     BoundingVolume(IntersectableShape, usize),
-    Shape(IntersectableShape),
+    Shape{
+        shape: IntersectableShape,
+        source: ShapeSource,
+    },
     CSG(CSGOperation, usize, usize),
 }
 
@@ -29,7 +38,7 @@ impl Deref for Chain {
     fn deref(&self) -> &Self::Target {
         match self {
             Chain::BoundingVolume(s, _) => s,
-            Chain::Shape(s) => s,
+            Chain::Shape { shape: s, .. } => s,
             Chain::CSG(_, _, _) => {
                 panic!("Not permitted")
             }
@@ -77,7 +86,7 @@ impl Intersect for [Chain] {
                         next!(data; count: skip);
                     }
                 }
-                Chain::Shape(s) => {
+                Chain::Shape { shape: s,  .. } => {
                     results += s.intersect(ray);
                 }
                 Chain::CSG(operation, lhs_length, rhs_length) => {
@@ -101,7 +110,10 @@ impl Intersect for [Chain] {
 #[macro_export]
 macro_rules! chain_link {
     ($shape:expr) => {
-        Chain::Shape($shape.to_intersectable())
+        Chain::Shape {
+            shape:$shape.to_intersectable(),
+            source:ShapeSource::Scene,
+        }
     };
     ($bv:expr, skip:$skip:expr) => {
         Chain::BoundingVolume($bv.to_intersectable(), $skip)

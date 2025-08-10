@@ -14,7 +14,7 @@ still!(
     camera: | size| Camera::new(size, degrees!(120));
     world: | world: &mut World | {
         world.add_light(PointLight::new(point!(10, 10, 7), *WHITE));
-        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Solid;
+        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::TranslucentEmpty;
     };
     scene: {
         let mut root = SceneTree::default();
