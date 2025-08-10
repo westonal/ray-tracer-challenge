@@ -2,7 +2,7 @@ use obj::{Group, Obj};
 use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene_tree::SceneTree;
-use ray_tracer::{auto, cube, scene, AABB};
+use ray_tracer::{auto, scene};
 
 #[macro_export]
 macro_rules! obj {
@@ -31,60 +31,35 @@ impl ObjLoader {
 
     pub fn obj_to_scene(&self, obj: &Obj) -> SceneTree {
         let mut scene = scene!();
-        let mut count = 0;
-        let mut complete_aabb = AABB::new();
 
-        let (object, aabb) = self.add_group(&obj, &obj.default_group);
-        if object.is_not_empty() {
-            scene.add(object);
-            complete_aabb += aabb;
-        }
-        count += 1;
+        scene.add(self.add_group(&obj, &obj.default_group));
 
         for g in obj.group_names() {
             let g = &obj[g];
-            let (object, aabb) = self.add_group(&obj, g);
-            scene.add(object);
-            complete_aabb += aabb;
-            count += 1;
+            scene.add(self.add_group(&obj, g));
         }
 
-        Self::scene_bounded_by(scene, &complete_aabb)
+        auto_bv_scene(scene)
     }
 
-    fn scene_bounded_by(scene: SceneTree, aabb: &AABB) -> SceneTree {
-        if let Some(bv) = aabb.to_bounding_range().map(|m| cube!(matrix: m)) {
-            scene!(
-                bounding_volume: auto!();
-                +scene;
-            )
-        } else {
-            scene
-        }
-    }
-
-    fn add_group(&self, obj: &Obj, g: &Group) -> (SceneTree, AABB) {
+    fn add_group(&self, obj: &Obj, g: &Group) -> SceneTree {
         println!(
             "{}: {} Triangles",
             g.name.clone().unwrap_or("Default Group".to_string()),
             g.len()
         );
 
-        let mut complete_aabb = AABB::new();
-
         let mut group = scene!();
 
         if g.len() == 0 {
-            return (group, complete_aabb);
+            return group;
         }
 
         let mut part = scene!();
         let mut part_size = 0;
 
-        let mut aabb = AABB::new();
         for t in g.iter() {
             let points = obj.points.of(t);
-            aabb.push_points(&points);
 
             let mut triangle = match obj.normals.of(t) {
                 None => Shape::new_triangle(Triangle::new(points)),
@@ -99,17 +74,21 @@ impl ObjLoader {
             part_size += 1;
 
             if part_size > 100 {
-                group.add(Self::scene_bounded_by(part, &aabb));
-                complete_aabb += aabb;
+                group.add(auto_bv_scene(part));
                 part = scene!();
                 part_size = 0;
-                aabb = AABB::new();
             }
         }
 
-        group.add(Self::scene_bounded_by(part, &aabb));
-        complete_aabb += aabb;
+        group.add(auto_bv_scene(part));
 
-        (group, complete_aabb)
+        group
     }
+}
+
+fn auto_bv_scene(scene: SceneTree) -> SceneTree {
+    scene!(
+        bounding_volume: auto!();
+        +scene;
+    )
 }
