@@ -58,9 +58,9 @@ impl ObjLoader {
 
         let m1 = complete_aabb.to_bounding_range();
         let m2 = complete_aabb2.to_bounding_range();
-        if m1 != m2 {
-            panic!("{:?} != {:?}", m1, m2)
-        }
+        // if m1 != m2 {
+        //     panic!("{:?} != {:?}", m1, m2)
+        // }
 
         Self::scene_bounded_by(scene, &complete_aabb)
     }

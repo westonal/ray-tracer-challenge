@@ -16,10 +16,10 @@ impl Default for FlattenSceneOptions {
         Self {
             bounding_volume_debug: BoundingVolumeDebug::Off,
         }
-    }    
+    }
 }
 
-impl From<RenderPreferences> for FlattenSceneOptions{
+impl From<RenderPreferences> for FlattenSceneOptions {
     fn from(value: RenderPreferences) -> Self {
         Self {
             bounding_volume_debug: value.bounding_volume_debug,
@@ -160,6 +160,24 @@ impl SceneTree {
                                     // TODO decide if we want this oversizing on the actual BV, not just the representation
                                     bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
                                     bounds2.material.transparency = 0.9;
+                                    into.push(Chain::Shape(bounds2.to_intersectable()));
+                                }
+                                BoundingVolumeDebug::Solid => {
+                                    // display bounds
+                                    let mut bounds2 = bounds.clone();
+                                    // TODO decide if we want this oversizing on the actual BV, not just the representation
+                                    bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
+                                    // keep only other subtrees
+                                    subtree = subtree
+                                        .into_iter()
+                                        .filter(|f| match f {
+                                            Chain::BoundingVolume(_, _) => true,
+                                            _ => false,
+                                        })
+                                        .collect();
+                                    if !subtree.is_empty() {
+                                        bounds2.material.transparency = 0.9;
+                                    }
                                     into.push(Chain::Shape(bounds2.to_intersectable()));
                                 }
                             }
