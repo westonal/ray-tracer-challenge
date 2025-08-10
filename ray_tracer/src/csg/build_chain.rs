@@ -10,7 +10,7 @@ macro_rules! assert_chain {
                 Chain::BoundingVolume(shape, skip) => {
                     format!("{:?}", ("BV", shape.surface, skip))
                 }
-                Chain::Shape(shape) => {
+                Chain::Shape{shape, ..} => {
                     format!("{:?}", shape.surface)
                 }
                 Chain::CSG(op, skip_left, skip_right) => {

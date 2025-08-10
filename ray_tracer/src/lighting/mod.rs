@@ -288,7 +288,7 @@ mod reflection_lighting_tests {
         let mut plane2 = solid_reflective_plane(*RED, 0.25);
         plane2.matrix = Matrix4x4::translation(0., 10., 0.);
         let mut world = World::default();
-        world.max_ray_generation = 4;
+        world.render_preferences.max_ray_generation = 4;
         world.set_light(PointLight::new(Point::origin(), *WHITE));
         world.add(plane1);
         world.add(plane2);
@@ -297,7 +297,7 @@ mod reflection_lighting_tests {
         // first case should have no color from the reflection
         let ray = RayGeneration::new_ray_with_generation(
             ray!((0., 5., 0.), (0., -1., 0.)),
-            world.max_ray_generation,
+            world.render_preferences.max_ray_generation,
         );
 
         let world = world.prepare_for_render();
@@ -306,7 +306,7 @@ mod reflection_lighting_tests {
         // second case should have one color from the reflection
         let ray = RayGeneration::new_ray_with_generation(
             ray!((0., 5., 0.), (0., -1., 0.)),
-            world.max_ray_generation - 1,
+            world.render_preferences.max_ray_generation - 1,
         );
         assert_eq!(color!(0.25, 1, 0), world.color_at(ray));
 
