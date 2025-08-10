@@ -2,28 +2,66 @@ use crate::material::Material;
 use crate::primatives::Surface;
 use crate::scene_tree::flat_scene::{Chain, FlatScene};
 use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
+use crate::world::{BoundingVolumeDebug, RenderPreferences};
 use crate::{AABB, chain_link, cube};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::{matrix4x4, point};
 
+pub struct FlattenSceneOptions {
+    pub bounding_volume_debug: BoundingVolumeDebug,
+}
+
+impl Default for FlattenSceneOptions {
+    fn default() -> Self {
+        Self {
+            bounding_volume_debug: BoundingVolumeDebug::Off,
+        }
+    }    
+}
+
+impl From<RenderPreferences> for FlattenSceneOptions{
+    fn from(value: RenderPreferences) -> Self {
+        Self {
+            bounding_volume_debug: value.bounding_volume_debug,
+        }
+    }
+}
+
 pub trait FlattenScene {
-    fn flatten_scene(&self) -> FlatScene;
+    fn flatten_scene(&self) -> FlatScene {
+        self.flatten_scene_with_options(Default::default())
+    }
+
+    fn flatten_scene_with_options(&self, flatten_scene_options: FlattenSceneOptions) -> FlatScene;
 }
 
 pub(crate) trait FlattenSceneWithMatrix {
-    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene;
+    fn flatten_with_matrix(
+        &self,
+        matrix: Matrix4x4,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) -> FlatScene;
 }
 
 impl<T: FlattenSceneWithMatrix> FlattenScene for T {
-    fn flatten_scene(&self) -> FlatScene {
-        self.flatten_with_matrix(matrix4x4!())
+    fn flatten_scene_with_options(&self, flatten_scene_options: FlattenSceneOptions) -> FlatScene {
+        self.flatten_with_matrix(matrix4x4!(), &flatten_scene_options)
     }
 }
 
 impl FlattenSceneWithMatrix for SceneTree {
-    fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
+    fn flatten_with_matrix(
+        &self,
+        matrix4x4: Matrix4x4,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, matrix4x4, &Overrides::default());
+        self.walk(
+            &mut chain,
+            matrix4x4,
+            &Overrides::default(),
+            flatten_scene_options,
+        );
         FlatScene::new(chain)
     }
 }
@@ -42,7 +80,13 @@ impl Overrides {
 }
 
 impl SceneTree {
-    fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4, overrides: &Overrides) {
+    fn walk(
+        &self,
+        into: &mut Vec<Chain>,
+        tree_matrix: Matrix4x4,
+        overrides: &Overrides,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
@@ -55,9 +99,19 @@ impl SceneTree {
             }
             SceneTree::CsgLeaf(lhs_tree, operation, rhs_tree) => {
                 let mut lhs_chain = vec![];
-                lhs_tree.walk(&mut lhs_chain, tree_matrix, overrides);
+                lhs_tree.walk(
+                    &mut lhs_chain,
+                    tree_matrix,
+                    overrides,
+                    flatten_scene_options,
+                );
                 let mut rhs_chain = vec![];
-                rhs_tree.walk(&mut rhs_chain, tree_matrix, overrides);
+                rhs_tree.walk(
+                    &mut rhs_chain,
+                    tree_matrix,
+                    overrides,
+                    flatten_scene_options,
+                );
                 into.push(Chain::CSG(*operation, lhs_chain.len(), rhs_chain.len()));
                 into.append(&mut lhs_chain);
                 into.append(&mut rhs_chain);
@@ -79,13 +133,13 @@ impl SceneTree {
                 match bounding_shape {
                     None => {
                         for child in children {
-                            child.walk(into, matrix, overrides);
+                            child.walk(into, matrix, overrides, flatten_scene_options);
                         }
                     }
                     Some(bounds) => {
                         let mut subtree = vec![];
                         for child in children {
-                            child.walk(&mut subtree, matrix, overrides);
+                            child.walk(&mut subtree, matrix, overrides, flatten_scene_options);
                         }
 
                         if !subtree.is_empty() {
@@ -98,12 +152,17 @@ impl SceneTree {
                                 bounds
                             };
 
-                            // display bounds
-                            let mut bounds2 = bounds.clone();
-                            // TODO decide if we want this oversizing on the actual BV, not just the representation
-                            bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
-                            bounds2.material.transparency = 0.9;
-                            into.push(Chain::Shape(bounds2.to_intersectable()));
+                            match flatten_scene_options.bounding_volume_debug {
+                                BoundingVolumeDebug::Off => {}
+                                BoundingVolumeDebug::Translucent => {
+                                    // display bounds
+                                    let mut bounds2 = bounds.clone();
+                                    // TODO decide if we want this oversizing on the actual BV, not just the representation
+                                    bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
+                                    bounds2.material.transparency = 0.9;
+                                    into.push(Chain::Shape(bounds2.to_intersectable()));
+                                }
+                            }
 
                             into.push(chain_link!(bounds, skip: subtree.len()));
                             into.append(&mut subtree);

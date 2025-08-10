@@ -5,14 +5,17 @@ use ray_tracer::camera::Camera;
 use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
-use ray_tracer::world::World;
-use ray_tracer::{cube, scene, sphere};
+use ray_tracer::world::{BoundingVolumeDebug, World};
+use ray_tracer::{auto, cube, scene, sphere};
 
 still!(
     Grid;
     file_name: "grid_of_spheres";
     camera: | size| Camera::new(size, degrees!(120));
-    world: | world: &mut World | world.add_light(PointLight::new(point!(10, 10, 7), *WHITE));
+    world: | world: &mut World | {
+        world.add_light(PointLight::new(point!(10, 10, 7), *WHITE));
+        // world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Translucent;
+    };
     scene: {
         let mut root = SceneTree::default();
         let x_count: i32 = 11;
@@ -21,7 +24,7 @@ still!(
         for x in -x_count..(x_count + 1) {
             let mut column = scene!(
                 matrix: translate!(x: x;);
-                bounding_volume: cube!(matrix: scale!(scale, y_count as f32 + 0.5, scale));
+                bounding_volume: auto!();
             );
             for y in -y_count..(y_count + 1) {
                 let pattern = Pattern::Solid(if x == 0 && y == 0 {

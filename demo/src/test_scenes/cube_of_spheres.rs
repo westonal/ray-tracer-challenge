@@ -25,7 +25,7 @@ still!(
     };
     world: | world: &mut World | {
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
-        world.max_ray_generation = 2;
+        world.render_preferences.max_ray_generation = 2;
     };
     scene: {
         scene!(

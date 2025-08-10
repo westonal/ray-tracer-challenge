@@ -8,7 +8,7 @@ use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
+use ray_tracer::world::{BoundingVolumeDebug, World};
 use ray_tracer::{auto, cube, gradient_stops, material, plane, scene, sphere};
 
 use dsl::still;
@@ -25,6 +25,7 @@ still!(
     };
     world: | world: &mut World | {
         world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
+        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Translucent;
     };
     scene: {
         scene!(
