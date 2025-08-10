@@ -47,9 +47,10 @@ impl Camera {
         ray!(origin, direction.to_vector())
     }
 
-    pub fn set_transform(&mut self, transform: Matrix4x4) {
-        self.invert_transform = transform.invert().expect("unable to invert transform");
-        self.transform = transform;
+    pub fn set_transform<T: Into<Matrix4x4>>(&mut self, transform: T) {
+        let matrix4x4 = transform.into();
+        self.invert_transform = matrix4x4.invert().expect("unable to invert transform");
+        self.transform = matrix4x4;
     }
 
     pub fn color_at(&self, x_y: (u32, u32), world: &RenderableWorld) -> Color {
@@ -106,9 +107,11 @@ mod camera_tests {
     fn render_world_with_camera() {
         let world = World::default_world();
         let mut camera = Camera::new(Size::new(11, 11), degrees!(90));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(0, 0, -5), point!(0, 0, 0), vector!(0, 1, 0)).into(),
-        );
+        camera.set_transform(ViewMatrix::new_look_at(
+            point!(0, 0, -5),
+            point!(0, 0, 0),
+            vector!(0, 1, 0),
+        ));
 
         let world = world.prepare_for_render();
         let color = camera.color_at((5, 5), &world);

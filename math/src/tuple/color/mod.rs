@@ -57,6 +57,18 @@ impl From<Color> for Tuple {
     }
 }
 
+impl From<[f32; 3]> for Color {
+    fn from(array: [f32; 3]) -> Color {
+        Color::rgba(array[0], array[1], array[2], 1.)
+    }
+}
+
+impl From<[f32; 4]> for Color {
+    fn from(array: [f32; 4]) -> Color {
+        Color::rgba(array[0], array[1], array[2], array[3])
+    }
+}
+
 impl From<(f32, f32, f32)> for Color {
     fn from(tuple: (f32, f32, f32)) -> Color {
         Color::rgba(tuple.0, tuple.1, tuple.2, 1.)

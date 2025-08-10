@@ -116,8 +116,8 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
             point!(-1, 1.2, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(top_down_high.into());
-        // camera.set_transform(side_on.into());
+        camera.set_transform(top_down_high);
+        // camera.set_transform(side_on);
         camera
     }
 }

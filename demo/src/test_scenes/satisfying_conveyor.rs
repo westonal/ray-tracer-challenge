@@ -16,6 +16,7 @@ use ray_tracer::{cube, plane, scene, sphere};
 use std::default::Default;
 use std::f32::consts::PI;
 use std::mem;
+use std::ops::Deref;
 use std::time::Duration;
 
 const MODE: Mode = Mode::Final;
@@ -71,22 +72,22 @@ macro_rules! multi_part_animation {
             }
 
             fn animation_spec(&self) -> Option<AnimationSpec> {
-                Some($name.sub_scenes().iter().map(|f| f.0.animation_spec().unwrap()).sum())
+                Some($name.sub_scenes().iter().map(|f| f.deref().animation_spec().unwrap()).sum())
             }
 
             fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
                 let (scene, frame) = map_frame($name.sub_scenes(), frame);
-                scene.0.build_world_for_frame(&frame)
+                scene.deref().build_world_for_frame(&frame)
             }
 
             fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
                 let (scene, frame) = map_frame($name.sub_scenes(), frame);
-                scene.0.build_camera_for_frame(size, &frame)
+                scene.deref().build_camera_for_frame(size, &frame)
             }
 
             fn sub_scenes(&self) -> Vec<DynamicScene> {
                 vec![
-                    $(DynamicScene(Box::new($sub_animation),), )+
+                    $(DynamicScene::new(Box::new($sub_animation)), )+
                 ]
             }
         }
@@ -99,7 +100,7 @@ fn map_frame(
 ) -> (DynamicScene, AnimationFrame) {
     let mut frame_number = input_frame.number;
     for (sub_scene_index, sub_animation) in scenes.into_iter().enumerate() {
-        let spec = sub_animation.0.animation_spec().unwrap();
+        let spec = sub_animation.deref().animation_spec().unwrap();
         let frames_in_part = spec.frame_count();
         if frame_number <= frames_in_part {
             let mut f = spec
@@ -136,7 +137,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -163,7 +164,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -190,7 +191,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );
@@ -218,7 +219,7 @@ animation!(
             point!(0, 0.5, 0),
             vector!(0, 1, 0),
         );
-        camera.set_transform(zoom.into());
+        camera.set_transform(zoom);
         camera
     };
 );

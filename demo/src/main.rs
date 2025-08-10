@@ -1,6 +1,7 @@
 use animation::AnimationSpec;
 use clap::builder::{IntoResettable, OsStr, Resettable};
 use clap::{Arg, ArgAction, command, value_parser};
+use demo::test_scenes::book_cover::BookCover;
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -27,6 +28,7 @@ struct BuiltScene {
     name: String,
     file_name: String,
     cli_argument_name: String,
+    default_size: Option<Size>,
     test_scene: DynamicScene,
     animation_spec: Option<AnimationSpec>,
 }
@@ -55,6 +57,7 @@ macro_rules! scenes {
                 all_scenes.push(BuiltScene {
                             name: name.to_string(),
                             file_name: format!("{}{}", $name.name(), extension),
+                            default_size: $name.default_size(),
                             cli_argument_name: name.to_string(),
                             test_scene: DynamicScene::new(Box::new($name)),
                             animation_spec: animation_spec,
@@ -70,6 +73,7 @@ macro_rules! scenes {
                     all_scenes.push(BuiltScene {
                             name: format!("{}.part_{}", name, i + 1),
                             file_name: format!("{}{}", sub_scene.name(), extension),
+                            default_size: sub_scene.default_size(),
                             cli_argument_name: format!("{}.{}", name, i + 1),
                             test_scene: sub,
                             animation_spec: animation_spec,
@@ -87,6 +91,7 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
         Teapot
         TeapotAnimated
         Pawn
+        BookCover
         Queen
         QueenMaterialAnimation
         Triangles
@@ -103,6 +108,8 @@ static ALL_SCENES: LazyLock<Vec<BuiltScene>> = LazyLock::new(|| {
     scenes.sort_by(|a, b| a.cli_argument_name.cmp(&b.cli_argument_name));
     scenes
 });
+
+static DEFAULT_SIZE: Size = Size::HD_720P;
 
 /// Size is defined outside this module, so we can't implement [IntoResettable] directly.
 struct ClapSizeWrapper(Size);
@@ -147,8 +154,11 @@ fn main() {
                 .required(false)
                 .long("size")
                 .short('s')
-                .default_value(ClapSizeWrapper(Size::HD_720P))
-                .help("Size of the frames"),
+                //.default_value(ClapSizeWrapper(Size::HD_720P))
+                .help(format!(
+                    "Size of the images/frames, default {} unless scene overrides",
+                    DEFAULT_SIZE,
+                )),
         );
 
     for (n, scene) in ALL_SCENES.iter().enumerate() {
@@ -174,10 +184,14 @@ fn main() {
 
     let matches = command.get_matches();
 
-    let size = *matches.get_one::<Size>("size").unwrap();
     let all = matches.get_flag("all");
     let mut count = 0;
     for scene in ALL_SCENES.iter() {
+        let size = matches
+            .get_one::<Size>("size")
+            .copied()
+            .or(scene.default_size)
+            .unwrap_or(DEFAULT_SIZE);
         if (all && scene.animation_spec.is_none()) || matches.get_flag(&scene.name) {
             scene
                 .test_scene

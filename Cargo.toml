@@ -1,6 +1,6 @@
 [workspace]
 members = [ "animation",
-    "demo", "demo",
+    "demo", "demo", "dsl",
     "math", "obj",
     "ray_tracer",
 ]
