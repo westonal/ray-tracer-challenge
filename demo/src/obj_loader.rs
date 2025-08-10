@@ -2,7 +2,7 @@ use obj::{Group, Obj};
 use ray_tracer::material::Material;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::scene_tree::SceneTree;
-use ray_tracer::{cube, scene, AABB};
+use ray_tracer::{auto, cube, scene, AABB};
 
 #[macro_export]
 macro_rules! obj {
@@ -55,7 +55,7 @@ impl ObjLoader {
     fn scene_bounded_by(scene: SceneTree, aabb: &AABB) -> SceneTree {
         if let Some(bv) = aabb.to_bounding_range().map(|m| cube!(matrix: m)) {
             scene!(
-                bounding_volume: bv;
+                bounding_volume: auto!();
                 +scene;
             )
         } else {

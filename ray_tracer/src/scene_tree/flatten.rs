@@ -6,6 +6,7 @@ use crate::world::{BoundingVolumeDebug, RenderPreferences};
 use crate::{AABB, chain_link, cube};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::{matrix4x4, point};
+use crate::scene_tree::auto_bounding_volume::auto_bounds_matrix;
 
 pub struct FlattenSceneOptions {
     pub bounding_volume_debug: BoundingVolumeDebug,
@@ -201,58 +202,7 @@ impl SceneTree {
     }
 }
 
-fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
-    let mut aabb = AABB::new();
-    let mut result = matrix4x4!();
-    for c in chain {
-        match c {
-            Chain::BoundingVolume(_, _) => {
-                todo!("Auto BV not yet implemented for BVs")
-            }
-            Chain::Shape{shape,..} => {
-                let x4 = shape.transform.object_to_world_matrix();
-                result = shape.transform.world_to_object_matrix();
-                match shape.surface {
-                    Surface::UnitSphere => {
-                        // TODO, can be cleverer with this, 6 point
-                        aabb.push_points(&vec![
-                            (x4 * point!(1, 0, 0)).force_point(),
-                            (x4 * point!(-1, 0, 0)).force_point(),
-                            (x4 * point!(0, 1, 0)).force_point(),
-                            (x4 * point!(0, -1, 0)).force_point(),
-                            (x4 * point!(0, 0, 1)).force_point(),
-                            (x4 * point!(0, 0, -1)).force_point(),
-                        ])
-                    }
-                    Surface::UnitCube => aabb.push_points(&vec![
-                        //todo check rotate
-                        (x4 * point!(1, 1, 1)).force_point(),
-                        (x4 * point!(1, 1, -1)).force_point(),
-                        (x4 * point!(1, -1, 1)).force_point(),
-                        (x4 * point!(1, -1, -1)).force_point(),
-                        (x4 * point!(-1, 1, 1)).force_point(),
-                        (x4 * point!(-1, 1, -1)).force_point(),
-                        (x4 * point!(-1, -1, 1)).force_point(),
-                        (x4 * point!(-1, -1, -1)).force_point(),
-                    ]),
-                    Surface::PlaneXZ => {
-                        panic!("Planes cannot be within auto bounding volumes")
-                    }
-                    Surface::UnitCylinder(_) => {
-                        todo!()
-                    }
-                    Surface::SingleTriangle(_) => {
-                        todo!()
-                    }
-                }
-            }
-            Chain::CSG(_, _, _) => {
-                todo!("Auto BV not yet implemented for CSG")
-            }
-        }
-    }
-    aabb.to_bounding_range().unwrap()
-}
+
 
 #[cfg(test)]
 mod flatten_tests {

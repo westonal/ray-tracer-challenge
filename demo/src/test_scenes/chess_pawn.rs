@@ -24,7 +24,7 @@ still!(
     };
     world: | world: &mut World | {
         world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
-        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::TranslucentEmpty;
+        //world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::TranslucentEmpty;
     };
     scene: {
         scene!(
@@ -35,7 +35,10 @@ still!(
                              );
             );
             +scene!(
-                matrix: matrix4x4!(rotation_y(degrees!(-60)));
+                matrix: matrix4x4!(
+                    //translation(2.6, 0., 0.,)
+                    rotation_y(degrees!(-60))
+                );
                 +obj!(
                     path: "objs/chess/pawn.obj";
                     material: Material::glass();

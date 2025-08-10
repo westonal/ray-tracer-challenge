@@ -17,6 +17,21 @@ struct AABBAxis {
 }
 
 impl AABBAxis {
+    pub(crate) fn ensure_some_width(&mut self, width: f32) {
+        if self.width() == 0.{
+            self.min_width(width);
+        }
+    }
+    pub(crate) fn min_width(&mut self, min_width: f32) {
+        let width_diff = min_width - self.width();
+        if width_diff > 0. {
+            self.push(self.min - width_diff / 2.);
+            self.push(self.max + width_diff / 2.);
+        }
+    }
+}
+
+impl AABBAxis {
     fn is_zero_or_empty(&self) -> bool {
         self.min >= self.max
     }
@@ -43,14 +58,14 @@ impl AABBAxis {
 
 impl AABB {
     pub fn min_point(&self) -> Option<Point> {
-        if self.x.is_empty() {
+        if self.is_empty() {
             return None;
         }
         Some(point!(self.x.min, self.y.min, self.z.min))
     }
 
     pub fn max_point(&self) -> Option<Point> {
-        if self.x.is_empty() {
+        if self.is_empty() {
             return None;
         }
         Some(point!(self.x.max, self.y.max, self.z.max))
@@ -60,16 +75,29 @@ impl AABB {
         self.x.is_zero_or_empty() || self.y.is_zero_or_empty() || self.z.is_zero_or_empty()
     }
 
+    fn is_empty(&self) -> bool {
+        self.x.is_empty()
+    }
+
     pub fn to_bounding_range(&self) -> Option<Matrix4x4> {
-        if self.is_zero_or_empty() {
+        if self.is_empty() {
             return None;
         }
+        let resized = self.clone_with_min_width(0.1);
         Some(matrix4x4!(
-            translation(self.x.min, self.y.min, self.z.min)
-            scale(self.x.width(), self.y.width(), self.z.width())
+            translation(resized.x.min, resized.y.min, resized.z.min)
+            scale(resized.x.width(), resized.y.width(), resized.z.width())
             translation(0.5, 0.5, 0.5)
             scale_all(0.5)
         ))
+    }
+
+    fn clone_with_min_width(&self, min_width: f32) -> AABB {
+        let mut aabb = self.clone();
+        aabb.x.ensure_some_width(min_width);
+        aabb.y.ensure_some_width(min_width);
+        aabb.z.ensure_some_width(min_width);
+        aabb
     }
 }
 
@@ -122,9 +150,7 @@ pub trait AABBPushable {
 
 impl<T: AABBPushable> AddAssign<T> for AABB {
     fn add_assign(&mut self, rhs: T) {
-        let x = &rhs.extreme_points();
-        println!("Extreme {:?}", x);
-        self.push_points(x)
+        self.push_points(&rhs.extreme_points())
     }
 }
 

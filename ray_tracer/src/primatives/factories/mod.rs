@@ -151,3 +151,29 @@ mod cylinder_factory_tests {
         );
     }
 }
+
+#[macro_export]
+macro_rules! triangle {
+    (                
+        $triangle:expr
+        $(; matrix: $matrix:expr)?) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::SingleTriangle($triangle.into());
+            $(matrix: $matrix;)?
+        )
+    };
+
+    (        
+        $triangle:expr;
+        $(matrix: $matrix:expr;)?
+        $(material: $material:expr;)?
+        $(pattern: $pattern:expr$(;)?)?
+    ) => {
+        $crate::shape!(
+            surface: $crate::primatives::Surface::SingleTriangle(triangle.into());
+            $(matrix: $matrix;)?
+            $(material: $material;)?
+            $(pattern: $pattern;)?
+        )
+    };
+}
