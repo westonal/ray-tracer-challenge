@@ -54,6 +54,12 @@ impl Triangle {
     }
 }
 
+impl From<[Point; 3]> for Triangle {
+    fn from(value: [Point; 3]) -> Self {
+        Self::new(value)
+    }
+}
+
 #[cfg(test)]
 mod create_triangle_tests {
     use super::*;

@@ -10,12 +10,13 @@ macro_rules! material {
         $(transparency: $transparency:expr;)?
         $(reflectivity: $reflectivity:expr;)?
         $(refractive-index: $refractive_index:expr;)?
+        $(shadow-opacity: $shadow_opacity:expr;)?
         $(pattern: $pattern:expr;)?
     ) => {
         {
             let mut _material = $crate::material::Material::default();
             $(_material = $base.clone();)?
-            $(_material.pattern = ray_tracer::material::pattern::Pattern::Solid($color.into());)?
+            $(_material.pattern = $crate::material::pattern::Pattern::Solid($color.into());)?
             $(_material.diffuse = $diffuse as f32;)?
             $(_material.ambient = $ambient as f32;)?
             $(_material.specular = $specular as f32;)?
@@ -23,6 +24,7 @@ macro_rules! material {
             $(_material.transparency = $transparency as f32;)?
             $(_material.reflectivity = $reflectivity as f32;)?
             $(_material.refractive_index = $refractive_index as f32;)?
+            $(_material.shadow_opacity = $shadow_opacity as f32;)?
             $(_material.pattern = $pattern.into();)?
             _material
         }

@@ -10,7 +10,7 @@ macro_rules! assert_chain {
                 Chain::BoundingVolume(shape, skip) => {
                     format!("{:?}", ("BV", shape.surface, skip))
                 }
-                Chain::Shape(shape) => {
+                Chain::Shape{shape, ..} => {
                     format!("{:?}", shape.surface)
                 }
                 Chain::CSG(op, skip_left, skip_right) => {
@@ -114,6 +114,22 @@ mod filter_intersections_tests {
                 (CSGOperation::Intersection, 1, 1),
                 Surface::UnitCube,
                 Surface::UnitCube,
+            ]
+        );
+    }
+
+    #[test]
+    fn bv_skipped_if_no_objects() {
+        let scene = scene!(
+            +scene!(
+                bounding_volume: cube!();
+            );
+            +sphere!();
+        );
+        assert_chain!(
+            actual: scene.flatten_scene(),
+            expect: [
+                Surface::UnitSphere
             ]
         );
     }

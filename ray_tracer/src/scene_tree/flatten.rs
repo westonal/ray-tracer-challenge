@@ -1,28 +1,68 @@
-use crate::chain_link;
 use crate::material::Material;
-use crate::scene_tree::SceneTree;
-use crate::scene_tree::flat_scene::{Chain, FlatScene};
+use crate::primatives::Shape;
+use crate::scene_tree::auto_bounding_volume::auto_bounds_matrix;
+use crate::scene_tree::flat_scene::{Chain, FlatScene, ShapeSource};
+use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
+use crate::world::{BoundingVolumeDebug, RenderPreferences};
+use crate::{chain_link, cube, material, shape};
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::matrix4x4;
 
+pub struct FlattenSceneOptions {
+    pub bounding_volume_debug: BoundingVolumeDebug,
+}
+
+impl Default for FlattenSceneOptions {
+    fn default() -> Self {
+        Self {
+            bounding_volume_debug: BoundingVolumeDebug::Off,
+        }
+    }
+}
+
+impl From<RenderPreferences> for FlattenSceneOptions {
+    fn from(value: RenderPreferences) -> Self {
+        Self {
+            bounding_volume_debug: value.bounding_volume_debug,
+        }
+    }
+}
+
 pub trait FlattenScene {
-    fn flatten_scene(&self) -> FlatScene;
+    fn flatten_scene(&self) -> FlatScene {
+        self.flatten_scene_with_options(Default::default())
+    }
+
+    fn flatten_scene_with_options(&self, flatten_scene_options: FlattenSceneOptions) -> FlatScene;
 }
 
 pub(crate) trait FlattenSceneWithMatrix {
-    fn flatten_with_matrix(&self, matrix: Matrix4x4) -> FlatScene;
+    fn flatten_with_matrix(
+        &self,
+        matrix: Matrix4x4,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) -> FlatScene;
 }
 
 impl<T: FlattenSceneWithMatrix> FlattenScene for T {
-    fn flatten_scene(&self) -> FlatScene {
-        self.flatten_with_matrix(matrix4x4!())
+    fn flatten_scene_with_options(&self, flatten_scene_options: FlattenSceneOptions) -> FlatScene {
+        self.flatten_with_matrix(matrix4x4!(), &flatten_scene_options)
     }
 }
 
 impl FlattenSceneWithMatrix for SceneTree {
-    fn flatten_with_matrix(&self, matrix4x4: Matrix4x4) -> FlatScene {
+    fn flatten_with_matrix(
+        &self,
+        matrix4x4: Matrix4x4,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) -> FlatScene {
         let mut chain = vec![];
-        self.walk(&mut chain, matrix4x4, &Overrides::default());
+        self.walk(
+            &mut chain,
+            matrix4x4,
+            &Overrides::default(),
+            flatten_scene_options,
+        );
         FlatScene::new(chain)
     }
 }
@@ -41,7 +81,13 @@ impl Overrides {
 }
 
 impl SceneTree {
-    fn walk(&self, into: &mut Vec<Chain>, tree_matrix: Matrix4x4, overrides: &Overrides) {
+    fn walk(
+        &self,
+        into: &mut Vec<Chain>,
+        tree_matrix: Matrix4x4,
+        overrides: &Overrides,
+        flatten_scene_options: &FlattenSceneOptions,
+    ) {
         match self {
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
@@ -54,9 +100,19 @@ impl SceneTree {
             }
             SceneTree::CsgLeaf(lhs_tree, operation, rhs_tree) => {
                 let mut lhs_chain = vec![];
-                lhs_tree.walk(&mut lhs_chain, tree_matrix, overrides);
+                lhs_tree.walk(
+                    &mut lhs_chain,
+                    tree_matrix,
+                    overrides,
+                    flatten_scene_options,
+                );
                 let mut rhs_chain = vec![];
-                rhs_tree.walk(&mut rhs_chain, tree_matrix, overrides);
+                rhs_tree.walk(
+                    &mut rhs_chain,
+                    tree_matrix,
+                    overrides,
+                    flatten_scene_options,
+                );
                 into.push(Chain::CSG(*operation, lhs_chain.len(), rhs_chain.len()));
                 into.append(&mut lhs_chain);
                 into.append(&mut rhs_chain);
@@ -78,28 +134,71 @@ impl SceneTree {
                 match bounding_shape {
                     None => {
                         for child in children {
-                            child.walk(into, matrix, overrides);
+                            child.walk(into, matrix, overrides, flatten_scene_options);
                         }
                     }
                     Some(bounds) => {
                         let mut subtree = vec![];
                         for child in children {
-                            child.walk(&mut subtree, matrix, overrides);
+                            child.walk(&mut subtree, matrix, overrides, flatten_scene_options);
                         }
 
-                        let mut bounds = bounds.clone();
-                        bounds.matrix = matrix * bounds.matrix;
-                        into.push(chain_link!(bounds, skip: subtree.len()));
-                        // bounds2.material.transparency = 0.9;
-                        // into.push(Chain::Shape(
-                        //     bounds2.to_intersectable(),
-                        //     //subtree.len(),
-                        // ));
-                        into.append(&mut subtree);
+                        if !subtree.is_empty() {
+                            let bounds = if bounds.id == AUTO_CUBE_BOUNDING_VOLUME.id {
+                                let bounds_matrix = auto_bounds_matrix(&subtree);
+                                cube!(matrix: bounds_matrix)
+                            } else {
+                                let mut bounds = bounds.clone();
+                                bounds.matrix = matrix * bounds.matrix;
+                                bounds
+                            };
+
+                            match flatten_scene_options.bounding_volume_debug {
+                                BoundingVolumeDebug::Translucent
+                                | BoundingVolumeDebug::TranslucentEmpty => {
+                                    if flatten_scene_options.bounding_volume_debug
+                                        == BoundingVolumeDebug::TranslucentEmpty
+                                    {
+                                        // keep only other subtrees
+                                        subtree = subtree
+                                            .into_iter()
+                                            .filter(|f| match f {
+                                                Chain::BoundingVolume(_, i) => true,
+                                                Chain::Shape { source, .. } => {
+                                                    source == &ShapeSource::Debug
+                                                }
+                                                Chain::CSG(_, _, _) => false,
+                                            })
+                                            .collect();
+                                    }
+
+                                    into.push(bounding_volume_debug_shape(&bounds));
+                                }
+                                BoundingVolumeDebug::Off => {}
+                            }
+
+                            into.push(chain_link!(bounds, skip: subtree.len()));
+                            into.append(&mut subtree);
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+fn bounding_volume_debug_shape(bounds: &Shape) -> Chain {
+    let volume = shape!(
+        surface: bounds.surface;
+        matrix: bounds.matrix;
+        material: material!(
+                    transparency: 0.3;
+                    shadow-opacity: 0;
+                  );
+    );
+    Chain::Shape {
+        shape: volume.to_intersectable(),
+        source: ShapeSource::Debug,
     }
 }
 

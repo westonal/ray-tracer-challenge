@@ -1,3 +1,4 @@
+mod aabb;
 pub mod camera;
 pub mod canvas;
 pub mod csg;
@@ -12,6 +13,7 @@ pub mod transform;
 pub mod view_matrix;
 pub mod world;
 
+pub use aabb::AABB;
 pub use render::RenderableWorld;
 pub use render::render_world::RenderPartialWorld;
 pub use render::render_world::RenderWorld;

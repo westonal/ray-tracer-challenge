@@ -32,7 +32,7 @@ impl RenderableWorld<'_> {
                     shadow_factor,
                 )
         }
-        if pre_calculations.ray_generation < self.max_ray_generation {
+        if pre_calculations.ray_generation < self.render_preferences.max_ray_generation {
             let (reflect, refract) = if material.reflectivity > 0. && material.transparency > 0. {
                 let reflectance = schlick(&pre_calculations, &refraction_medium_indexes);
                 (reflectance, 1. - reflectance)
@@ -68,7 +68,7 @@ impl RenderableWorld<'_> {
             let pre_calculations = hit.to_pre_calculation(ray);
             self.shade_with_refraction(pre_calculations, refractions)
         } else {
-            self.background
+            self.render_preferences.background
         }
     }
 }
@@ -118,10 +118,10 @@ mod world_shading_tests {
     #[test]
     fn color_when_ray_misses_alt_background_color() {
         let mut world = World::default_world();
-        world.background = color!(0., 1., 0.);
+        world.render_preferences.background = color!(0, 1, 0);
         let ray = ray_first_gen!(point!(0, 0, -5), vector!(0, 1, 0));
         let c = world.prepare_for_render().color_at(ray);
-        assert_color!(color!(0., 1., 0., 1.), c);
+        assert_color!(color!(0, 1, 0, 1), c);
     }
 
     #[test]

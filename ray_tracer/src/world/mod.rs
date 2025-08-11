@@ -1,5 +1,6 @@
 use crate::scene_tree::{Chain, FlattenScene};
 mod default;
+mod preferences;
 pub mod shading;
 mod shadows;
 
@@ -9,24 +10,25 @@ pub use crate::world::default::test_world;
 use crate::lighting::PointLight;
 use crate::render::RenderableWorld;
 use crate::scene_tree::SceneTree;
-use math::tuple::color::Color;
+pub use preferences::BoundingVolumeDebug;
+pub use preferences::RenderPreferences;
 
 pub struct World {
     pub scene_tree: SceneTree,
     pub lights: Vec<PointLight>,
-    pub background: Color,
-    pub max_ray_generation: u32,
+    pub render_preferences: RenderPreferences,
 }
 
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
-        let scene = self.scene_tree.flatten_scene();
+        let scene = self
+            .scene_tree
+            .flatten_scene_with_options(self.render_preferences.into());
         //debug_print(&scene);
         RenderableWorld {
             flat_scene: scene,
             lights: &self.lights,
-            background: self.background,
-            max_ray_generation: self.max_ray_generation,
+            render_preferences: &self.render_preferences,
         }
     }
 }
@@ -66,8 +68,7 @@ impl Default for World {
         Self {
             scene_tree: Default::default(),
             lights: vec![],
-            background: Default::default(),
-            max_ray_generation: 10,
+            render_preferences: Default::default(),
         }
     }
 }
@@ -85,7 +86,7 @@ mod world_tests {
 
     #[test]
     fn default_world_values() {
-        assert_eq!(10, World::default().max_ray_generation);
+        assert_eq!(10, World::default().render_preferences.max_ray_generation);
     }
 
     #[test]

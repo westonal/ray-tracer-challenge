@@ -8,8 +8,8 @@ use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
-use ray_tracer::{plane, scene};
+use ray_tracer::world::{BoundingVolumeDebug, World};
+use ray_tracer::{auto, plane, scene};
 use std::default::Default;
 
 still!(
@@ -24,6 +24,7 @@ still!(
     };
     world: | world: &mut World | {
         world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
+        world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Off;
     };
     scene: {
         scene!(
@@ -34,7 +35,11 @@ still!(
                              );
             );
             +scene!(
-                matrix: matrix4x4!(rotation_y(degrees!(-60)));
+                matrix: matrix4x4!(
+                    //translation(2.6, 0., 0.,)
+                    rotation_y(degrees!(-60))
+                );
+                bounding_volume: auto!();
                 +obj!(
                     path: "objs/chess/pawn.obj";
                     material: Material::glass();

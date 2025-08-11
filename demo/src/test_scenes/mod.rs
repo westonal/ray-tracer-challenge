@@ -1,4 +1,5 @@
 pub mod book_cover;
+pub mod bounding_volumes;
 pub mod chapter7_scene;
 pub mod chess_pawn;
 pub mod chess_queen;
