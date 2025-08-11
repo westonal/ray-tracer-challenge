@@ -1,3 +1,6 @@
+mod axis;
+
+use crate::aabb::axis::AABBAxis;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::tuple::point::Point;
 use math::{matrix4x4, point};
@@ -8,52 +11,6 @@ pub struct AABB {
     x: AABBAxis,
     y: AABBAxis,
     z: AABBAxis,
-}
-
-#[derive(Debug, Copy, Clone)]
-struct AABBAxis {
-    min: f32,
-    max: f32,
-}
-
-impl AABBAxis {
-    pub(crate) fn ensure_some_width(&mut self, width: f32) {
-        if self.width() == 0.{
-            self.min_width(width);
-        }
-    }
-    pub(crate) fn min_width(&mut self, min_width: f32) {
-        let width_diff = min_width - self.width();
-        if width_diff > 0. {
-            self.push(self.min - width_diff / 2.);
-            self.push(self.max + width_diff / 2.);
-        }
-    }
-}
-
-impl AABBAxis {
-    fn is_zero_or_empty(&self) -> bool {
-        self.min >= self.max
-    }
-
-    pub(crate) fn is_empty(&self) -> bool {
-        self.min > self.max
-    }
-}
-
-impl Default for AABBAxis {
-    fn default() -> Self {
-        Self {
-            min: f32::MAX,
-            max: f32::MIN,
-        }
-    }
-}
-
-impl AABBAxis {
-    fn width(&self) -> f32 {
-        self.max - self.min
-    }
 }
 
 impl AABB {
@@ -71,11 +28,7 @@ impl AABB {
         Some(point!(self.x.max, self.y.max, self.z.max))
     }
 
-    fn is_zero_or_empty(&self) -> bool {
-        self.x.is_zero_or_empty() || self.y.is_zero_or_empty() || self.z.is_zero_or_empty()
-    }
-
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.x.is_empty()
     }
 
@@ -104,13 +57,6 @@ impl AABB {
 impl AABB {
     pub fn new() -> Self {
         Self::default()
-    }
-}
-
-impl AABBAxis {
-    fn push(&mut self, value: f32) {
-        self.min = self.min.min(value);
-        self.max = self.max.max(value);
     }
 }
 
@@ -168,26 +114,11 @@ mod aabb_tests {
     }
 
     #[test]
-    fn push_one_point_still_empty() {
-        let mut aabb = AABB::new();
-        aabb.push_point(&point!(1, 0, 0));
-        assert_eq!(None, aabb.to_bounding_range());
-    }
-
-    #[test]
     fn push_one_point_min_and_max_points_available() {
         let mut aabb = AABB::new();
         aabb.push_point(&point!(1, 2, 3));
         assert_eq!(Some(point!(1, 2, 3)), aabb.min_point());
         assert_eq!(Some(point!(1, 2, 3)), aabb.max_point());
-    }
-
-    #[test]
-    fn push_two_points_still_empty_due_to_only_two_axis() {
-        let mut aabb = AABB::new();
-        aabb.push_point(&point!(1, 0, 0));
-        aabb.push_point(&point!(0, 1, 0));
-        assert_eq!(None, aabb.to_bounding_range());
     }
 
     #[test]

@@ -2,6 +2,7 @@ use animation::AnimationSpec;
 use clap::builder::{IntoResettable, OsStr, Resettable};
 use clap::{Arg, ArgAction, command, value_parser};
 use demo::test_scenes::book_cover::BookCover;
+use demo::test_scenes::bounding_volumes::BoundingVolumes;
 use demo::test_scenes::chapter7_scene::Chapter7Scene;
 use demo::test_scenes::chess_pawn::Pawn;
 use demo::test_scenes::chess_queen::Queen;
@@ -23,7 +24,6 @@ use ray_tracer::canvas::Size;
 use std::ops::Deref;
 use std::process::exit;
 use std::sync::LazyLock;
-use demo::test_scenes::bounding_volumes::BoundingVolumes;
 
 struct BuiltScene {
     name: String,

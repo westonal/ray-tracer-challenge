@@ -2,8 +2,7 @@ use crate::AABB;
 use crate::primatives::{IntersectableShape, Surface};
 use crate::scene_tree::{Chain, FlatScene};
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::{matrix4x4, point};
-use math::tuple::point::Point;
+use math::point;
 
 pub(crate) fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
     let mut aabb = AABB::new();
@@ -25,37 +24,27 @@ pub(crate) fn auto_bounds_matrix(chain: &Vec<Chain>) -> Matrix4x4 {
     aabb.to_bounding_range().unwrap()
 }
 
-fn shape_to_aabb(shape: &IntersectableShape) -> AABB{
+fn shape_to_aabb(shape: &IntersectableShape) -> AABB {
     let mut aabb = AABB::new();
     let x4 = shape.transform.object_to_world_matrix();
     match shape.surface {
-        Surface::UnitSphere => {
-            // TODO, can be cleverer with this, 6 point
+        // TODO this is unsophisticated for sphere and cylinder
+        //  sphere should not be subject to rotation in any axis, and cylinder can ignore y rotation
+        //  The way this is, the BVs are potentially larger as they treat these primatives like cubes.
+        Surface::UnitSphere | Surface::UnitCube | Surface::UnitCylinder(_) => {
             aabb.push_points(&vec![
-                (x4 * point!(1, 0, 0)).force_point(),
-                (x4 * point!(-1, 0, 0)).force_point(),
-                (x4 * point!(0, 1, 0)).force_point(),
-                (x4 * point!(0, -1, 0)).force_point(),
-                (x4 * point!(0, 0, 1)).force_point(),
-                (x4 * point!(0, 0, -1)).force_point(),
+                (x4 * point!(1, 1, 1)).force_point(),
+                (x4 * point!(1, 1, -1)).force_point(),
+                (x4 * point!(1, -1, 1)).force_point(),
+                (x4 * point!(1, -1, -1)).force_point(),
+                (x4 * point!(-1, 1, 1)).force_point(),
+                (x4 * point!(-1, 1, -1)).force_point(),
+                (x4 * point!(-1, -1, 1)).force_point(),
+                (x4 * point!(-1, -1, -1)).force_point(),
             ])
         }
-        Surface::UnitCube => aabb.push_points(&vec![
-            //todo check rotate
-            (x4 * point!(1, 1, 1)).force_point(),
-            (x4 * point!(1, 1, -1)).force_point(),
-            (x4 * point!(1, -1, 1)).force_point(),
-            (x4 * point!(1, -1, -1)).force_point(),
-            (x4 * point!(-1, 1, 1)).force_point(),
-            (x4 * point!(-1, 1, -1)).force_point(),
-            (x4 * point!(-1, -1, 1)).force_point(),
-            (x4 * point!(-1, -1, -1)).force_point(),
-        ]),
         Surface::PlaneXZ => {
             panic!("Planes cannot be within auto bounding volumes")
-        }
-        Surface::UnitCylinder(_) => {
-            todo!()
         }
         Surface::SingleTriangle(triangle) => {
             aabb.push_points(&triangle.vertices.map(|p| (x4 * p).force_point()));
@@ -67,17 +56,16 @@ fn shape_to_aabb(shape: &IntersectableShape) -> AABB{
 #[cfg(test)]
 mod auto_bounding_volume_tests {
 
-    use crate::primatives::Surface;
+    use crate::scene_tree::FlattenScene;
     use crate::scene_tree::auto_bounding_volume::extract_bounding_volume_matrix;
-    use crate::scene_tree::{Chain, FlatScene, FlattenScene};
     use crate::{auto, cube, scene, sphere, triangle};
-    use math::matrix::matrix_4x4::Matrix4x4;
+
     use math::{matrix4x4, point, scale, translate};
 
     #[test]
     fn auto_of_cube_no_transforms() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +cube!();
         )
         .flatten_scene();
@@ -87,7 +75,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_sphere_no_transforms() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +sphere!();
         )
         .flatten_scene();
@@ -97,7 +85,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_empty() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
         )
         .flatten_scene();
         assert!(scene.is_empty());
@@ -106,7 +94,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn bv_mirrors_transform_of_child() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +sphere!(
                 matrix: translate!(x:1;)
             );
@@ -119,7 +107,7 @@ mod auto_bounding_volume_tests {
     fn bv_mirrors_transform_of_child_and_outer() {
         let scene = scene!(
             matrix: scale!(2);
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
@@ -137,7 +125,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn bv_extends_to_contain_both_childs() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
@@ -160,10 +148,10 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_3_dimensions() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(0, 0, 1)]);
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
             matrix4x4!(
                 translation(0.5, 0.5, 0.5)
@@ -176,10 +164,10 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_2_dimensions() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]);
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
             matrix4x4!(
                 translation(0.5, 0.5, 0.)
@@ -193,10 +181,10 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_1_dimensions() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +triangle!([point!(0, 0, 0), point!(1, 0, 0), point!(2, 0, 0)]);
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
             matrix4x4!(
                 translation(1., 0., 0.)
@@ -209,14 +197,12 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_0_dimensions() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +triangle!([point!(0, 0, 0), point!(0, 0, 0), point!(0, 0, 0)]);
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
-            matrix4x4!(
-                scale_all(0.05,)
-            ),
+            matrix4x4!(scale_all(0.05,)),
             extract_bounding_volume_matrix(&scene)
         );
     }
@@ -225,10 +211,10 @@ mod auto_bounding_volume_tests {
     fn auto_of_triangle_in_3_dimensions_with_transform() {
         let scene = scene!(
             matrix: translate!(x: 1;);
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(0, 0, 1)]);
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
             matrix4x4!(
                 translation(1.5, 0.5, 0.5)
@@ -241,18 +227,18 @@ mod auto_bounding_volume_tests {
     #[test]
     fn nested_auto_bv() {
         let scene = scene!(
-            bounding_volume: auto!();
+            bounding-volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
             +scene!(
-                bounding_volume: auto!();
+                bounding-volume: auto!();
                 +sphere!(
                     matrix: translate!(x: -1;)
                 );
             );
         )
-            .flatten_scene();
+        .flatten_scene();
         assert_eq!(
             matrix4x4!(
                 [2, 0, 0, 0]

@@ -1,12 +1,12 @@
 use crate::material::Material;
-use crate::primatives::Surface;
+use crate::primatives::Shape;
+use crate::scene_tree::auto_bounding_volume::auto_bounds_matrix;
 use crate::scene_tree::flat_scene::{Chain, FlatScene, ShapeSource};
 use crate::scene_tree::{AUTO_CUBE_BOUNDING_VOLUME, SceneTree};
 use crate::world::{BoundingVolumeDebug, RenderPreferences};
-use crate::{AABB, chain_link, cube};
+use crate::{chain_link, cube, material, shape};
 use math::matrix::matrix_4x4::Matrix4x4;
-use math::{matrix4x4, point};
-use crate::scene_tree::auto_bounding_volume::auto_bounds_matrix;
+use math::matrix4x4;
 
 pub struct FlattenSceneOptions {
     pub bounding_volume_debug: BoundingVolumeDebug,
@@ -154,42 +154,27 @@ impl SceneTree {
                             };
 
                             match flatten_scene_options.bounding_volume_debug {
+                                BoundingVolumeDebug::Translucent
+                                | BoundingVolumeDebug::TranslucentEmpty => {
+                                    if flatten_scene_options.bounding_volume_debug
+                                        == BoundingVolumeDebug::TranslucentEmpty
+                                    {
+                                        // keep only other subtrees
+                                        subtree = subtree
+                                            .into_iter()
+                                            .filter(|f| match f {
+                                                Chain::BoundingVolume(_, i) => true,
+                                                Chain::Shape { source, .. } => {
+                                                    source == &ShapeSource::Debug
+                                                }
+                                                Chain::CSG(_, _, _) => false,
+                                            })
+                                            .collect();
+                                    }
+
+                                    into.push(bounding_volume_debug_shape(&bounds));
+                                }
                                 BoundingVolumeDebug::Off => {}
-                                BoundingVolumeDebug::Translucent => {
-                                    // display bounds
-                                    let mut bounds2 = bounds.clone();
-                                    // TODO decide if we want this oversizing on the actual BV, not just the representation
-                                    bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
-                                    bounds2.material.transparency = 0.9;
-                                    into.push(Chain::Shape {
-                                        shape: bounds2.to_intersectable(),
-                                        source: ShapeSource::Debug,
-                                    });
-                                }
-                                BoundingVolumeDebug::TranslucentEmpty => {
-                                    // display bounds
-                                    let mut bounds2 = bounds.clone();
-                                    // TODO decide if we want this oversizing on the actual BV, not just the representation
-                                    bounds2.matrix = bounds2.matrix * matrix4x4!(scale_all(1.01));
-                                    // keep only other subtrees
-                                    subtree = subtree
-                                        .into_iter()
-                                        .filter(|f| match f {
-                                            Chain::BoundingVolume(_, i) => {
-                                                true
-                                            }
-                                            Chain::Shape { source, .. } => {
-                                                source == &ShapeSource::Debug
-                                            }
-                                            Chain::CSG(_, _, _) => false,
-                                        })
-                                        .collect();
-                                    bounds2.material.transparency = 0.9;
-                                    into.push(Chain::Shape {
-                                        shape: bounds2.to_intersectable(),
-                                        source: ShapeSource::Debug,
-                                    });
-                                }
                             }
 
                             into.push(chain_link!(bounds, skip: subtree.len()));
@@ -202,7 +187,20 @@ impl SceneTree {
     }
 }
 
-
+fn bounding_volume_debug_shape(bounds: &Shape) -> Chain {
+    let volume = shape!(
+        surface: bounds.surface;
+        matrix: bounds.matrix;
+        material: material!(
+                    transparency: 0.3;
+                    shadow-opacity: 0;
+                  );
+    );
+    Chain::Shape {
+        shape: volume.to_intersectable(),
+        source: ShapeSource::Debug,
+    }
+}
 
 #[cfg(test)]
 mod flatten_tests {
@@ -337,7 +335,7 @@ mod material_override_tests {
             +sphere!();
             +scene!(
                 material_override: Material::air();
-                bounding_volume: cube!();
+                bounding-volume: cube!();
                 +cube!();
                 +scene!(
                     +cube!();

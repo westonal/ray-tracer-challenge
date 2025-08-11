@@ -1,8 +1,8 @@
 use crate::scene_tree::{Chain, FlattenScene};
 mod default;
+mod preferences;
 pub mod shading;
 mod shadows;
-mod preferences;
 
 #[cfg(test)]
 pub use crate::world::default::test_world;
@@ -10,9 +10,8 @@ pub use crate::world::default::test_world;
 use crate::lighting::PointLight;
 use crate::render::RenderableWorld;
 use crate::scene_tree::SceneTree;
-use math::tuple::color::Color;
-pub use preferences::RenderPreferences;
 pub use preferences::BoundingVolumeDebug;
+pub use preferences::RenderPreferences;
 
 pub struct World {
     pub scene_tree: SceneTree,
@@ -22,9 +21,9 @@ pub struct World {
 
 impl<'w> World {
     pub fn prepare_for_render(&'w self) -> RenderableWorld<'w> {
-        let scene = self.scene_tree.flatten_scene_with_options(
-            self.render_preferences.into(),
-        );
+        let scene = self
+            .scene_tree
+            .flatten_scene_with_options(self.render_preferences.into());
         //debug_print(&scene);
         RenderableWorld {
             flat_scene: scene,

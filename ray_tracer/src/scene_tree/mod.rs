@@ -105,7 +105,7 @@ macro_rules! scene {
     ($(iff: $iff:expr;)?
      $(matrix: $matrix:expr;)?
      $(material_override: $material_override:expr;)?
-     $(bounding_volume: $bounding_volume:expr;)?
+     $(bounding-volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {
@@ -118,7 +118,11 @@ macro_rules! scene {
                 $(let _matrix = $matrix;)?
                 $(let _bounding_volume = Some($bounding_volume);)?
                 $(let _material_override = Some($material_override);)?
-                let mut _tree = $crate::scene_tree::SceneTree::new_bounded(_matrix, _bounding_volume, _material_override);
+                let mut _tree = $crate::scene_tree::SceneTree::new_bounded(
+                    _matrix,
+                    _bounding_volume,
+                    _material_override
+                );
                 $(
                 _tree.add($entry);
                 )*

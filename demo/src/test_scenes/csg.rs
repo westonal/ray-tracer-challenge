@@ -40,7 +40,7 @@ still!(
                             translation(0., 4.001, 0.)
                             scale_all(4.)
                         );
-                bounding_volume: cube!();
+                bounding-volume: cube!();
                 +cube!() - sphere!(matrix: scale!(1.25); pattern: Pattern::Solid(*RED);)
                     &
                  sphere!(matrix: scale!(1.45); pattern: Pattern::Solid(*BLUE););

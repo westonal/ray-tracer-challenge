@@ -154,7 +154,7 @@ mod cylinder_factory_tests {
 
 #[macro_export]
 macro_rules! triangle {
-    (                
+    (
         $triangle:expr
         $(; matrix: $matrix:expr)?) => {
         $crate::shape!(
@@ -163,7 +163,7 @@ macro_rules! triangle {
         )
     };
 
-    (        
+    (
         $triangle:expr;
         $(matrix: $matrix:expr;)?
         $(material: $material:expr;)?

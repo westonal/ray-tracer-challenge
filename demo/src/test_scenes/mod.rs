@@ -1,4 +1,5 @@
 pub mod book_cover;
+pub mod bounding_volumes;
 pub mod chapter7_scene;
 pub mod chess_pawn;
 pub mod chess_queen;
@@ -15,7 +16,6 @@ pub mod satisfying_pipes_raising;
 pub mod teapot;
 pub mod teapot_animated;
 pub mod triangles;
-pub mod bounding_volumes;
 
 use crate::png_write::PngWrite;
 use crate::threaded_canvas::ThreadedCanvas;

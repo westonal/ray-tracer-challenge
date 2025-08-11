@@ -24,7 +24,7 @@ pub enum ShapeSource {
 #[derive(Debug)]
 pub enum Chain {
     BoundingVolume(IntersectableShape, usize),
-    Shape{
+    Shape {
         shape: IntersectableShape,
         source: ShapeSource,
     },
@@ -86,7 +86,7 @@ impl Intersect for [Chain] {
                         next!(data; count: skip);
                     }
                 }
-                Chain::Shape { shape: s,  .. } => {
+                Chain::Shape { shape: s, .. } => {
                     results += s.intersect(ray);
                 }
                 Chain::CSG(operation, lhs_length, rhs_length) => {
@@ -111,8 +111,8 @@ impl Intersect for [Chain] {
 macro_rules! chain_link {
     ($shape:expr) => {
         Chain::Shape {
-            shape:$shape.to_intersectable(),
-            source:ShapeSource::Scene,
+            shape: $shape.to_intersectable(),
+            source: ShapeSource::Scene,
         }
     };
     ($bv:expr, skip:$skip:expr) => {
@@ -215,7 +215,7 @@ mod chain_build_from_tree_intersect_tests {
         let scene = scene!(
             +sphere!();
             +scene!(
-                bounding_volume: sphere!();
+                bounding-volume: sphere!();
                 +sphere!();
             );
         );
@@ -230,7 +230,7 @@ mod chain_build_from_tree_intersect_tests {
         let scene = scene!(
             +sphere!();
             +scene!(
-                bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
+                bounding-volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
                 +sphere!();
             );
             +sphere!();
@@ -247,7 +247,7 @@ mod chain_build_from_tree_intersect_tests {
             +sphere!();
             +scene!(
                 matrix: Matrix4x4::translation(1.1, 0., 0.);
-                bounding_volume: sphere!();
+                bounding-volume: sphere!();
                 +sphere!(matrix: Matrix4x4::translation(-1.1, 0., 0.));
                 +sphere!();
             );
@@ -264,7 +264,7 @@ mod chain_build_from_tree_intersect_tests {
         let mut scene = SceneTree::default();
         scene.add(sphere!());
         let mut sub_scene = scene!(
-            bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
+            bounding-volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
         );
         sub_scene.add(sphere!()); // skipped
         sub_scene.add(sphere!()); // skipped

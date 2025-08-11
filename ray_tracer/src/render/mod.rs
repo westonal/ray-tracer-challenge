@@ -2,7 +2,6 @@ use crate::intersection::{Intersect, Intersections};
 use crate::lighting::PointLight;
 use crate::rays::Ray;
 use crate::scene_tree::FlatScene;
-use math::tuple::color::Color;
 use crate::world::RenderPreferences;
 
 pub mod render_world;

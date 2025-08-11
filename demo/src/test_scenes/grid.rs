@@ -6,7 +6,7 @@ use ray_tracer::lighting::PointLight;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::world::{BoundingVolumeDebug, World};
-use ray_tracer::{auto, cube, scene, sphere};
+use ray_tracer::{auto, scene, sphere};
 
 still!(
     Grid;
@@ -24,7 +24,7 @@ still!(
         for x in -x_count..(x_count + 1) {
             let mut column = scene!(
                 matrix: translate!(x: x;);
-                bounding_volume: auto!();
+                bounding-volume: auto!();
             );
             for y in -y_count..(y_count + 1) {
                 let pattern = Pattern::Solid(if x == 0 && y == 0 {

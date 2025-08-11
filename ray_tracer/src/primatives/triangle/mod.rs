@@ -54,7 +54,7 @@ impl Triangle {
     }
 }
 
-impl From<[Point; 3]> for Triangle{
+impl From<[Point; 3]> for Triangle {
     fn from(value: [Point; 3]) -> Self {
         Self::new(value)
     }

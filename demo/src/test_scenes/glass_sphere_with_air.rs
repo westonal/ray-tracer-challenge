@@ -34,7 +34,7 @@ still!(
             );
             +scene!(
                 matrix: scale!(5);
-                bounding_volume: cube!();
+                bounding-volume: cube!();
                 +sphere!(material: Material::glass(););
                 +scene!(
                     matrix: scale!(0.5);
