@@ -24,7 +24,7 @@ still!(
         for x in -x_count..(x_count + 1) {
             let mut column = scene!(
                 matrix: translate!(x: x;);
-                bounding-volume: auto!();
+                bounding_volume: auto!();
             );
             for y in -y_count..(y_count + 1) {
                 let pattern = Pattern::Solid(if x == 0 && y == 0 {

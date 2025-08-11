@@ -51,12 +51,12 @@ still!(
                 matrix: translate!(3.5, 4, 3.5);
                 +scene!(
                     matrix: scale!(2);
-                    bounding-volume: cube!(matrix: scale!(2));
+                    bounding_volume: cube!(matrix: scale!(2));
                     +double(
                         |matrix| {
                             scene!(
                                 matrix: matrix.scale_all(0.5);
-                                bounding-volume: cube!(matrix: scale!(2));
+                                bounding_volume: cube!(matrix: scale!(2));
                                 +double(
                                     |matrix| {
                                         scene!(
@@ -77,7 +77,7 @@ still!(
 fn cubes() -> SceneTree {
     scene!(
         matrix: scale!(0.5);
-        bounding-volume: cube!(matrix: scale!(2));
+        bounding_volume: cube!(matrix: scale!(2));
         +double(
             |matrix| {
                 scene!(

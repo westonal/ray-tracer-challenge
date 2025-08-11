@@ -88,7 +88,7 @@ impl ObjLoader {
 
 fn auto_bv_scene(scene: SceneTree) -> SceneTree {
     scene!(
-        bounding-volume: auto!();
+        bounding_volume: auto!();
         +scene;
     )
 }

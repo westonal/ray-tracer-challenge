@@ -43,7 +43,7 @@ mod filter_intersections_tests {
     #[test]
     fn single_csg_in_a_scene_with_bounds() {
         let scene = scene!(
-            bounding-volume: cube!();
+            bounding_volume: cube!();
             +sphere!();
         );
         assert_chain!(
@@ -58,7 +58,7 @@ mod filter_intersections_tests {
     #[test]
     fn two_csg_in_a_scene_with_bounds() {
         let scene = scene!(
-            bounding-volume: cube!();
+            bounding_volume: cube!();
             +sphere!();
             +cube!();
         );
@@ -76,7 +76,7 @@ mod filter_intersections_tests {
     #[test]
     fn two_csg_union_in_a_scene_with_bounds() {
         let scene = scene!(
-            bounding-volume: cube!();
+            bounding_volume: cube!();
             +sphere!() + cube!();
         );
         assert_chain!(
@@ -122,7 +122,7 @@ mod filter_intersections_tests {
     fn bv_skipped_if_no_objects() {
         let scene = scene!(
             +scene!(
-                bounding-volume: cube!();
+                bounding_volume: cube!();
             );
             +sphere!();
         );

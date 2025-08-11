@@ -65,7 +65,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_cube_no_transforms() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +cube!();
         )
         .flatten_scene();
@@ -75,7 +75,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_sphere_no_transforms() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +sphere!();
         )
         .flatten_scene();
@@ -85,7 +85,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_empty() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
         )
         .flatten_scene();
         assert!(scene.is_empty());
@@ -94,7 +94,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn bv_mirrors_transform_of_child() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +sphere!(
                 matrix: translate!(x:1;)
             );
@@ -107,7 +107,7 @@ mod auto_bounding_volume_tests {
     fn bv_mirrors_transform_of_child_and_outer() {
         let scene = scene!(
             matrix: scale!(2);
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
@@ -125,7 +125,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn bv_extends_to_contain_both_childs() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
@@ -148,7 +148,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_3_dimensions() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(0, 0, 1)]);
         )
         .flatten_scene();
@@ -164,7 +164,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_2_dimensions() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(1, 1, 0)]);
         )
         .flatten_scene();
@@ -181,7 +181,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_1_dimensions() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +triangle!([point!(0, 0, 0), point!(1, 0, 0), point!(2, 0, 0)]);
         )
         .flatten_scene();
@@ -197,7 +197,7 @@ mod auto_bounding_volume_tests {
     #[test]
     fn auto_of_triangle_in_0_dimensions() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +triangle!([point!(0, 0, 0), point!(0, 0, 0), point!(0, 0, 0)]);
         )
         .flatten_scene();
@@ -211,7 +211,7 @@ mod auto_bounding_volume_tests {
     fn auto_of_triangle_in_3_dimensions_with_transform() {
         let scene = scene!(
             matrix: translate!(x: 1;);
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +triangle!([point!(1, 0, 0), point!(0, 1, 0), point!(0, 0, 1)]);
         )
         .flatten_scene();
@@ -227,12 +227,12 @@ mod auto_bounding_volume_tests {
     #[test]
     fn nested_auto_bv() {
         let scene = scene!(
-            bounding-volume: auto!();
+            bounding_volume: auto!();
             +sphere!(
                 matrix: translate!(x: 1;)
             );
             +scene!(
-                bounding-volume: auto!();
+                bounding_volume: auto!();
                 +sphere!(
                     matrix: translate!(x: -1;)
                 );

@@ -215,7 +215,7 @@ mod chain_build_from_tree_intersect_tests {
         let scene = scene!(
             +sphere!();
             +scene!(
-                bounding-volume: sphere!();
+                bounding_volume: sphere!();
                 +sphere!();
             );
         );
@@ -230,7 +230,7 @@ mod chain_build_from_tree_intersect_tests {
         let scene = scene!(
             +sphere!();
             +scene!(
-                bounding-volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
+                bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
                 +sphere!();
             );
             +sphere!();
@@ -247,7 +247,7 @@ mod chain_build_from_tree_intersect_tests {
             +sphere!();
             +scene!(
                 matrix: Matrix4x4::translation(1.1, 0., 0.);
-                bounding-volume: sphere!();
+                bounding_volume: sphere!();
                 +sphere!(matrix: Matrix4x4::translation(-1.1, 0., 0.));
                 +sphere!();
             );
@@ -264,7 +264,7 @@ mod chain_build_from_tree_intersect_tests {
         let mut scene = SceneTree::default();
         scene.add(sphere!());
         let mut sub_scene = scene!(
-            bounding-volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
+            bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
         );
         sub_scene.add(sphere!()); // skipped
         sub_scene.add(sphere!()); // skipped

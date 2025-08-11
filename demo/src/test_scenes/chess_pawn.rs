@@ -39,7 +39,7 @@ still!(
                     //translation(2.6, 0., 0.,)
                     rotation_y(degrees!(-60))
                 );
-                bounding-volume: auto!();
+                bounding_volume: auto!();
                 +obj!(
                     path: "objs/chess/pawn.obj";
                     material: Material::glass();

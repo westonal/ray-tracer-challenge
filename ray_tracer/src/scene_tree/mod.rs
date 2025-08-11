@@ -105,7 +105,7 @@ macro_rules! scene {
     ($(iff: $iff:expr;)?
      $(matrix: $matrix:expr;)?
      $(material_override: $material_override:expr;)?
-     $(bounding-volume: $bounding_volume:expr;)?
+     $(bounding_volume: $bounding_volume:expr;)?
      $(+$entry:expr;)*
     ) => {
         {

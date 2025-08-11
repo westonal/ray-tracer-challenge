@@ -181,7 +181,7 @@ impl SatisfyingPipesAnimatedFactory {
                 rotation_x(degrees!(90))
                 scale(1., length, 1.,)
             );
-            bounding-volume: cube!(matrix: matrix4x4!(scale(1.21, 1.01, 1.21)));
+            bounding_volume: cube!(matrix: matrix4x4!(scale(1.21, 1.01, 1.21)));
             +(cylinder!(matrix: matrix4x4!(scale(1.2, 1., 1.2)))
               - {
                     let mut c = cylinder!(matrix: matrix4x4!(scale(1., 1.01, 1.)));

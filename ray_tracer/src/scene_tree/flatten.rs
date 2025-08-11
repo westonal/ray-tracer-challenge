@@ -335,7 +335,7 @@ mod material_override_tests {
             +sphere!();
             +scene!(
                 material_override: Material::air();
-                bounding-volume: cube!();
+                bounding_volume: cube!();
                 +cube!();
                 +scene!(
                     +cube!();

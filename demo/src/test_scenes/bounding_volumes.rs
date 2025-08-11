@@ -47,7 +47,7 @@ still!(
             );
             +scene!(
                 matrix: translate!(y: 1;);
-                bounding-volume: auto!();
+                bounding_volume: auto!();
                 +cube!(matrix: matrix4x4!(
                     rotation_z(degrees!(10))
                     translation(1., 1., 0.)
@@ -59,7 +59,7 @@ still!(
                 ));
             );
             +scene!(
-                bounding-volume: auto!();
+                bounding_volume: auto!();
                 +sphere!(
                     matrix: matrix4x4!(
                         scale_all(3.5)
@@ -74,7 +74,7 @@ still!(
                 );
             );
             +scene!(
-                bounding-volume: auto!();
+                bounding_volume: auto!();
                 +cylinder!(
                     matrix: matrix4x4!(
                         translation(-8., 4., -3.)
