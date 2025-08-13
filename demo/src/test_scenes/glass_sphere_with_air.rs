@@ -8,7 +8,6 @@ use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
 use ray_tracer::{cube, plane, scene, sphere};
 
 still!(
@@ -23,11 +22,9 @@ still!(
         ));
         camera
     };
-    world: | world: &mut World | {
-        world.push(light!(point!(-300, 200, 20), *WHITE));
-    };
     scene: {
         scene!(
+            +light!(point!(-300, 200, 20));
             +plane!(
                 matrix: translate!(y: -32;);
                 pattern: Pattern::Checker(*BLACK, *WHITE, Transform::new(scale!(3)));

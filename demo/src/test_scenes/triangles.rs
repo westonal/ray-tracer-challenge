@@ -7,7 +7,6 @@ use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
 use ray_tracer::{gradient_stops, material, plane, scene};
 
 dsl::still!(
@@ -22,11 +21,9 @@ dsl::still!(
         ));
         camera
     };
-    world: | world: &mut World | {
-        world.push(light!(point!(40, 40, 20), *WHITE * 0.9));
-    };
     scene: {
         scene!(
+            +light!(point!(40, 40, 20), *WHITE * 0.9);
             +plane!(
                 material: material!(
                     reflectivity: 0.5;

@@ -23,11 +23,11 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(light!(point!(40, 40, 20), *WHITE * 0.9));
         world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Translucent;
     };
     scene: {
         scene!(
+            +light!(point!(40, 40, 20), *WHITE * 0.9);
             +plane!(
                 material: material!(
                     reflectivity: 0.5;

@@ -61,8 +61,8 @@ impl TestScene for QueenMaterialAnimation {
 
         let mut world = World::default();
         world.render_preferences.max_ray_generation = 5;
-        world.add(world_scene);
-        world.push(light!(point!(2, 20, 10), *WHITE));
+        world.push(world_scene);
+        world.push(light!(point!(2, 20, 10)));
         world
     }
 

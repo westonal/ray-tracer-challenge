@@ -23,11 +23,11 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(light!(point!(2, 20, 10), *WHITE));
         world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Off;
     };
     scene: {
         scene!(
+            +light!(point!(2, 20, 10));
             +plane!(pattern: Pattern::Checker(
                                 *WHITE,
                                 *RED,

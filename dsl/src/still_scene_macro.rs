@@ -5,7 +5,7 @@ macro_rules! still {
         file_name: $file_name:expr;
         $(size: $size:expr;)?
         camera: $camera:expr;
-        world: $world:expr;
+        $(world: $world:expr;)?
         scene: $scene:expr;
     ) => {
         pub struct $name;
@@ -23,8 +23,8 @@ macro_rules! still {
 
             fn build_world(&self) -> ray_tracer::world::World {
                 let mut world = ray_tracer::world::World::default();
-                $world(&mut world);
-                world.add($scene);
+                $($world(&mut world);)?
+                world.push($scene);
                 world
             }
 

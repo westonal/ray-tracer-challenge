@@ -93,7 +93,7 @@ impl SceneTree {
                 let mut light = light.clone();
                 light.position = (tree_matrix * light.position).force_point();
                 into.lights.push(light);
-            },
+            }
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
@@ -307,10 +307,10 @@ mod flatten_matrix_tests {
 
 #[cfg(test)]
 mod lights_in_scene_flatten_tests {
-    use math::{assert_point, degrees, point, translate};
     use super::*;
+    use math::{assert_point, degrees, point, translate};
 
-    use crate::{cube, light, plane, scene, sphere};
+    use crate::{light, scene};
 
     macro_rules! light_scene_flatten_test {
         ($($name:ident; $data:expr => $expect_pos:expr)*) => {
@@ -350,7 +350,6 @@ mod lights_in_scene_flatten_tests {
                                      );
                                  ) => point!(11, 17, 32)
     );
-
 }
 
 #[cfg(test)]

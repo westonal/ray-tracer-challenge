@@ -2,7 +2,7 @@ use crate::obj;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{RED, WHITE};
-use math::{color, degrees, matrix4x4, point, vector};
+use math::{degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
 use ray_tracer::light;
@@ -34,13 +34,13 @@ impl TestScene for TeapotAnimated {
         );
 
         let world_scene = scene!(
+            +light!(point!(2, 20, 10));
             +plane!(pattern: Pattern::Checker(*WHITE, *RED, Transform::identity()););
             +teapot;
         );
 
         let mut world = World::default();
         world.push(world_scene);
-        world.push(light!(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 

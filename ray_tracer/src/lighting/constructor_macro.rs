@@ -11,8 +11,8 @@ macro_rules! light {
 
 #[cfg(test)]
 mod point_light_macro_tests {
-    use math::{assert_color, color, point};
     use crate::lighting::PointLight;
+    use math::{assert_color, color, point};
 
     macro_rules! point_light_test {
         ($($name:ident; $actual:expr => $expect:expr)*) => {

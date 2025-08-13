@@ -7,7 +7,6 @@ use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
 use ray_tracer::{material, plane, scene};
 use std::default::Default;
 
@@ -21,11 +20,9 @@ dsl::still!(
         );
         camera
     };
-    world: | world: &mut World | {
-        world.push(light!(point!(2, 20, 10), *WHITE));
-    };
     scene: {
         scene!(
+            +light!(point!(2, 20, 10));
             +plane!(pattern: Pattern::Checker(
                                 *WHITE,
                                 *BLACK,

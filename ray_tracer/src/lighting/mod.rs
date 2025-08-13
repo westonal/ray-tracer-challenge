@@ -1,7 +1,7 @@
+mod constructor_macro;
 pub mod pre_calculations;
 pub mod refraction_lighting;
 pub mod surface_hit;
-mod constructor_macro;
 
 use crate::material::Material;
 use crate::transform::Transform;
