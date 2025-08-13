@@ -89,7 +89,11 @@ impl SceneTree {
         flatten_scene_options: &FlattenSceneOptions,
     ) {
         match self {
-            SceneTree::Light(light) => into.lights.push(light.clone()),
+            SceneTree::Light(light) => {
+                let mut light = light.clone();
+                light.position = (tree_matrix * light.position).force_point();
+                into.lights.push(light);
+            },
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
@@ -299,6 +303,54 @@ mod flatten_matrix_tests {
         assert_eq!(Transform::new(r * b * c), vec.get(1).unwrap().transform);
         assert_eq!(Transform::new(r * d), vec.get(2).unwrap().transform);
     }
+}
+
+#[cfg(test)]
+mod lights_in_scene_flatten_tests {
+    use math::{assert_point, degrees, point, translate};
+    use super::*;
+
+    use crate::{cube, light, plane, scene, sphere};
+
+    macro_rules! light_scene_flatten_test {
+        ($($name:ident; $data:expr => $expect_pos:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    let mut tree = SceneTree::default();
+                    tree.add($data);
+                    let vec = tree.flatten_scene();
+                    assert_point!($expect_pos, vec.lights.get(0).unwrap().position);
+                }
+            )*
+        };
+    }
+
+    light_scene_flatten_test!(
+        origin;     light!(point!()) => point!()
+        non_origin; light!(point!(1, 2, 3)) => point!(1, 2, 3)
+        in_scene;   scene!(
+                        +light!(point!(1, 2, 3));
+                    ) => point!(1, 2, 3)
+
+        in_scene_with_translate; scene!(
+                                     matrix: translate!(x:1;);
+                                     +light!(point!(1, 2, 3));
+                                 ) => point!(2, 2, 3)
+
+        in_scene_with_rotate;    scene!(
+                                     matrix: matrix4x4!(rotation_x(degrees!(90)));
+                                     +light!(point!(1, 2, 3));
+                                 ) => point!(1, -3, 2)
+        nested_transforms;       scene!(
+                                     matrix: translate!(10, 20, 30);
+                                     +scene!(
+                                        matrix: matrix4x4!(rotation_x(degrees!(90)));
+                                        +light!(point!(1, 2, 3));
+                                     );
+                                 ) => point!(11, 17, 32)
+    );
+
 }
 
 #[cfg(test)]
