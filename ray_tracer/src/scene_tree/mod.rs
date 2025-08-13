@@ -6,6 +6,7 @@ mod manipulation;
 
 use crate::csg::CSGOperation;
 use crate::cube;
+use crate::lighting::PointLight;
 use crate::material::Material;
 use crate::primatives::Shape;
 pub(crate) use flat_scene::Chain;
@@ -13,7 +14,6 @@ pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::sync::LazyLock;
-use crate::lighting::PointLight;
 
 #[derive(Clone)]
 pub enum SceneTree {
@@ -79,6 +79,12 @@ impl SceneTree {
 impl From<Shape> for SceneTree {
     fn from(value: Shape) -> Self {
         SceneTree::Leaf(value)
+    }
+}
+
+impl From<PointLight> for SceneTree {
+    fn from(value: PointLight) -> Self {
+        SceneTree::Light(value)
     }
 }
 

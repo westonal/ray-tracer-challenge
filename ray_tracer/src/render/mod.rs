@@ -1,5 +1,4 @@
 use crate::intersection::{Intersect, Intersections};
-use crate::lighting::PointLight;
 use crate::rays::Ray;
 use crate::scene_tree::FlatScene;
 use crate::world::RenderPreferences;

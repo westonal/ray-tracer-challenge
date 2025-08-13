@@ -89,9 +89,7 @@ impl SceneTree {
         flatten_scene_options: &FlattenSceneOptions,
     ) {
         match self {
-            SceneTree::Light(light) => {
-                into.lights.push(light.clone())
-            }
+            SceneTree::Light(light) => into.lights.push(light.clone()),
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
@@ -163,7 +161,8 @@ impl SceneTree {
                                         == BoundingVolumeDebug::TranslucentEmpty
                                     {
                                         // keep only other subtrees
-                                        subtree.chain = subtree.chain
+                                        subtree.chain = subtree
+                                            .chain
                                             .into_iter()
                                             .filter(|f| match f {
                                                 Chain::BoundingVolume(_, i) => true,

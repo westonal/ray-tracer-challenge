@@ -37,7 +37,11 @@ impl Debug for SceneTree {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             SceneTree::Light(point_light, ..) => {
-                write!(f, "PointLight({:?}, {:?})", point_light.position, point_light.color)
+                write!(
+                    f,
+                    "PointLight({:?}, {:?})",
+                    point_light.position, point_light.color
+                )
             }
             SceneTree::Leaf(shape, ..) => {
                 write!(f, "{:?}", shape.surface)

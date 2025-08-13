@@ -7,7 +7,6 @@ mod shadows;
 #[cfg(test)]
 pub use crate::world::default::test_world;
 
-use crate::lighting::PointLight;
 use crate::render::RenderableWorld;
 use crate::scene_tree::SceneTree;
 pub use preferences::BoundingVolumeDebug;
@@ -48,7 +47,7 @@ impl World {
         self.scene_tree.add(object);
     }
 
-    #[deprecated(note="use `push`")] // clashes with Add trait for csg, use push
+    #[deprecated(note = "use `push`")] // clashes with Add trait for csg, use push
     pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
         self.push(object)
     }

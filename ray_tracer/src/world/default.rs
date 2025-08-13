@@ -29,7 +29,7 @@ pub mod test_world {
             world.add(sphere);
             world
         }
-        
+
         pub fn default_world() -> World {
             let mut world = Self::default_world_no_lights();
             world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));

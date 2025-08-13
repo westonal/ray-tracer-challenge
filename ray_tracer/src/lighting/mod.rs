@@ -7,7 +7,6 @@ use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
-use crate::scene_tree::SceneTree;
 
 #[derive(Clone)]
 pub struct PointLight {
@@ -18,12 +17,6 @@ pub struct PointLight {
 impl PointLight {
     pub fn new(position: Point, color: Color) -> Self {
         Self { position, color }
-    }
-}
-
-impl From<PointLight> for SceneTree{
-    fn from(value: PointLight) -> Self {
-        SceneTree::Light(value)
     }
 }
 
