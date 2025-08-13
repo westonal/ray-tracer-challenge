@@ -8,11 +8,12 @@ use math::tuple::vector::normal::Normal;
 pub struct Transform {
     object_to_world_transform: Matrix4x4,
     world_to_object_transform: Matrix4x4,
+    world_to_object_transform_transpose: Matrix4x4,
 }
 
 impl Transform {
     pub(crate) fn object_normal_to_world_normal(&self, object_normal: Vector) -> Normal {
-        let world_normal = self.world_to_object_transform.transpose() * object_normal;
+        let world_normal = self.world_to_object_transform_transpose * object_normal;
         world_normal.force_vector().normalize()
     }
 
@@ -38,15 +39,18 @@ impl Transform {
         Self {
             object_to_world_transform: Matrix4x4::identity(),
             world_to_object_transform: Matrix4x4::identity(),
+            world_to_object_transform_transpose: Matrix4x4::identity(),
         }
     }
 
     pub fn new(object_to_world_matrix: Matrix4x4) -> Self {
+        let world_to_object = object_to_world_matrix
+            .invert()
+            .expect("inverse transform failure");
         Self {
             object_to_world_transform: object_to_world_matrix,
-            world_to_object_transform: object_to_world_matrix
-                .invert()
-                .expect("inverse transform failure"),
+            world_to_object_transform: world_to_object,
+            world_to_object_transform_transpose: world_to_object.transpose(),
         }
     }
 }
