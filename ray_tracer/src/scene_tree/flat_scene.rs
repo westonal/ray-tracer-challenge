@@ -1,17 +1,23 @@
 use crate::csg::{CSGOperation, Filter};
 use crate::intersection::{Intersect, Intersection, Intersections};
+use crate::lighting::PointLight;
 use crate::primatives::IntersectableShape;
 use crate::rays::Ray;
 use std::fmt::Debug;
 use std::ops::{Deref, DerefMut};
 
+#[derive(Default)]
 pub struct FlatScene {
-    chain: Vec<Chain>,
+    pub(crate) chain: Vec<Chain>,
+    pub(crate) lights: Vec<PointLight>,
 }
 
 impl FlatScene {
     pub(crate) fn new(chain: Vec<Chain>) -> Self {
-        Self { chain }
+        Self {
+            chain,
+            lights: vec![],
+        }
     }
 }
 

@@ -46,8 +46,8 @@ macro_rules! animation {
             fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
                 let mut world = World::default();
                 world.render_preferences.max_ray_generation = 7;
-                world.add($scene(frame));
-                world.add_light(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
+                world.push($scene(frame));
+                world.push(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
                 world
             }
 

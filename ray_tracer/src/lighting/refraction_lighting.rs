@@ -142,7 +142,7 @@ mod refraction_lighting_tests {
     #[test]
     fn shade_with_a_transparent_material() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
         let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.transparency = 0.5;
@@ -165,7 +165,7 @@ mod refraction_lighting_tests {
     #[test]
     fn shade_with_a_reflective_and_transparent_material() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
         let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.reflectivity = 0.5;

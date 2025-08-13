@@ -35,8 +35,8 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.add_light(PointLight::new(point!(50, 100, -50), color!(1, 1, 1)));
-        world.add_light(PointLight::new(point!(-400, 50, -10), color!(0.2, 0.2, 0.2)));
+        world.push(PointLight::new(point!(50, 100, -50), color!(1, 1, 1)));
+        world.push(PointLight::new(point!(-400, 50, -10), color!(0.2, 0.2, 0.2)));
     };
     scene: {
         let white = material!(

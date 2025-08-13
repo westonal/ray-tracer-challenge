@@ -39,8 +39,8 @@ impl TestScene for TeapotAnimated {
         );
 
         let mut world = World::default();
-        world.add(world_scene);
-        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(world_scene);
+        world.push(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 

@@ -23,7 +23,7 @@ dsl::still!(
         camera
     };
     world: | world: &mut World | {
-        world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
+        world.push(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
     };
     scene: {
         scene!(

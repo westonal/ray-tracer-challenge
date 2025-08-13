@@ -22,15 +22,15 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.add_light(PointLight::new(
+        world.push(PointLight::new(
             point!(2, 20, 10),
             color!(1, 0.5, 0.5) * 0.5,
         ));
-        world.add_light(PointLight::new(
+        world.push(PointLight::new(
             point!(-2, 20, -10),
             color!(0.5, 1, 0.5) * 0.5,
         ));
-        world.add_light(PointLight::new(
+        world.push(PointLight::new(
             point!(-10, 20, -2),
             color!(0.5, 0.5, 1) * 0.5,
         ));

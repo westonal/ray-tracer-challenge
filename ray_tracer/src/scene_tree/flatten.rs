@@ -56,14 +56,14 @@ impl FlattenSceneWithMatrix for SceneTree {
         matrix4x4: Matrix4x4,
         flatten_scene_options: &FlattenSceneOptions,
     ) -> FlatScene {
-        let mut chain = vec![];
+        let mut flat_scene = FlatScene::default();
         self.walk(
-            &mut chain,
+            &mut flat_scene,
             matrix4x4,
             &Overrides::default(),
             flatten_scene_options,
         );
-        FlatScene::new(chain)
+        flat_scene
     }
 }
 
@@ -83,12 +83,15 @@ impl Overrides {
 impl SceneTree {
     fn walk(
         &self,
-        into: &mut Vec<Chain>,
+        into: &mut FlatScene,
         tree_matrix: Matrix4x4,
         overrides: &Overrides,
         flatten_scene_options: &FlattenSceneOptions,
     ) {
         match self {
+            SceneTree::Light(light) => {
+                into.lights.push(light.clone())
+            }
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
@@ -96,17 +99,17 @@ impl SceneTree {
                     .material_override
                     .to_owned()
                     .unwrap_or(shape.material);
-                into.push(chain_link!(shape))
+                into.chain.push(chain_link!(shape))
             }
             SceneTree::CsgLeaf(lhs_tree, operation, rhs_tree) => {
-                let mut lhs_chain = vec![];
+                let mut lhs_chain = FlatScene::default();
                 lhs_tree.walk(
                     &mut lhs_chain,
                     tree_matrix,
                     overrides,
                     flatten_scene_options,
                 );
-                let mut rhs_chain = vec![];
+                let mut rhs_chain = FlatScene::default();
                 rhs_tree.walk(
                     &mut rhs_chain,
                     tree_matrix,
@@ -138,7 +141,7 @@ impl SceneTree {
                         }
                     }
                     Some(bounds) => {
-                        let mut subtree = vec![];
+                        let mut subtree = FlatScene::default();
                         for child in children {
                             child.walk(&mut subtree, matrix, overrides, flatten_scene_options);
                         }
@@ -160,7 +163,7 @@ impl SceneTree {
                                         == BoundingVolumeDebug::TranslucentEmpty
                                     {
                                         // keep only other subtrees
-                                        subtree = subtree
+                                        subtree.chain = subtree.chain
                                             .into_iter()
                                             .filter(|f| match f {
                                                 Chain::BoundingVolume(_, i) => true,

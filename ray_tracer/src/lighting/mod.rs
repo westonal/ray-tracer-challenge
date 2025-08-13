@@ -7,7 +7,9 @@ use crate::transform::Transform;
 use math::tuple::color::Color;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
+use crate::scene_tree::SceneTree;
 
+#[derive(Clone)]
 pub struct PointLight {
     pub position: Point,
     pub color: Color,
@@ -16,6 +18,12 @@ pub struct PointLight {
 impl PointLight {
     pub fn new(position: Point, color: Color) -> Self {
         Self { position, color }
+    }
+}
+
+impl From<PointLight> for SceneTree{
+    fn from(value: PointLight) -> Self {
+        SceneTree::Light(value)
     }
 }
 
@@ -264,7 +272,7 @@ mod reflection_lighting_tests {
         let mut plane = plane!();
         plane.material = material;
         let mut world = World::default();
-        world.set_light(PointLight::new(Point::origin(), *WHITE));
+        world.push(PointLight::new(Point::origin(), *WHITE));
         world.add(sphere);
         world.add(plane);
 
@@ -289,7 +297,7 @@ mod reflection_lighting_tests {
         plane2.matrix = Matrix4x4::translation(0., 10., 0.);
         let mut world = World::default();
         world.render_preferences.max_ray_generation = 4;
-        world.set_light(PointLight::new(Point::origin(), *WHITE));
+        world.push(PointLight::new(Point::origin(), *WHITE));
         world.add(plane1);
         world.add(plane2);
         // Shoot straight at plane 1

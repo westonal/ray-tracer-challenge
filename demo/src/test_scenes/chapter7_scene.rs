@@ -24,7 +24,7 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
     };
     scene: {
         scene!(

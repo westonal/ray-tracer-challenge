@@ -15,7 +15,6 @@ pub use preferences::RenderPreferences;
 
 pub struct World {
     pub scene_tree: SceneTree,
-    pub lights: Vec<PointLight>,
     pub render_preferences: RenderPreferences,
 }
 
@@ -27,7 +26,6 @@ impl<'w> World {
         //debug_print(&scene);
         RenderableWorld {
             flat_scene: scene,
-            lights: &self.lights,
             render_preferences: &self.render_preferences,
         }
     }
@@ -42,14 +40,14 @@ fn debug_print(scene: &Vec<Chain>) {
 }
 
 impl World {
+    #[deprecated(note="use `push`")] // this is a hangover from before lights were part of the scene
     pub fn add_light(&mut self, light: PointLight) {
-        self.lights.push(light);
+        self.push(light);
     }
 
     /// Set lighting to a single light, use add light for multiple lights
     pub fn set_light(&mut self, light: PointLight) {
-        self.lights.clear();
-        self.add_light(light);
+        self.push(light);
     }
 }
 
@@ -58,8 +56,13 @@ impl World {
         self.scene_tree.shape_count()
     }
 
-    pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
+    pub fn push<T: Into<SceneTree>>(&mut self, object: T) {
         self.scene_tree.add(object);
+    }
+
+    #[deprecated(note="use `push`")] // clashes with Add trait for csg, use push
+    pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
+        self.push(object)
     }
 }
 
@@ -67,7 +70,6 @@ impl Default for World {
     fn default() -> Self {
         Self {
             scene_tree: Default::default(),
-            lights: vec![],
             render_preferences: Default::default(),
         }
     }
@@ -95,9 +97,9 @@ mod world_tests {
         world.add(sphere!());
         world.add(sphere!());
         assert_eq!(2, world.shape_count());
-        assert!(world.lights.is_empty());
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
-        assert!(!world.lights.is_empty());
+        assert!(world.prepare_for_render().flat_scene.lights.is_empty());
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
+        assert!(!world.prepare_for_render().flat_scene.lights.is_empty());
     }
 
     #[test]

@@ -3,6 +3,7 @@ use crate::scene_tree::SceneTree;
 impl SceneTree {
     pub fn shape_count(&self) -> usize {
         match self {
+            SceneTree::Light(_) => 0,
             SceneTree::Leaf(_) => 1,
             SceneTree::Group { children, .. } => children.iter().map(|a| a.shape_count()).sum(),
             SceneTree::CsgLeaf(..) => {
@@ -13,6 +14,9 @@ impl SceneTree {
 
     pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
         match self {
+            SceneTree::Light(..) => {
+                panic!("Can't add to another leaf")
+            }
             SceneTree::Leaf(..) => {
                 panic!("Can't add to another leaf")
             }
@@ -33,6 +37,9 @@ use crate::primatives::Shape;
 impl SceneTree {
     pub(crate) fn get_mut_shape(&mut self, index: usize) -> &mut Shape {
         match self {
+            SceneTree::Light(item) => {
+                panic!()
+            }
             SceneTree::Leaf(item) => {
                 if index == 0 {
                     item

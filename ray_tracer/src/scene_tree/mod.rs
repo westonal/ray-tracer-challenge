@@ -13,9 +13,11 @@ pub use flat_scene::FlatScene;
 pub use flatten::FlattenScene;
 use math::matrix::matrix_4x4::Matrix4x4;
 use std::sync::LazyLock;
+use crate::lighting::PointLight;
 
 #[derive(Clone)]
 pub enum SceneTree {
+    Light(PointLight),
     Leaf(Shape),
     CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
     Group {
@@ -62,6 +64,7 @@ impl SceneTree {
 
     pub fn is_not_empty(&self) -> bool {
         match self {
+            SceneTree::Light(_) => true,
             SceneTree::Leaf(_) => true,
             SceneTree::CsgLeaf(_, _, _) => true,
             SceneTree::Group { children, .. } => children.iter().any(|c| c.is_not_empty()),

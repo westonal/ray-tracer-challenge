@@ -8,7 +8,6 @@ pub mod render_world;
 
 pub struct RenderableWorld<'w> {
     pub(crate) flat_scene: FlatScene,
-    pub lights: &'w Vec<PointLight>,
     pub render_preferences: &'w RenderPreferences,
 }
 
