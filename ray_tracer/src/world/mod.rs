@@ -44,7 +44,7 @@ impl World {
     }
 
     pub fn push<T: Into<SceneTree>>(&mut self, object: T) {
-        self.scene_tree.add(object);
+        self.scene_tree.push(object);
     }
 }
 

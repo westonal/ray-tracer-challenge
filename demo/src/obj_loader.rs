@@ -32,11 +32,11 @@ impl ObjLoader {
     pub fn obj_to_scene(&self, obj: &Obj) -> SceneTree {
         let mut scene = scene!();
 
-        scene.add(self.add_group(&obj, &obj.default_group));
+        scene.push(self.add_group(&obj, &obj.default_group));
 
         for g in obj.group_names() {
             let g = &obj[g];
-            scene.add(self.add_group(&obj, g));
+            scene.push(self.add_group(&obj, g));
         }
 
         auto_bv_scene(scene)
@@ -70,17 +70,17 @@ impl ObjLoader {
                 triangle.material = m.clone();
             }
 
-            part.add(triangle);
+            part.push(triangle);
             part_size += 1;
 
             if part_size > 100 {
-                group.add(auto_bv_scene(part));
+                group.push(auto_bv_scene(part));
                 part = scene!();
                 part_size = 0;
             }
         }
 
-        group.add(auto_bv_scene(part));
+        group.push(auto_bv_scene(part));
 
         group
     }

@@ -268,15 +268,15 @@ mod chain_build_from_tree_intersect_tests {
     #[test]
     fn bounding_volume_missed_skip_one_two_due_to_bounding_volume_translation() {
         let mut scene = SceneTree::default();
-        scene.add(sphere!());
+        scene.push(sphere!());
         let mut sub_scene = scene!(
             bounding_volume: sphere!(matrix: Matrix4x4::translation(1.1, 0., 0.));
         );
-        sub_scene.add(sphere!()); // skipped
-        sub_scene.add(sphere!()); // skipped
-        scene.add(sub_scene);
-        scene.add(sphere!());
-        scene.add(sphere!());
+        sub_scene.push(sphere!()); // skipped
+        sub_scene.push(sphere!()); // skipped
+        scene.push(sub_scene);
+        scene.push(sphere!());
+        scene.push(sphere!());
 
         let scene = scene.flatten_scene();
         let intersections = scene.intersect(&ray!(point!(0, 0, -10), vector!(0, 0, 1)));

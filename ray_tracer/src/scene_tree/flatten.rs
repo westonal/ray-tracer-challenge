@@ -217,7 +217,7 @@ mod flatten_tests {
     #[test]
     fn flatten_one() {
         let mut tree = SceneTree::default();
-        tree.add(sphere!());
+        tree.push(sphere!());
 
         let vec = tree.flatten_scene();
         assert_eq!(1, vec.len());
@@ -226,8 +226,8 @@ mod flatten_tests {
     #[test]
     fn flatten_two() {
         let mut tree = SceneTree::default();
-        tree.add(sphere!());
-        tree.add(cube!());
+        tree.push(sphere!());
+        tree.push(cube!());
 
         let vec = tree.flatten_scene();
         assert_eq!(2, vec.len());
@@ -236,12 +236,12 @@ mod flatten_tests {
     #[test]
     fn flatten_two_in_sub_tree() {
         let mut tree = SceneTree::default();
-        tree.add(sphere!());
+        tree.push(sphere!());
 
         let mut branch = SceneTree::default();
-        branch.add(cube!());
+        branch.push(cube!());
 
-        tree.add(branch);
+        tree.push(branch);
 
         let vec = tree.flatten_scene();
         assert_eq!(2, vec.len());
@@ -250,13 +250,13 @@ mod flatten_tests {
     #[test]
     fn flatten_three_in_sub_tree() {
         let mut tree = SceneTree::default();
-        tree.add(sphere!());
+        tree.push(sphere!());
 
         let mut branch = SceneTree::default();
-        branch.add(cube!());
-        branch.add(plane!());
+        branch.push(cube!());
+        branch.push(plane!());
 
-        tree.add(branch);
+        tree.push(branch);
 
         let vec = tree.flatten_scene();
         assert_eq!(3, vec.len());
@@ -280,13 +280,13 @@ mod flatten_matrix_tests {
         let d = matrix4x4!(rotation_y(degrees!(45)));
 
         let mut root = SceneTree::new(r);
-        root.add(sphere!(matrix: a));
+        root.push(sphere!(matrix: a));
 
         let mut branch = SceneTree::new(b);
-        branch.add(cube!(matrix: c));
+        branch.push(cube!(matrix: c));
 
-        root.add(branch);
-        root.add(cylinder!(matrix: d));
+        root.push(branch);
+        root.push(cylinder!(matrix: d));
 
         let vec = root.flatten_scene();
 
@@ -318,7 +318,7 @@ mod lights_in_scene_flatten_tests {
                 #[test]
                 fn $name() {
                     let mut tree = SceneTree::default();
-                    tree.add($data);
+                    tree.push($data);
                     let vec = tree.flatten_scene();
                     assert_point!($expect_pos, vec.lights.get(0).unwrap().position);
                 }

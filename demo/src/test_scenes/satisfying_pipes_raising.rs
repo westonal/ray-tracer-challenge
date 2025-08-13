@@ -61,7 +61,7 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
                     for x in -9..3 {
                         let artifical_progress = factory.prog(x, frame.loop_progress);
                         let extra_height = -2. * artifical_progress;
-                        scene.add(
+                        scene.push(
                             scene!(
                                 matrix: matrix4x4!(
                                             translation(

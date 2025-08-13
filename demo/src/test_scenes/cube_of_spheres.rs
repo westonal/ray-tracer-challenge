@@ -101,7 +101,7 @@ fn double<T: Fn(Matrix4x4) -> SceneTree>(f: T) -> SceneTree {
     for x in 0..2 {
         for y in 0..2 {
             for z in 0..2 {
-                tree.add(f(translate!(
+                tree.push(f(translate!(
                     x as f32 * 2. - 1.,
                     y as f32 * 2. - 1.,
                     z as f32 * 2. - 1.

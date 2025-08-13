@@ -32,12 +32,12 @@ still!(
                 } else {
                     color!(0, 0.5, 0.9)
                 });
-                column.add(sphere!(
+                column.push(sphere!(
                     matrix: translate!(y: y;) * scale!(scale);
                     pattern: pattern;
                 ));
             }
-            root.add(column);
+            root.push(column);
         }
         scene!(
             +light!(point!(10, 10, 7));

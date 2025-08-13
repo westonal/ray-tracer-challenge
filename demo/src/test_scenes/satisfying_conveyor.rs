@@ -411,7 +411,7 @@ impl SatisfyingPipesAnimatedFactory {
         let mut scene = scene!();
         for i in 0..self.prior_objects_on_belt {
             let i = i + offset + 1;
-            scene.add(scene!(
+            scene.push(scene!(
                 matrix: matrix4x4!(
                     translation(0., 0., (self.conveyor_motion_per_cycle/2.) * i as f32)
                     translation(0.,0.,self.conveyor_position)

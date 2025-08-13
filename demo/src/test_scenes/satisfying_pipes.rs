@@ -58,7 +58,7 @@ impl TestScene for SatisfyingPipesAnimated {
                         } else {
                             angle2
                         };
-                        scene.add(
+                        scene.push(
                             scene!(
                                 matrix: matrix4x4!(
                                             translation(

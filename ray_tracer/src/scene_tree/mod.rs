@@ -133,7 +133,7 @@ macro_rules! scene {
                     _material_override
                 );
                 $(
-                _tree.add($entry);
+                _tree.push($entry);
                 )*
                 _tree
             } else {

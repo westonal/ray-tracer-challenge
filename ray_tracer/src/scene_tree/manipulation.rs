@@ -12,7 +12,7 @@ impl SceneTree {
         }
     }
 
-    pub fn add<T: Into<SceneTree>>(&mut self, object: T) {
+    pub fn push<T: Into<SceneTree>>(&mut self, object: T) {
         match self {
             SceneTree::Light(..) => {
                 panic!("Can't add to another leaf")
@@ -81,26 +81,26 @@ mod build_tree_tests {
     #[test]
     fn add_one_leaf() {
         let mut tree = SceneTree::default();
-        tree.add(cylinder!());
+        tree.push(cylinder!());
         assert_eq!(1, tree.shape_count());
     }
 
     #[test]
     fn add_two_leafs() {
         let mut tree = SceneTree::default();
-        tree.add(cylinder!());
-        tree.add(sphere!());
+        tree.push(cylinder!());
+        tree.push(sphere!());
         assert_eq!(2, tree.shape_count());
     }
 
     #[test]
     fn add_two_leafs_at_two_depths() {
         let mut tree = SceneTree::default();
-        tree.add(cylinder!());
+        tree.push(cylinder!());
         let mut branch = SceneTree::default();
-        branch.add(cylinder!());
-        branch.add(sphere!());
-        tree.add(branch);
+        branch.push(cylinder!());
+        branch.push(sphere!());
+        tree.push(branch);
         assert_eq!(3, tree.shape_count());
     }
 }
