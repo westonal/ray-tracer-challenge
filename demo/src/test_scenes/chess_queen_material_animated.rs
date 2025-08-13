@@ -2,15 +2,14 @@ use crate::obj;
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLACK, WHITE};
-use math::{color, degrees, matrix4x4, point, vector};
+use math::{color, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
+use ray_tracer::{light, look_at};
 use ray_tracer::{plane, scene};
 use std::default::Default;
 use std::time::Duration;
@@ -69,11 +68,7 @@ impl TestScene for QueenMaterialAnimation {
     fn build_camera_for_frame(&self, size: Size, frame: &AnimationFrame) -> Camera {
         let prog = frame.loop_progress;
         let mut camera = Camera::new(size, degrees!(35.0 - cycle(prog) * 20.0));
-        camera.set_transform(ViewMatrix::new_look_at(
-            point!(4, 6, 8),
-            point!(0, 1.8 + cycle(prog) * 1.25, 0),
-            vector!(0, 1, 0),
-        ));
+        camera.set_transform(look_at!(point!(4, 6, 8) => point!(0, 1.8 + cycle(prog) * 1.25, 0)));
         camera
     }
 }

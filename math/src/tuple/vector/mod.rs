@@ -91,6 +91,24 @@ macro_rules! vector {
     };
 }
 
+#[macro_export]
+macro_rules! pub_static_vectors {
+    ($($name:ident = $vector:expr;)+) => {
+        $(
+        pub static $name: std::sync::LazyLock<Vector> = std::sync::LazyLock::new(|| $vector);
+        )+
+    };
+}
+
+pub_static_vectors! {
+    POSITIVE_X = vector!( 1,  0,  0);
+    NEGATIVE_X = vector!(-1,  0,  0);
+    POSITIVE_Y = vector!( 0,  1,  0);
+    NEGATIVE_Y = vector!( 0, -1,  0);
+    POSITIVE_Z = vector!( 0,  0,  1);
+    NEGATIVE_Z = vector!( 0,  0, -1);
+}
+
 #[cfg(test)]
 mod vector_creation_tests {
     use super::*;

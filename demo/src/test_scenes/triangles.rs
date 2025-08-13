@@ -1,24 +1,19 @@
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
-use math::{degrees, matrix4x4, point, vector};
+use math::{degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::{Shape, Triangle};
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::{gradient_stops, material, plane, scene};
+use ray_tracer::{light, look_at};
 
 dsl::still!(
     Triangles;
     file_name: "triangles";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(30));
-        camera.set_transform(ViewMatrix::new_look_at(
-            point!(17, 19, 23),
-            point!(1, 2, -3),
-            vector!(0, 1, 0),
-        ));
+        camera.set_transform(look_at!(point!(17, 19, 23) => point!(1, 2, -3)));
         camera
     };
     scene: {

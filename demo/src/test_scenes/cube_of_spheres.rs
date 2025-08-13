@@ -1,26 +1,21 @@
 use dsl::still;
 use math::matrix::matrix_4x4::{Matrix4x4, Matrix4x4ScaleAll};
 use math::tuple::color::{BLACK, GREEN, WHITE};
-use math::{degrees, matrix4x4, point, scale, translate, vector};
+use math::{degrees, matrix4x4, point, scale, translate};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, material, plane, scene, sphere};
+use ray_tracer::{light, look_at};
 
 still!(
     CubeOfSpheres;
     file_name: "cube_of_spheres";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(30));
-        camera.set_transform(ViewMatrix::new_look_at(
-            point!(17, 19, 23),
-            point!(4, 2, 4),
-            vector!(0, 1, 0),
-        ));
+        camera.set_transform(look_at!(point!(17, 19, 23) => point!(4, 2, 4)));
         camera
     };
     world: | world: &mut World | {

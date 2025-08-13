@@ -1,25 +1,20 @@
 use crate::Material;
 use dsl::still;
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
-use math::{Angle, color, degrees, matrix4x4, point, vector};
+use math::{Angle, color, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::{gradient_stops, plane, scene, sphere};
+use ray_tracer::{light, look_at};
 
 still!(
     Chapter7Scene;
     file_name: "Chapter 7 Scene";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(60));
-        camera.set_transform(ViewMatrix::new_look_at(
-            point!(0, 1.5, -5),
-            point!(0, 1, 0),
-            vector!(0, 1, 0),
-        ));
+        camera.set_transform(look_at!(point!(0, 1.5, -5) => point!(0, 1, 0)));
         camera
     };
     scene: {

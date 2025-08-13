@@ -22,6 +22,16 @@ impl ViewMatrix {
     }
 }
 
+#[macro_export]
+macro_rules! look_at {
+    ($eye:expr => $center:expr; up: $up:expr) => {
+        $crate::view_matrix::ViewMatrix::new_look_at($eye.into(), $center.into(), $up.into())
+    };
+    ($eye:expr => $center:expr) => {
+        $crate::look_at!($eye => $center; up: *math::tuple::vector::POSITIVE_Y)
+    };
+}
+
 impl From<ViewMatrix> for Matrix4x4 {
     fn from(value: ViewMatrix) -> Self {
         value.0

@@ -1,15 +1,14 @@
 use crate::obj;
 use dsl::still;
 use math::tuple::color::{RED, WHITE};
-use math::{degrees, matrix4x4, point, vector};
+use math::{degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::{BoundingVolumeDebug, World};
 use ray_tracer::{auto, plane, scene};
+use ray_tracer::{light, look_at};
 use std::default::Default;
 
 still!(
@@ -17,9 +16,7 @@ still!(
     file_name: "chess_pawn";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(35));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.4, 0), vector!(0, 1, 0)),
-        );
+        camera.set_transform(look_at!(point!(4, 6, 8) => point!(0, 1.4, 0)));
         camera
     };
     world: | world: &mut World | {

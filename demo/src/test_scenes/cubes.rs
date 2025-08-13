@@ -1,23 +1,20 @@
 use dsl::still;
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
-use math::{degrees, matrix4x4, point, translate, vector};
+use math::{degrees, matrix4x4, point, translate};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::{cube, gradient_stops, material, plane, scene};
+use ray_tracer::{light, look_at};
 
 still!(
     Cubes;
     file_name: "cubes";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(30));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(17, 19, 23), point!(1, 2, -3), vector!(0, 1, 0)),
-        );
+        camera.set_transform(look_at!(point!(17, 19, 23) => point!(1, 2, -3)));
         camera
     };
     scene: {

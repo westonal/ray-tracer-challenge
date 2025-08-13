@@ -63,8 +63,7 @@ impl Camera {
 mod camera_tests {
     use super::*;
 
-    use crate::view_matrix::ViewMatrix;
-
+    use crate::look_at;
     use crate::world::World;
     use math::{
         assert_color, assert_point, assert_vector, color, degrees, matrix4x4, point, vector,
@@ -107,11 +106,7 @@ mod camera_tests {
     fn render_world_with_camera() {
         let world = World::default_world();
         let mut camera = Camera::new(Size::new(11, 11), degrees!(90));
-        camera.set_transform(ViewMatrix::new_look_at(
-            point!(0, 0, -5),
-            point!(0, 0, 0),
-            vector!(0, 1, 0),
-        ));
+        camera.set_transform(look_at!(point!(0, 0, -5) => point!()));
 
         let world = world.prepare_for_render();
         let color = camera.color_at((5, 5), &world);

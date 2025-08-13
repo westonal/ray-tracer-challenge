@@ -3,17 +3,16 @@ use crate::test_scenes::{AnimationFrame, AnimationSpec, DynamicScene, Frames, Te
 use animation::animation_spec;
 use animation::interpolation::{Accelerate, AccelerateDecelerate, Decelerate, Interpolator};
 use math::tuple::color::{BLACK, GREEN, WHITE, YELLOW};
-use math::{color, degrees, matrix4x4, max, point, vector};
+use math::{color, degrees, matrix4x4, max, point};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, plane, scene, sphere};
+use ray_tracer::{light, look_at};
 use std::default::Default;
 use std::mem;
 use std::ops::Deref;
@@ -128,14 +127,14 @@ animation!(
     |size, frame:&AnimationFrame|{
         let mut camera = Camera::new(size, degrees!(25));
         let motion = if CAMERA_MOTION {accelerate_decelerate(frame.progress)} else {1.};
-        let zoom = ViewMatrix::new_look_at(
+        let zoom = look_at!(
             point!(
                 (motion * -20. + 10.) * 0.8,
                 8. * 0.8,
                 20. * 0.8
-            ),
-            point!(0, 0.5, 0),
-            vector!(0, 1, 0),
+            )
+            =>
+            point!(0, 0.5, 0)
         );
         camera.set_transform(zoom);
         camera
@@ -155,14 +154,14 @@ animation!(
     |size, frame:&AnimationFrame|{
         let mut camera = Camera::new(size, degrees!(25));
         let motion = if CAMERA_MOTION {accelerate_decelerate(1.-frame.progress)} else {1.};
-        let zoom = ViewMatrix::new_look_at(
+        let zoom = look_at!(
             point!(
                 (motion * -20. + 10.) * 0.8,
                 8. * 0.8,
                 20. * 0.8
-            ),
-            point!(0, 0.5, 0),
-            vector!(0, 1, 0),
+            )
+            =>
+            point!(0, 0.5, 0)
         );
         camera.set_transform(zoom);
         camera
@@ -182,14 +181,14 @@ animation!(
     };
     |size, frame:&AnimationFrame|{
         let mut camera = Camera::new(size, degrees!(25));
-        let zoom = ViewMatrix::new_look_at(
+        let zoom = look_at!(
             point!(
                 -10. * 0.8,
                 8. * 0.8,
                 20. * 0.8
-            ),
-            point!(0, 0.5, 0),
-            vector!(0, 1, 0),
+            )
+            =>
+            point!(0, 0.5, 0)
         );
         camera.set_transform(zoom);
         camera
@@ -210,14 +209,14 @@ animation!(
     |size, frame:&AnimationFrame|{
         let mut camera = Camera::new(size, degrees!(25));
         let motion = if CAMERA_MOTION {accelerate_decelerate(1.-frame.progress)} else {1.};
-        let zoom = ViewMatrix::new_look_at(
+        let zoom = look_at!(
             point!(
                 (motion * -20. + 10.) * 0.8,
                 8. * 0.8,
                 20. * 0.8
-            ),
-            point!(0, 0.5, 0),
-            vector!(0, 1, 0),
+            )
+            =>
+            point!(0, 0.5, 0)
         );
         camera.set_transform(zoom);
         camera

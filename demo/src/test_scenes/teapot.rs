@@ -1,12 +1,11 @@
 use crate::obj;
 use dsl::still;
 use math::tuple::color::{RED, WHITE};
-use math::{color, degrees, matrix4x4, point, vector};
+use math::{color, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
+use ray_tracer::{light, look_at};
 use ray_tracer::{plane, scene};
 use std::default::Default;
 
@@ -15,9 +14,7 @@ still!(
     file_name: "utah_teapot";
     camera: | size| {
         let mut camera = Camera::new(size, degrees!(35));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(8, 6, 4), point!(0, 0.8, 0), vector!(0, 1, 0)),
-        );
+        camera.set_transform(look_at!(point!(8, 6, 4) => point!(0, 0.8, 0)));
         camera
     };
     scene: scene!(

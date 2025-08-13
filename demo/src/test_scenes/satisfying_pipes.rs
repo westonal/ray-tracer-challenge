@@ -1,16 +1,16 @@
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
-use math::{Angle, degrees, matrix4x4, point, vector};
+use math::tuple::vector::POSITIVE_Z;
+use math::{Angle, degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, cylinder, plane, scene, sphere};
+use ray_tracer::{light, look_at};
 use std::default::Default;
 use std::time::Duration;
 
@@ -95,9 +95,8 @@ impl TestScene for SatisfyingPipesAnimated {
 
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(35));
-        let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
-        let top_down_high =
-            ViewMatrix::new_look_at(point!(0, 30, 0), point!(0, 0, 0), vector!(0, 0, 1));
+        let top_down = look_at!(point!(0, 10, 0) => point!(); up: *POSITIVE_Z);
+        let top_down_high = look_at!(point!(0, 30, 0) => point!(); up: *POSITIVE_Z);
         camera.set_transform(top_down_high);
         camera
     }

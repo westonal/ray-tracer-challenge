@@ -2,16 +2,16 @@ use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use animation::interpolation::{Accelerate, Decelerate, Interpolator};
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
-use math::{color, degrees, matrix4x4, point, radians, vector};
+use math::tuple::vector::POSITIVE_Z;
+use math::{color, degrees, matrix4x4, point, radians};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
 use ray_tracer::{cube, cylinder, plane, scene, sphere};
+use ray_tracer::{light, look_at};
 use std::default::Default;
 use std::f32::consts::TAU;
 use std::time::Duration;
@@ -110,12 +110,10 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
 
     fn build_camera(&self, size: Size) -> Camera {
         let mut camera = Camera::new(size, degrees!(30));
-        let top_down = ViewMatrix::new_look_at(point!(0, 10, 0), point!(0, 0, 0), vector!(0, 0, 1));
-        let side_on = ViewMatrix::new_look_at(point!(0, 0, 10), point!(0, 0, 0), vector!(0, 1, 0));
-        let top_down_high = ViewMatrix::new_look_at(
-            point!(-8 - 1, 8. + 1.2, 10),
-            point!(-1, 1.2, 0),
-            vector!(0, 1, 0),
+        let top_down = look_at!(point!(0, 10, 0) => point!(0, 0, 0); up: *POSITIVE_Z);
+        let side_on = look_at!(point!(0, 0, 10) => point!(0, 0, 0));
+        let top_down_high = look_at!(
+            point!(-8 - 1, 8. + 1.2, 10) => point!(-1, 1.2, 0)
         );
         camera.set_transform(top_down_high);
         // camera.set_transform(side_on);

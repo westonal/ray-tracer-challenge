@@ -1,12 +1,11 @@
 use crate::obj;
 use math::tuple::color::{BLACK, WHITE};
-use math::{degrees, matrix4x4, point, vector};
+use math::{degrees, matrix4x4, point};
 use ray_tracer::camera::Camera;
-use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
-use ray_tracer::view_matrix::ViewMatrix;
+use ray_tracer::{light, look_at};
 use ray_tracer::{material, plane, scene};
 use std::default::Default;
 
@@ -15,9 +14,7 @@ dsl::still!(
     file_name: "chess_queen";
     camera: | size | {
         let mut camera = Camera::new(size, degrees!(35));
-        camera.set_transform(
-            ViewMatrix::new_look_at(point!(4, 6, 8), point!(0, 1.8, 0), vector!(0, 1, 0)),
-        );
+        camera.set_transform(look_at!(point!(4, 6, 8) => point!(0, 1.8, 0)));
         camera
     };
     scene: {

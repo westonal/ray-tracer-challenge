@@ -1,8 +1,7 @@
 use dsl::still;
 use math::{color, degrees, matrix4x4, point, radians, scale, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::{cube, light, material, plane, scene, sphere};
+use ray_tracer::{cube, light, look_at, material, plane, scene, sphere};
 
 macro_rules! cover_cube {
     (
@@ -23,13 +22,7 @@ still!(
     size: (1280, 1280);
     camera: |s| {
         let mut camera = Camera::new(s, radians!(0.785));
-        camera.set_transform(
-            ViewMatrix::new_look_at(
-                point!(-6, 6, -10),
-                point!(6,0,6),
-                vector!(-0.45,1,0),
-            )
-        );
+        camera.set_transform(look_at!(point!(-6, 6, -10) => point!(6,0,6); up: vector!(-0.45,1,0)));
         camera
     };
     scene: {
