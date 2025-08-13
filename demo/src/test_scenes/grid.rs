@@ -2,7 +2,7 @@ use dsl::still;
 use math::tuple::color::WHITE;
 use math::{color, degrees, matrix4x4, point, scale, translate};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::world::{BoundingVolumeDebug, World};
@@ -13,7 +13,7 @@ still!(
     file_name: "grid_of_spheres";
     camera: | size| Camera::new(size, degrees!(120));
     world: | world: &mut World | {
-        world.push(PointLight::new(point!(10, 10, 7), *WHITE));
+        world.push(light!(point!(10, 10, 7), *WHITE));
         world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::TranslucentEmpty;
     };
     scene: {

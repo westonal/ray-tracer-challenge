@@ -4,7 +4,7 @@ macro_rules! light {
         $crate::light!($point, *math::tuple::color::WHITE)
     };
 
-    ($point:expr, $color:expr) => {
+    ($point:expr, $color:expr$(,)?) => {
         $crate::lighting::PointLight::new($point.into(), $color.into())
     };
 }
@@ -32,6 +32,9 @@ mod point_light_macro_tests {
 
         specify_color;
             light!(point!(4, 5, 6), color!(1, 1, 0)) => PointLight::new(point!(4, 5, 6), color!(1, 1, 0, 1))
+
+        specify_color_trailing_comma;
+            light!(point!(4, 5, 6), color!(0, 0, 1),) => PointLight::new(point!(4, 5, 6), color!(0, 0, 1, 1))
 
         make_use_of_intos;
             light!((4., 5., 6.), (1., 1., 0.)) => PointLight::new(point!(4, 5, 6), color!(1, 1, 0, 1))

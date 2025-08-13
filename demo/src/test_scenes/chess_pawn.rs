@@ -3,7 +3,7 @@ use dsl::still;
 use math::tuple::color::{RED, WHITE};
 use math::{degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
@@ -23,7 +23,7 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(PointLight::new(point!(2, 20, 10), *WHITE));
+        world.push(light!(point!(2, 20, 10), *WHITE));
         world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Off;
     };
     scene: {

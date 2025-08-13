@@ -5,7 +5,7 @@ use math::tuple::color::{BLACK, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
@@ -62,7 +62,7 @@ impl TestScene for QueenMaterialAnimation {
         let mut world = World::default();
         world.render_preferences.max_ray_generation = 5;
         world.add(world_scene);
-        world.push(PointLight::new(point!(2, 20, 10), *WHITE));
+        world.push(light!(point!(2, 20, 10), *WHITE));
         world
     }
 

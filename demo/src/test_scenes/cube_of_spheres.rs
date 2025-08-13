@@ -3,7 +3,7 @@ use math::matrix::matrix_4x4::{Matrix4x4, Matrix4x4ScaleAll};
 use math::tuple::color::{BLACK, GREEN, WHITE};
 use math::{degrees, matrix4x4, point, scale, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
@@ -24,7 +24,7 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
+        world.push(light!(point!(40, 40, 20), *WHITE * 0.9));
         world.render_preferences.max_ray_generation = 2;
     };
     scene: {

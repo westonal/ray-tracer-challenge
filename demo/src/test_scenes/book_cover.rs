@@ -1,10 +1,9 @@
 use dsl::still;
 use math::{color, degrees, matrix4x4, point, radians, scale, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
 use ray_tracer::view_matrix::ViewMatrix;
 use ray_tracer::world::World;
-use ray_tracer::{cube, material, plane, scene, sphere};
+use ray_tracer::{cube, light, material, plane, scene, sphere};
 
 macro_rules! cover_cube {
     (
@@ -35,8 +34,8 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(PointLight::new(point!(50, 100, -50), color!(1, 1, 1)));
-        world.push(PointLight::new(point!(-400, 50, -10), color!(0.2, 0.2, 0.2)));
+        world.push(light!(point!(50, 100, -50), color!(1, 1, 1)));
+        world.push(light!(point!(-400, 50, -10), color!(0.2, 0.2, 0.2)));
     };
     scene: {
         let white = material!(

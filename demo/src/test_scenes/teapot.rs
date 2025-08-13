@@ -3,7 +3,7 @@ use dsl::still;
 use math::tuple::color::{RED, WHITE};
 use math::{color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
@@ -22,15 +22,15 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.push(PointLight::new(
+        world.push(light!(
             point!(2, 20, 10),
             color!(1, 0.5, 0.5) * 0.5,
         ));
-        world.push(PointLight::new(
+        world.push(light!(
             point!(-2, 20, -10),
             color!(0.5, 1, 0.5) * 0.5,
         ));
-        world.push(PointLight::new(
+        world.push(light!(
             point!(-10, 20, -2),
             color!(0.5, 0.5, 1) * 0.5,
         ));

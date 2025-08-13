@@ -5,7 +5,7 @@ use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{color, degrees, matrix4x4, point, radians, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
@@ -104,7 +104,7 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
         world.add(scene!(
             +world_scene;
         ));
-        world.push(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(light!(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 
