@@ -89,7 +89,7 @@ impl TestScene for SatisfyingPipesAnimated {
             //matrix: matrix4x4!(translation(pipe_grid_length,0.,0.));
             +world_scene;
         ));
-        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 

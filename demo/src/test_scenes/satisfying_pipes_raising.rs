@@ -104,7 +104,7 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
         world.add(scene!(
             +world_scene;
         ));
-        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
         world
     }
 

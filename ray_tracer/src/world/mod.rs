@@ -40,18 +40,6 @@ fn debug_print(scene: &Vec<Chain>) {
 }
 
 impl World {
-    #[deprecated(note="use `push`")] // this is a hangover from before lights were part of the scene
-    pub fn add_light(&mut self, light: PointLight) {
-        self.push(light);
-    }
-
-    /// Set lighting to a single light, use add light for multiple lights
-    pub fn set_light(&mut self, light: PointLight) {
-        self.push(light);
-    }
-}
-
-impl World {
     pub fn shape_count(&self) -> usize {
         self.scene_tree.shape_count()
     }

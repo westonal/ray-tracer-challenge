@@ -23,7 +23,7 @@ still!(
         camera
     };
     world: | world: &mut World | {
-        world.add_light(PointLight::new(point!(2, 20, 10), *WHITE));
+        world.push(PointLight::new(point!(2, 20, 10), *WHITE));
         world.render_preferences.bounding_volume_debug = BoundingVolumeDebug::Off;
     };
     scene: {
