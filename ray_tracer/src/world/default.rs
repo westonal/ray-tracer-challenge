@@ -21,12 +21,12 @@ pub mod test_world {
             // turn off shadows
             material.shadow_boost = 1.;
             sphere.material = material;
-            world.add(sphere);
+            world.push(sphere);
             let mut material = Material::default();
             material.shadow_boost = 1.;
             let mut sphere = sphere!(matrix: Matrix4x4::scale(0.5, 0.5, 0.5));
             sphere.material = material;
-            world.add(sphere);
+            world.push(sphere);
             world
         }
 

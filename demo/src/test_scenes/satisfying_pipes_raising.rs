@@ -101,10 +101,10 @@ impl TestScene for SatisfyingPipesRaisingAnimated {
         );
 
         let mut world = World::default();
-        world.add(scene!(
+        world.push(scene!(
             +world_scene;
         ));
-        world.push(light!(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(light!(point!(2, 20, 10)));
         world
     }
 

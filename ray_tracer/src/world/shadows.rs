@@ -37,7 +37,7 @@ mod shadow_tests {
     fn there_is_no_shadow_when_nothing_is_collinear_with_point_and_light() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(sphere!());
+        world.push(sphere!());
         let point = point!(0, 10, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -50,7 +50,7 @@ mod shadow_tests {
     fn the_shadow_when_an_object_is_between_the_light_and_the_object() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(sphere!());
+        world.push(sphere!());
         let point = point!(5, -5, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -65,7 +65,7 @@ mod shadow_tests {
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         let mut shape = sphere!();
         shape.material.shadow_opacity = 0.4;
-        world.add(shape);
+        world.push(shape);
         let point = point!(5, -5, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -78,7 +78,7 @@ mod shadow_tests {
     fn no_shadow_when_point_is_colinear_but_beyond_the_light() {
         let mut world = World::default();
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
-        world.add(sphere!());
+        world.push(sphere!());
         let point = point!(-11, 11, 0);
         let id = ShapeId::default();
         let surface_hit = SurfaceHit::new(&id, point);
@@ -95,7 +95,7 @@ mod shadow_tests {
         let light = PointLight::new(point!(-10, 10, 0), Color::default());
         let shape = sphere!();
         let id = shape.id.clone();
-        world.add(shape);
+        world.push(shape);
         let point = point!(5, -5, 0);
         let surface_hit = SurfaceHit::new(&id, point);
         let world = world.prepare_for_render();

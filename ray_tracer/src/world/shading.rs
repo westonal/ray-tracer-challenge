@@ -148,8 +148,8 @@ mod world_shadow_shading_tests {
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::default();
         world.push(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
-        world.add(sphere!());
-        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
+        world.push(sphere!());
+        world.push(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -169,8 +169,8 @@ mod world_shadow_shading_tests {
         // The transparency doesn't control the shadow
         blocking_shape.material.shadow_opacity = 0.2;
         println!("Blocking is {}", blocking_shape.id);
-        world.add(blocking_shape);
-        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
+        world.push(blocking_shape);
+        world.push(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -221,7 +221,7 @@ mod world_pattern_shading_tests {
             let mut material = Material::solid(*BLUE);
             material.pattern = Pattern::Stripe(*GREEN, *RED, Transform::new(stripe_transform));
             plane.material = material;
-            world.add(plane);
+            world.push(plane);
             TestScene { world }
         }
     }
