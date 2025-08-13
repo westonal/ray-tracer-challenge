@@ -1,5 +1,4 @@
 use crate::intersection::{Intersect, Intersections};
-use crate::lighting::PointLight;
 use crate::rays::Ray;
 use crate::scene_tree::FlatScene;
 use crate::world::RenderPreferences;
@@ -8,7 +7,6 @@ pub mod render_world;
 
 pub struct RenderableWorld<'w> {
     pub(crate) flat_scene: FlatScene,
-    pub lights: &'w Vec<PointLight>,
     pub render_preferences: &'w RenderPreferences,
 }
 

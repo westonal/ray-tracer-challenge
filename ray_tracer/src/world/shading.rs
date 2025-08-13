@@ -19,7 +19,7 @@ impl RenderableWorld<'_> {
     ) -> Color {
         let mut result = color!(0, 0, 0, 0);
         let material = &pre_calculations.shape.material;
-        for light in self.lights {
+        for light in &self.flat_scene.lights {
             let shadow_factor =
                 self.how_much_light_let_blocked(&pre_calculations.surface_hit, light);
             result = result
@@ -96,8 +96,8 @@ mod world_shading_tests {
 
     #[test]
     fn shade_an_intersection_from_inside() {
-        let mut world = World::default_world();
-        world.set_light(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
+        let mut world = World::default_world_no_lights();
+        world.push(PointLight::new(point!(0, 0.25, 0), color!(1, 1, 1)));
         let ray = ray_first_gen!(point!(0, 0, 0), vector!(0, 0, 1));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
@@ -147,9 +147,9 @@ mod world_shadow_shading_tests {
     #[test]
     fn shade_when_given_intersection_in_shadow() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
-        world.add(sphere!());
-        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
+        world.push(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+        world.push(sphere!());
+        world.push(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -164,13 +164,13 @@ mod world_shadow_shading_tests {
     #[test]
     fn shade_when_given_intersection_in_shadow_of_transparent_object() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+        world.push(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
         let mut blocking_shape = sphere!();
         // The transparency doesn't control the shadow
         blocking_shape.material.shadow_opacity = 0.2;
         println!("Blocking is {}", blocking_shape.id);
-        world.add(blocking_shape);
-        world.add(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
+        world.push(blocking_shape);
+        world.push(sphere!(matrix: Matrix4x4::translation(0., 0., 10.)));
         let world = world.prepare_for_render();
         let second = world.flat_scene.get(1).unwrap();
         let intersection = Intersection::new(4., &second);
@@ -216,12 +216,12 @@ mod world_pattern_shading_tests {
     impl TestScene {
         fn given(stripe_transform: Matrix4x4, plane_transformation: Matrix4x4) -> TestScene {
             let mut world = World::default();
-            world.set_light(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
+            world.push(PointLight::new(point!(0, 0, -10), color!(1, 1, 1)));
             let mut plane = plane!(matrix: plane_transformation);
             let mut material = Material::solid(*BLUE);
             material.pattern = Pattern::Stripe(*GREEN, *RED, Transform::new(stripe_transform));
             plane.material = material;
-            world.add(plane);
+            world.push(plane);
             TestScene { world }
         }
     }

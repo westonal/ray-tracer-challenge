@@ -59,7 +59,7 @@ mod refraction_lighting_tests {
     fn the_refracted_color_of_an_opaque_surface() {
         let sphere = sphere!();
         let mut world = World::default();
-        world.add(sphere);
+        world.push(sphere);
         let world = world.prepare_for_render();
         let sphere = world.flat_scene.get(0).unwrap();
 
@@ -83,7 +83,7 @@ mod refraction_lighting_tests {
         let mut sphere = sphere!();
         sphere.material = Material::glass();
         let mut world = World::default();
-        world.add(sphere);
+        world.push(sphere);
 
         let world = world.prepare_for_render();
         let sphere = world.flat_scene.get(0).unwrap();
@@ -142,17 +142,17 @@ mod refraction_lighting_tests {
     #[test]
     fn shade_with_a_transparent_material() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
         let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.transparency = 0.5;
         floor.material.refractive_index = 1.5;
-        world.add(floor);
+        world.push(floor);
 
         let mut ball = sphere!(matrix: Matrix4x4::translation(0., -3.5, -0.5));
         ball.material.pattern = Pattern::Solid(*RED);
         ball.material.ambient = 0.5;
-        world.add(ball);
+        world.push(ball);
 
         let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(
@@ -165,18 +165,18 @@ mod refraction_lighting_tests {
     #[test]
     fn shade_with_a_reflective_and_transparent_material() {
         let mut world = World::default();
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
+        world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
 
         let mut floor = plane!(matrix: Matrix4x4::translation(0., -1., 0.));
         floor.material.reflectivity = 0.5;
         floor.material.transparency = 0.5;
         floor.material.refractive_index = 1.5;
-        world.add(floor);
+        world.push(floor);
 
         let mut ball = sphere!(matrix: Matrix4x4::translation(0., -3.5, -0.5));
         ball.material.pattern = Pattern::Solid(*RED);
         ball.material.ambient = 0.5;
-        world.add(ball);
+        world.push(ball);
 
         let world = world.prepare_for_render();
         let c = world.color_at(ray_first_gen!(

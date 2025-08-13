@@ -56,14 +56,14 @@ impl FlattenSceneWithMatrix for SceneTree {
         matrix4x4: Matrix4x4,
         flatten_scene_options: &FlattenSceneOptions,
     ) -> FlatScene {
-        let mut chain = vec![];
+        let mut flat_scene = FlatScene::default();
         self.walk(
-            &mut chain,
+            &mut flat_scene,
             matrix4x4,
             &Overrides::default(),
             flatten_scene_options,
         );
-        FlatScene::new(chain)
+        flat_scene
     }
 }
 
@@ -83,12 +83,17 @@ impl Overrides {
 impl SceneTree {
     fn walk(
         &self,
-        into: &mut Vec<Chain>,
+        into: &mut FlatScene,
         tree_matrix: Matrix4x4,
         overrides: &Overrides,
         flatten_scene_options: &FlattenSceneOptions,
     ) {
         match self {
+            SceneTree::Light(light) => {
+                let mut light = light.clone();
+                light.position = (tree_matrix * light.position).force_point();
+                into.lights.push(light);
+            }
             SceneTree::Leaf(shape) => {
                 let mut shape = (*shape).clone();
                 shape.matrix = tree_matrix * shape.matrix;
@@ -96,17 +101,17 @@ impl SceneTree {
                     .material_override
                     .to_owned()
                     .unwrap_or(shape.material);
-                into.push(chain_link!(shape))
+                into.chain.push(chain_link!(shape))
             }
             SceneTree::CsgLeaf(lhs_tree, operation, rhs_tree) => {
-                let mut lhs_chain = vec![];
+                let mut lhs_chain = FlatScene::default();
                 lhs_tree.walk(
                     &mut lhs_chain,
                     tree_matrix,
                     overrides,
                     flatten_scene_options,
                 );
-                let mut rhs_chain = vec![];
+                let mut rhs_chain = FlatScene::default();
                 rhs_tree.walk(
                     &mut rhs_chain,
                     tree_matrix,
@@ -138,7 +143,7 @@ impl SceneTree {
                         }
                     }
                     Some(bounds) => {
-                        let mut subtree = vec![];
+                        let mut subtree = FlatScene::default();
                         for child in children {
                             child.walk(&mut subtree, matrix, overrides, flatten_scene_options);
                         }
@@ -160,7 +165,8 @@ impl SceneTree {
                                         == BoundingVolumeDebug::TranslucentEmpty
                                     {
                                         // keep only other subtrees
-                                        subtree = subtree
+                                        subtree.chain = subtree
+                                            .chain
                                             .into_iter()
                                             .filter(|f| match f {
                                                 Chain::BoundingVolume(_, i) => true,
@@ -297,6 +303,53 @@ mod flatten_matrix_tests {
         assert_eq!(Transform::new(r * b * c), vec.get(1).unwrap().transform);
         assert_eq!(Transform::new(r * d), vec.get(2).unwrap().transform);
     }
+}
+
+#[cfg(test)]
+mod lights_in_scene_flatten_tests {
+    use super::*;
+    use math::{assert_point, degrees, point, translate};
+
+    use crate::{light, scene};
+
+    macro_rules! light_scene_flatten_test {
+        ($($name:ident; $data:expr => $expect_pos:expr)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    let mut tree = SceneTree::default();
+                    tree.add($data);
+                    let vec = tree.flatten_scene();
+                    assert_point!($expect_pos, vec.lights.get(0).unwrap().position);
+                }
+            )*
+        };
+    }
+
+    light_scene_flatten_test!(
+        origin;     light!(point!()) => point!()
+        non_origin; light!(point!(1, 2, 3)) => point!(1, 2, 3)
+        in_scene;   scene!(
+                        +light!(point!(1, 2, 3));
+                    ) => point!(1, 2, 3)
+
+        in_scene_with_translate; scene!(
+                                     matrix: translate!(x:1;);
+                                     +light!(point!(1, 2, 3));
+                                 ) => point!(2, 2, 3)
+
+        in_scene_with_rotate;    scene!(
+                                     matrix: matrix4x4!(rotation_x(degrees!(90)));
+                                     +light!(point!(1, 2, 3));
+                                 ) => point!(1, -3, 2)
+        nested_transforms;       scene!(
+                                     matrix: translate!(10, 20, 30);
+                                     +scene!(
+                                        matrix: matrix4x4!(rotation_x(degrees!(90)));
+                                        +light!(point!(1, 2, 3));
+                                     );
+                                 ) => point!(11, 17, 32)
+    );
 }
 
 #[cfg(test)]

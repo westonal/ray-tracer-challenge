@@ -6,7 +6,7 @@ use math::tuple::color::{BLACK, GREEN, WHITE, YELLOW};
 use math::{color, degrees, matrix4x4, max, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
@@ -46,8 +46,8 @@ macro_rules! animation {
             fn build_world_for_frame(&self, frame: &AnimationFrame) -> World {
                 let mut world = World::default();
                 world.render_preferences.max_ray_generation = 7;
-                world.add($scene(frame));
-                world.add_light(PointLight::new(point!(-5, 20, 10), color!(1, 1, 1)));
+                world.push($scene(frame));
+                world.push(light!(point!(-5, 20, 10), color!(1, 1, 1)));
                 world
             }
 

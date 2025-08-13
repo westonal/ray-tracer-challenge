@@ -1,3 +1,4 @@
+mod constructor_macro;
 pub mod pre_calculations;
 pub mod refraction_lighting;
 pub mod surface_hit;
@@ -8,6 +9,7 @@ use math::tuple::color::Color;
 use math::tuple::point::Point;
 use math::tuple::vector::normal::Normal;
 
+#[derive(Clone)]
 pub struct PointLight {
     pub position: Point,
     pub color: Color,
@@ -264,9 +266,9 @@ mod reflection_lighting_tests {
         let mut plane = plane!();
         plane.material = material;
         let mut world = World::default();
-        world.set_light(PointLight::new(Point::origin(), *WHITE));
-        world.add(sphere);
-        world.add(plane);
+        world.push(PointLight::new(Point::origin(), *WHITE));
+        world.push(sphere);
+        world.push(plane);
 
         let world = world.prepare_for_render();
         // Shoot straight at sphere
@@ -289,9 +291,9 @@ mod reflection_lighting_tests {
         plane2.matrix = Matrix4x4::translation(0., 10., 0.);
         let mut world = World::default();
         world.render_preferences.max_ray_generation = 4;
-        world.set_light(PointLight::new(Point::origin(), *WHITE));
-        world.add(plane1);
-        world.add(plane2);
+        world.push(PointLight::new(Point::origin(), *WHITE));
+        world.push(plane1);
+        world.push(plane2);
         // Shoot straight at plane 1
 
         // first case should have no color from the reflection

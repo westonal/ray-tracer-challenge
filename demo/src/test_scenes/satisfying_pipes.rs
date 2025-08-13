@@ -1,10 +1,10 @@
 use crate::test_scenes::{AnimationFrame, AnimationSpec, TestScene};
 use animation::animation_spec;
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
-use math::{Angle, color, degrees, matrix4x4, point, vector};
+use math::{Angle, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
 use ray_tracer::canvas::Size;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::scene_tree::SceneTree;
 use ray_tracer::transform::Transform;
@@ -85,11 +85,11 @@ impl TestScene for SatisfyingPipesAnimated {
         );
 
         let mut world = World::default();
-        world.add(scene!(
+        world.push(scene!(
             //matrix: matrix4x4!(translation(pipe_grid_length,0.,0.));
             +world_scene;
         ));
-        world.add_light(PointLight::new(point!(2, 20, 10), color!(1, 1, 1)));
+        world.push(light!(point!(2, 20, 10)));
         world
     }
 

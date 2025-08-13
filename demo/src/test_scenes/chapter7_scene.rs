@@ -3,12 +3,11 @@ use dsl::still;
 use math::tuple::color::{BLUE, GREEN, RED, WHITE};
 use math::{Angle, color, degrees, matrix4x4, point, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
 use ray_tracer::{gradient_stops, plane, scene, sphere};
 
 still!(
@@ -23,11 +22,9 @@ still!(
         ));
         camera
     };
-    world: | world: &mut World | {
-        world.set_light(PointLight::new(point!(-10, 10, -10), color!(1, 1, 1)));
-    };
     scene: {
         scene!(
+            +light!(point!(-10, 10, -10));
             +floor();
             +wall(degrees!(-45)); // left wall
             +wall(degrees!(45)); // right wall

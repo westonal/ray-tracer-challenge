@@ -11,9 +11,8 @@ pub mod test_world {
 
     /// A test world
     impl World {
-        pub fn default_world() -> World {
+        pub fn default_world_no_lights() -> World {
             let mut world = World::default();
-            world.set_light(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
             let mut sphere = sphere!();
             let mut material = Material::default();
             material.pattern = Pattern::Solid(color!(0.8, 1., 0.6));
@@ -22,12 +21,18 @@ pub mod test_world {
             // turn off shadows
             material.shadow_boost = 1.;
             sphere.material = material;
-            world.add(sphere);
+            world.push(sphere);
             let mut material = Material::default();
             material.shadow_boost = 1.;
             let mut sphere = sphere!(matrix: Matrix4x4::scale(0.5, 0.5, 0.5));
             sphere.material = material;
-            world.add(sphere);
+            world.push(sphere);
+            world
+        }
+
+        pub fn default_world() -> World {
+            let mut world = Self::default_world_no_lights();
+            world.push(PointLight::new(point!(-10, 10, -10), color!(1.0, 1.0, 1.0)));
             world
         }
     }

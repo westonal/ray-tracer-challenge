@@ -2,13 +2,12 @@ use dsl::still;
 use math::tuple::color::{BLACK, BLUE, GREEN, RED, WHITE};
 use math::{degrees, matrix4x4, point, translate, vector};
 use ray_tracer::camera::Camera;
-use ray_tracer::lighting::PointLight;
+use ray_tracer::light;
 use ray_tracer::material::Material;
 use ray_tracer::material::pattern::Pattern;
 use ray_tracer::primatives::Shape;
 use ray_tracer::transform::Transform;
 use ray_tracer::view_matrix::ViewMatrix;
-use ray_tracer::world::World;
 use ray_tracer::{cube, gradient_stops, material, plane, scene};
 
 still!(
@@ -21,11 +20,9 @@ still!(
         );
         camera
     };
-    world: | world: &mut World | {
-        world.set_light(PointLight::new(point!(40, 40, 20), *WHITE * 0.9));
-    };
     scene: {
         scene!(
+            +light!(point!(40, 40, 20), *WHITE * 0.9);
             +floor();
             +cube!(matrix: translate!(y: 1;));
             +cube!(matrix: matrix4x4!(

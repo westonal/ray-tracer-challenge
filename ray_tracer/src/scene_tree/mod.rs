@@ -6,6 +6,7 @@ mod manipulation;
 
 use crate::csg::CSGOperation;
 use crate::cube;
+use crate::lighting::PointLight;
 use crate::material::Material;
 use crate::primatives::Shape;
 pub(crate) use flat_scene::Chain;
@@ -16,6 +17,7 @@ use std::sync::LazyLock;
 
 #[derive(Clone)]
 pub enum SceneTree {
+    Light(PointLight),
     Leaf(Shape),
     CsgLeaf(Box<SceneTree>, CSGOperation, Box<SceneTree>),
     Group {
@@ -62,6 +64,7 @@ impl SceneTree {
 
     pub fn is_not_empty(&self) -> bool {
         match self {
+            SceneTree::Light(_) => true,
             SceneTree::Leaf(_) => true,
             SceneTree::CsgLeaf(_, _, _) => true,
             SceneTree::Group { children, .. } => children.iter().any(|c| c.is_not_empty()),
@@ -76,6 +79,12 @@ impl SceneTree {
 impl From<Shape> for SceneTree {
     fn from(value: Shape) -> Self {
         SceneTree::Leaf(value)
+    }
+}
+
+impl From<PointLight> for SceneTree {
+    fn from(value: PointLight) -> Self {
+        SceneTree::Light(value)
     }
 }
 
