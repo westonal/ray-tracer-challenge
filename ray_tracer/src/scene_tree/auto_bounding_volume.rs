@@ -1,6 +1,6 @@
 use crate::AABB;
 use crate::primatives::{IntersectableShape, Surface};
-use crate::scene_tree::{Chain, FlatScene};
+use crate::scene_tree::Chain;
 use math::matrix::matrix_4x4::Matrix4x4;
 use math::point;
 
@@ -252,7 +252,7 @@ mod auto_bounding_volume_tests {
 }
 
 #[cfg(test)]
-fn extract_bounding_volume_matrix(flat_scene: &FlatScene) -> Matrix4x4 {
+fn extract_bounding_volume_matrix(flat_scene: &crate::scene_tree::FlatScene) -> Matrix4x4 {
     let x = flat_scene.get(0).unwrap();
     match x {
         Chain::BoundingVolume(shape, _) => {
